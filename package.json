@@ -4,10 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "scripts": {
-      "docs:dev": "vuepress dev docs",
-      "docs:build": "vuepress build docs"
-    }
+    "docs:dev": "vuepress dev docs",
+    "docs:build": "vuepress build docs"
   },
   "repository": {
     "type": "git",
