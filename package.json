@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "scripts": {
+      "docs:dev": "vuepress dev docs",
+      "docs:build": "vuepress build docs"
+    }
   },
   "repository": {
     "type": "git",
@@ -18,8 +21,9 @@
   "packageManager": "pnpm@9.15.0",
   "homepage": "https://github.com/authn-cn/authn-cn.github.io#readme",
   "devDependencies": {
-    "@vuepress/bundler-vite": "^2.0.0-rc.19",
-    "@vuepress/theme-default": "^2.0.0-rc.66",
-    "vuepress": "^2.0.0-rc.19"
+    "@vuepress/bundler-vite": "2.0.0-rc.19",
+    "@vuepress/theme-default": "2.0.0-rc.66",
+    "vue": "^3.5.13",
+    "vuepress": "2.0.0-rc.19"
   }
 }

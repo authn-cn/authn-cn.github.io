@@ -9,13 +9,16 @@ importers:
   .:
     devDependencies:
       '@vuepress/bundler-vite':
-        specifier: ^2.0.0-rc.19
+        specifier: 2.0.0-rc.19
         version: 2.0.0-rc.19(@types/node@22.10.2)
       '@vuepress/theme-default':
-        specifier: ^2.0.0-rc.66
+        specifier: 2.0.0-rc.66
         version: 2.0.0-rc.66(markdown-it@14.1.0)(vuepress@2.0.0-rc.19(@vuepress/bundler-vite@2.0.0-rc.19(@types/node@22.10.2))(vue@3.5.13))
+      vue:
+        specifier: ^3.5.13
+        version: 3.5.13
       vuepress:
-        specifier: ^2.0.0-rc.19
+        specifier: 2.0.0-rc.19
         version: 2.0.0-rc.19(@vuepress/bundler-vite@2.0.0-rc.19(@types/node@22.10.2))(vue@3.5.13)
 
 packages:
@@ -1737,7 +1740,7 @@ snapshots:
 
   '@types/sax@1.2.7':
     dependencies:
-      '@types/node': 17.0.45
+      '@types/node': 22.10.2
 
   '@types/web-bluetooth@0.0.20': {}
 
