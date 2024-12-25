@@ -15,6 +15,7 @@
   "bugs": {
     "url": "https://github.com/authn-cn/authn-cn.github.io/issues"
   },
+  "packageManager": "pnpm@9.15.0",
   "homepage": "https://github.com/authn-cn/authn-cn.github.io#readme",
   "devDependencies": {
     "@vuepress/bundler-vite": "^2.0.0-rc.19",
