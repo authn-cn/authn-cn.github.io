@@ -25,4 +25,6 @@ footer: Authn.tech · 用中文把认证与授权讲清楚
 - 想搞懂**企业单点登录**（SSO）？从 [SAML 2.0 概述](/saml/) 开始。
 - 想给 API 做**授权**？看 [OAuth 2.0 概述](/oauth2/)。
 - 想实现"**用 XX 账号登录**"？看 [OIDC 概述](/oidc/)。
+- 想做**无密码 / 抗钓鱼登录**（Passkey）？看 [WebAuthn 概述](/webauthn/)。
+- 想加**第二因素**（动态验证码）？看 [MFA / TOTP 概述](/mfa/)。
 - 手上有一个看不懂的 token？直接用 [JWT 解析器](/tools/jwt.html) 或 [SAML 编解码工具](/tools/saml.html)。

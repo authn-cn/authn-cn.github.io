@@ -35,6 +35,8 @@ export default defineUserConfig({
           { text: 'SAML 2.0', link: '/saml/' },
           { text: 'OAuth 2.0', link: '/oauth2/' },
           { text: 'OIDC', link: '/oidc/' },
+          { text: 'WebAuthn / Passkey', link: '/webauthn/' },
+          { text: 'MFA / TOTP', link: '/mfa/' },
         ],
       },
       {
@@ -47,6 +49,8 @@ export default defineUserConfig({
           { text: 'JWK / JWKS → PEM', link: '/tools/jwk-convert.html' },
           { text: 'PKCE 生成器', link: '/tools/pkce.html' },
           { text: 'OIDC Discovery', link: '/tools/discovery.html' },
+          { text: 'TOTP 工具', link: '/tools/totp.html' },
+          { text: 'WebAuthn 演示', link: '/tools/webauthn.html' },
           { text: 'SAML 编解码', link: '/tools/saml.html' },
           { text: 'SAML Metadata 解析', link: '/tools/saml-metadata.html' },
           { text: 'SAML Response 解析', link: '/tools/saml-parse.html' },
@@ -97,6 +101,27 @@ export default defineUserConfig({
           ],
         },
       ],
+      '/webauthn/': [
+        {
+          text: 'WebAuthn / Passkey',
+          children: [
+            '/webauthn/README.md',
+            '/webauthn/concepts.md',
+            '/webauthn/flows.md',
+            '/webauthn/reference.md',
+          ],
+        },
+      ],
+      '/mfa/': [
+        {
+          text: 'MFA / 一次性密码',
+          children: [
+            '/mfa/README.md',
+            '/mfa/totp.md',
+            '/mfa/reference.md',
+          ],
+        },
+      ],
       '/tools/': [
         {
           text: '在线工具',
@@ -109,6 +134,10 @@ export default defineUserConfig({
             {
               text: 'OAuth2 / OIDC',
               children: ['/tools/pkce.md', '/tools/discovery.md'],
+            },
+            {
+              text: 'MFA / Passkey',
+              children: ['/tools/totp.md', '/tools/webauthn.md'],
             },
             {
               text: 'SAML',

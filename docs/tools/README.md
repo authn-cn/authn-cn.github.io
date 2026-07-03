@@ -22,6 +22,13 @@ title: 工具总览
 | [PKCE 生成器](./pkce.md) | 生成 `code_verifier` / `code_challenge`(S256) 及 `state`、`nonce` |
 | [OIDC Discovery 查看器](./discovery.md) | 输入 issuer,拉取并解读 `/.well-known/openid-configuration` 与 JWKS |
 
+## MFA / Passkey
+
+| 工具 | 用途 |
+|------|------|
+| [TOTP 工具](./totp.md) | 生成密钥、实时验证码与倒计时、`otpauth://` URI 与二维码,校验验证码 |
+| [WebAuthn 演示](./webauthn.md) | 浏览器内真实创建/使用 Passkey,解析 attestation/assertion 数据结构 |
+
 ## SAML / 证书 / 编码
 
 | 工具 | 用途 |
