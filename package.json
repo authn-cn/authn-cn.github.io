@@ -19,10 +19,10 @@
   "packageManager": "pnpm@9.15.0",
   "homepage": "https://github.com/authn-cn/authn-cn.github.io#readme",
   "devDependencies": {
-    "@vuepress/bundler-vite": "2.0.0-rc.19",
-    "@vuepress/theme-default": "2.0.0-rc.66",
-    "sass-embedded": "^1.83.0",
-    "vue": "^3.5.13",
-    "vuepress": "2.0.0-rc.19"
+    "@vuepress/bundler-vite": "2.0.0-rc.30",
+    "@vuepress/theme-default": "2.0.0-rc.131",
+    "sass-embedded": "^1.100.0",
+    "vue": "^3.5.39",
+    "vuepress": "2.0.0-rc.30"
   }
 }
