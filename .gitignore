@@ -1,6 +1,10 @@
-# VuePress 默认临时文件目录
-.vuepress/.temp
-# VuePress 默认缓存目录
-.vuepress/.cache
-# VuePress 默认构建生成的静态文件目录
-.vuepress/dist
+# VuePress 临时文件 / 缓存 / 构建产物
+docs/.vuepress/.temp
+docs/.vuepress/.cache
+docs/.vuepress/dist
+
+# 本地密钥,禁止入库
+.env
+
+# 依赖目录
+node_modules

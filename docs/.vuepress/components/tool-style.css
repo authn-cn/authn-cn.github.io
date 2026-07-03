@@ -1,0 +1,110 @@
+.authn-tool {
+  margin: 1rem 0;
+}
+.authn-label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+}
+.authn-textarea,
+.authn-input,
+.authn-select {
+  width: 100%;
+  box-sizing: border-box;
+  font-family: var(--font-family-code, ui-monospace, monospace);
+  font-size: 0.85rem;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--vp-c-border, #dcdfe6);
+  border-radius: 6px;
+  background: var(--vp-c-bg, transparent);
+  color: inherit;
+  resize: vertical;
+}
+.authn-textarea:focus,
+.authn-input:focus,
+.authn-select:focus {
+  outline: none;
+  border-color: var(--vp-c-accent, #3eaf7c);
+}
+.authn-pre {
+  white-space: pre-wrap;
+  word-break: break-all;
+  padding: 0.8rem;
+  border-radius: 6px;
+  border: 1px solid var(--vp-c-border, #dcdfe6);
+  font-size: 0.82rem;
+  overflow-x: auto;
+}
+.authn-sig {
+  opacity: 0.75;
+}
+.authn-error {
+  color: #e53935;
+  font-weight: 500;
+}
+.authn-ok {
+  color: #2e7d32;
+  font-weight: 600;
+}
+.authn-bad {
+  color: #e53935;
+  font-weight: 600;
+}
+.authn-note {
+  font-size: 0.85rem;
+  opacity: 0.85;
+}
+.authn-table {
+  display: table;
+  width: 100%;
+}
+.authn-row {
+  display: flex;
+  gap: 0.8rem;
+  margin-bottom: 0.7rem;
+  flex-wrap: wrap;
+}
+.authn-field {
+  flex: 1;
+  min-width: 240px;
+}
+.authn-btn {
+  display: inline-block;
+  padding: 0.45rem 1.1rem;
+  margin: 0.3rem 0.6rem 0.3rem 0;
+  border: 1px solid var(--vp-c-accent, #3eaf7c);
+  border-radius: 6px;
+  background: var(--vp-c-accent, #3eaf7c);
+  color: #fff;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+.authn-btn.secondary {
+  background: transparent;
+  color: var(--vp-c-accent, #3eaf7c);
+}
+.authn-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.authn-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid var(--vp-c-border, #dcdfe6);
+}
+.authn-tab {
+  padding: 0.5rem 1.2rem;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-size: 0.95rem;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+}
+.authn-tab.active {
+  border-bottom-color: var(--vp-c-accent, #3eaf7c);
+  color: var(--vp-c-accent, #3eaf7c);
+  font-weight: 600;
+}
