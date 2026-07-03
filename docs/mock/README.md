@@ -50,6 +50,10 @@ curl -X POST https://authn-mock.lich-wang8718.workers.dev/oidc/token \
 
 拿到的 `id_token` 可以直接丢进本站的 [JWT 解析器](../tools/jwt.md) 查看。
 
+::: tip 想直接看效果?
+本站提供了一个**真实可点的** [OIDC 登录演示](./demo.md) —— 一键跑完整个授权码登录流程并展示解析结果,无需自己写代码。
+:::
+
 ::: danger 仅供测试
 签名私钥公开在[源码](https://github.com/authn-cn)中,任何人都能伪造该服务签发的令牌;授权码也不保证单次使用(无状态实现)。任何生产系统都不应信任 Mock 服务签发的断言或令牌。
 :::

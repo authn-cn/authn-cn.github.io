@@ -45,7 +45,13 @@ export default defineUserConfig({
           { text: 'SAML 编解码', link: '/tools/saml.html' },
         ],
       },
-      { text: 'Mock 服务器', link: '/mock/' },
+      {
+        text: 'Mock 服务器',
+        children: [
+          { text: '端点与说明', link: '/mock/' },
+          { text: 'OIDC 登录演示', link: '/mock/demo.html' },
+        ],
+      },
     ],
 
     sidebar: {
@@ -95,7 +101,7 @@ export default defineUserConfig({
       '/mock/': [
         {
           text: 'Mock 服务器',
-          children: ['/mock/README.md'],
+          children: ['/mock/README.md', '/mock/demo.md'],
         },
       ],
     },
