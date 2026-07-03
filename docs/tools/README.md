@@ -6,19 +6,29 @@ title: 工具总览
 
 本站提供一组面向认证协议调试的在线小工具。**全部逻辑在浏览器本地运行,你的 token / 报文不会被上传到任何服务器**,可放心粘贴调试数据。
 
-## 已上线
+## JWT / JWK
 
 | 工具 | 用途 |
 |------|------|
-| [JWT 解析器](./jwt.md) | 解码 JWT 的 Header / Payload,自动解读 `exp`、`iat`、`nbf` 等时间类 claims 并判断是否过期 |
-| [SAML 编解码](./saml.md) | 解码 `SAMLRequest` / `SAMLResponse`（自动识别 Redirect / POST Binding 编码）,以及按表单生成 AuthnRequest 与 Redirect URL |
+| [JWT 解析与验签](./jwt.md) | jwt.io 风格双栏解码,三段彩色高亮;支持 `HS/RS/PS/ES` 全系列签名验证 |
+| [JWT 签名生成](./jwt-sign.md) | 填 Payload + 密钥生成签名 token,可一键生成测试密钥对 |
+| [JWK / 密钥生成](./jwk.md) | 生成 RSA/EC 密钥对,导出 JWK、JWKS、PEM,含 RFC 7638 `kid` |
 
-## 规划中
+## OAuth2 / OIDC
 
-- **OIDC Discovery 查看器** —— 输入 issuer,拉取并解读 `/.well-known/openid-configuration` 与 JWKS
-- **PKCE 生成器** —— 生成 `code_verifier` / `code_challenge`（S256）
-- **SAML Metadata 解析器** —— 提取 EntityID、证书、端点等关键信息
+| 工具 | 用途 |
+|------|------|
+| [PKCE 生成器](./pkce.md) | 生成 `code_verifier` / `code_challenge`(S256) 及 `state`、`nonce` |
+| [OIDC Discovery 查看器](./discovery.md) | 输入 issuer,拉取并解读 `/.well-known/openid-configuration` 与 JWKS |
 
-::: tip 反馈
-有想要的工具？欢迎到 [GitHub 仓库](https://github.com/authn-cn/authn-cn.github.io/issues) 提 issue。
+## SAML / 证书 / 编码
+
+| 工具 | 用途 |
+|------|------|
+| [SAML 编解码](./saml.md) | 解码 `SAMLRequest` / `SAMLResponse`(自动识别 Redirect / POST 编码),生成 AuthnRequest 与 Redirect URL |
+| [X.509 证书解析](./cert.md) | 解析 PEM/DER 证书:主体、颁发者、有效期、公钥/签名算法、SHA-1/SHA-256 指纹 |
+| [Base64URL 编解码](./base64url.md) | 文本 ↔ Base64 / Base64URL 互转 |
+
+::: tip 配套 Mock 服务
+想端到端联调?见 [Mock 服务器](../mock/):OIDC OP/RP、资源服务器、SAML IdP/SP 四角色齐全,含真实可点的 [OIDC 登录演示](../mock/demo.md)。有想要的工具欢迎到 [GitHub](https://github.com/authn-cn/authn-cn.github.io/issues) 提 issue。
 :::

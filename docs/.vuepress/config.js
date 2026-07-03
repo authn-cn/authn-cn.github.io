@@ -41,7 +41,13 @@ export default defineUserConfig({
         text: '在线工具',
         children: [
           { text: '工具总览', link: '/tools/' },
-          { text: 'JWT 解析器', link: '/tools/jwt.html' },
+          { text: 'JWT 解析与验签', link: '/tools/jwt.html' },
+          { text: 'JWT 签名生成', link: '/tools/jwt-sign.html' },
+          { text: 'JWK / 密钥生成', link: '/tools/jwk.html' },
+          { text: 'PKCE 生成器', link: '/tools/pkce.html' },
+          { text: 'OIDC Discovery', link: '/tools/discovery.html' },
+          { text: 'X.509 证书解析', link: '/tools/cert.html' },
+          { text: 'Base64URL', link: '/tools/base64url.html' },
           { text: 'SAML 编解码', link: '/tools/saml.html' },
         ],
       },
@@ -93,8 +99,18 @@ export default defineUserConfig({
           text: '在线工具',
           children: [
             '/tools/README.md',
-            '/tools/jwt.md',
-            '/tools/saml.md',
+            {
+              text: 'JWT / JWK',
+              children: ['/tools/jwt.md', '/tools/jwt-sign.md', '/tools/jwk.md'],
+            },
+            {
+              text: 'OAuth2 / OIDC',
+              children: ['/tools/pkce.md', '/tools/discovery.md'],
+            },
+            {
+              text: 'SAML / 证书 / 编码',
+              children: ['/tools/saml.md', '/tools/cert.md', '/tools/base64url.md'],
+            },
           ],
         },
       ],
