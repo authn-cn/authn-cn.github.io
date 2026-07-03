@@ -13,6 +13,7 @@ title: 工具总览
 | [JWT 解析与验签](./jwt.md) | jwt.io 风格双栏解码,三段彩色高亮;支持 `HS/RS/PS/ES` 全系列签名验证 |
 | [JWT 签名生成](./jwt-sign.md) | 填 Payload + 密钥生成签名 token,可一键生成测试密钥对 |
 | [JWK / 密钥生成](./jwk.md) | 生成 RSA/EC 密钥对,导出 JWK、JWKS、PEM,含 RFC 7638 `kid` |
+| [JWK / JWKS → PEM](./jwk-convert.md) | 把 JWK/JWKS 转成 PEM 公钥,展示 `kty`/`alg`/`use`/`kid` 与 thumbprint |
 
 ## OAuth2 / OIDC
 
@@ -26,6 +27,8 @@ title: 工具总览
 | 工具 | 用途 |
 |------|------|
 | [SAML 编解码](./saml.md) | 解码 `SAMLRequest` / `SAMLResponse`(自动识别 Redirect / POST 编码),生成 AuthnRequest 与 Redirect URL |
+| [SAML Metadata 解析](./saml-metadata.md) | 解析 metadata:角色、entityID、端点、NameIDFormat,内嵌证书展示有效期/指纹 |
+| [SAML Response 解析](./saml-parse.md) | 结构化展示 Response/Assertion:Subject、Conditions、Attributes、签名算法 |
 | [X.509 证书解析](./cert.md) | 解析 PEM/DER 证书:主体、颁发者、有效期、公钥/签名算法、SHA-1/SHA-256 指纹 |
 | [Base64URL 编解码](./base64url.md) | 文本 ↔ Base64 / Base64URL 互转 |
 
