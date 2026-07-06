@@ -26,6 +26,7 @@
     "vuepress": "2.0.0-rc.30"
   },
   "dependencies": {
+    "jsqr": "^1.4.0",
     "qrcode": "^1.5.4"
   },
   "pnpm": {
