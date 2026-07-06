@@ -29,6 +29,7 @@ title: Mock 服务器
 
 - 🔷 [**OIDC / OAuth2 Mock**](./oidc.md) —— OP / RP / RS 三角色 + 授权码 + PKCE 调用顺序
 - 🔶 [**SAML Mock**](./saml.md) —— IdP / SP 两角色 + Web Browser SSO 调用顺序
+- 📬 [**邮件服务器**](./mail.md) —— 用 Email Routing 接收 `@authn.tech` 邮件,在线 / API 查看并抽取一次性验证码
 
 ::: danger 仅供测试
 签名私钥公开在[源码](https://github.com/authn-cn/authn-mock)中,任何人都能伪造该服务签发的令牌 / 断言;授权码也不保证单次使用(无状态实现)。**任何生产系统都不应信任 Mock 服务签发的断言或令牌。**
