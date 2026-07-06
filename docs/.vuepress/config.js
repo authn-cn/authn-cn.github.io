@@ -5,6 +5,141 @@ import { getDirname, path } from 'vuepress/utils'
 
 const __dirname = getDirname(import.meta.url)
 
+// 各语言的可翻译标签(专有名词类保持一致的放在 genNavbar/genSidebar 里直接写)
+const T = {
+  zh: {
+    home: '首页', protocols: '协议文档', tools: '在线工具', mock: 'Mock 服务器',
+    mfaH: 'MFA / 一次性密码', toolsH: '在线工具', mockH: 'Mock 服务器',
+    allTools: '工具总览', certGroup: '证书 / 编码',
+    overview: '概览 / 角色术语', mail: '邮件服务器', oidcDemo: 'OIDC 登录演示', samlDemo: 'SAML 登录演示',
+    jwt: 'JWT 解析', jwtSign: 'JWT 签名', jwk: 'JWK 生成', pkce: 'PKCE 生成', saml: 'SAML 编解码',
+    cert: 'X.509 证书', pemParse: 'PEM 解析',
+  },
+  en: {
+    home: 'Home', protocols: 'Protocols', tools: 'Tools', mock: 'Mock Servers',
+    mfaH: 'MFA / OTP', toolsH: 'Online Tools', mockH: 'Mock Servers',
+    allTools: 'All Tools', certGroup: 'Certs / Encoding',
+    overview: 'Overview & Roles', mail: 'Mail Server', oidcDemo: 'OIDC Login Demo', samlDemo: 'SAML Login Demo',
+    jwt: 'JWT Decode', jwtSign: 'JWT Sign', jwk: 'JWK Gen', pkce: 'PKCE Gen', saml: 'SAML Codec',
+    cert: 'X.509 Cert', pemParse: 'PEM Inspect',
+  },
+  de: {
+    home: 'Startseite', protocols: 'Protokolle', tools: 'Tools', mock: 'Mock-Server',
+    mfaH: 'MFA / OTP', toolsH: 'Online-Tools', mockH: 'Mock-Server',
+    allTools: 'Alle Tools', certGroup: 'Zertifikate / Kodierung',
+    overview: 'Übersicht & Rollen', mail: 'Mail-Server', oidcDemo: 'OIDC-Login-Demo', samlDemo: 'SAML-Login-Demo',
+    jwt: 'JWT dekodieren', jwtSign: 'JWT signieren', jwk: 'JWK erzeugen', pkce: 'PKCE erzeugen', saml: 'SAML-Codec',
+    cert: 'X.509-Zertifikat', pemParse: 'PEM prüfen',
+  },
+}
+
+// prefix: '' | '/en' | '/de'
+function genNavbar(prefix, t) {
+  const p = (s) => prefix + s
+  return [
+    { text: t.home, link: p('/') },
+    {
+      text: t.protocols,
+      children: [
+        { text: 'SAML 2.0', link: p('/saml/') },
+        { text: 'OAuth 2.0', link: p('/oauth2/') },
+        { text: 'OIDC', link: p('/oidc/') },
+        { text: 'WebAuthn / Passkey', link: p('/webauthn/') },
+        { text: 'MFA / TOTP', link: p('/mfa/') },
+      ],
+    },
+    {
+      text: t.tools,
+      children: [
+        { text: t.allTools, link: p('/tools/') },
+        { text: t.jwt, link: p('/tools/jwt.html') },
+        { text: t.jwtSign, link: p('/tools/jwt-sign.html') },
+        { text: t.jwk, link: p('/tools/jwk.html') },
+        { text: 'JWK → PEM', link: p('/tools/jwk-convert.html') },
+        { text: 'PEM → JWK', link: p('/tools/pem-to-jwk.html') },
+        { text: t.pkce, link: p('/tools/pkce.html') },
+        { text: 'OIDC Discovery', link: p('/tools/discovery.html') },
+        { text: 'TOTP', link: p('/tools/totp.html') },
+        { text: 'WebAuthn', link: p('/tools/webauthn.html') },
+        { text: t.saml, link: p('/tools/saml.html') },
+        { text: 'SAML Metadata', link: p('/tools/saml-metadata.html') },
+        { text: 'SAML Response', link: p('/tools/saml-parse.html') },
+        { text: t.cert, link: p('/tools/cert.html') },
+        { text: t.pemParse, link: p('/tools/pem-parse.html') },
+        { text: 'Base64URL', link: p('/tools/base64url.html') },
+      ],
+    },
+    {
+      text: t.mock,
+      children: [
+        { text: t.overview, link: p('/mock/') },
+        { text: 'OIDC Mock', link: p('/mock/oidc.html') },
+        { text: 'SAML Mock', link: p('/mock/saml.html') },
+        { text: t.mail, link: p('/mock/mail.html') },
+        { text: t.oidcDemo, link: p('/mock/demo.html') },
+        { text: t.samlDemo, link: p('/mock/saml-demo.html') },
+      ],
+    },
+  ]
+}
+
+function genSidebar(prefix, t) {
+  const p = (s) => prefix + s
+  return {
+    [p('/saml/')]: [{ text: 'SAML 2.0', children: [p('/saml/README.md'), p('/saml/concepts.md'), p('/saml/flows.md'), p('/saml/reference.md')] }],
+    [p('/oauth2/')]: [{ text: 'OAuth 2.0', children: [p('/oauth2/README.md'), p('/oauth2/concepts.md'), p('/oauth2/flows.md'), p('/oauth2/reference.md')] }],
+    [p('/oidc/')]: [{ text: 'OpenID Connect', children: [p('/oidc/README.md'), p('/oidc/concepts.md'), p('/oidc/flows.md'), p('/oidc/reference.md')] }],
+    [p('/webauthn/')]: [{ text: 'WebAuthn / Passkey', children: [p('/webauthn/README.md'), p('/webauthn/concepts.md'), p('/webauthn/flows.md'), p('/webauthn/reference.md')] }],
+    [p('/mfa/')]: [{ text: t.mfaH, children: [p('/mfa/README.md'), p('/mfa/totp.md'), p('/mfa/reference.md')] }],
+    [p('/tools/')]: [
+      {
+        text: t.toolsH,
+        children: [
+          { text: t.allTools, link: p('/tools/') },
+          { text: 'JWT / JWK', children: [
+            { text: t.jwt, link: p('/tools/jwt.html') },
+            { text: t.jwtSign, link: p('/tools/jwt-sign.html') },
+            { text: t.jwk, link: p('/tools/jwk.html') },
+            { text: 'JWK → PEM', link: p('/tools/jwk-convert.html') },
+            { text: 'PEM → JWK', link: p('/tools/pem-to-jwk.html') },
+          ] },
+          { text: 'OAuth2 / OIDC', children: [
+            { text: t.pkce, link: p('/tools/pkce.html') },
+            { text: 'Discovery', link: p('/tools/discovery.html') },
+          ] },
+          { text: 'MFA / Passkey', children: [
+            { text: 'TOTP', link: p('/tools/totp.html') },
+            { text: 'WebAuthn', link: p('/tools/webauthn.html') },
+          ] },
+          { text: 'SAML', children: [
+            { text: t.saml, link: p('/tools/saml.html') },
+            { text: 'SAML Metadata', link: p('/tools/saml-metadata.html') },
+            { text: 'SAML Response', link: p('/tools/saml-parse.html') },
+          ] },
+          { text: t.certGroup, children: [
+            { text: t.cert, link: p('/tools/cert.html') },
+            { text: t.pemParse, link: p('/tools/pem-parse.html') },
+            { text: 'Base64URL', link: p('/tools/base64url.html') },
+          ] },
+        ],
+      },
+    ],
+    [p('/mock/')]: [
+      {
+        text: t.mockH,
+        children: [
+          { text: t.overview, link: p('/mock/') },
+          { text: 'OIDC Mock', link: p('/mock/oidc.html') },
+          { text: 'SAML Mock', link: p('/mock/saml.html') },
+          { text: t.mail, link: p('/mock/mail.html') },
+          { text: t.oidcDemo, link: p('/mock/demo.html') },
+          { text: t.samlDemo, link: p('/mock/saml-demo.html') },
+        ],
+      },
+    ],
+  }
+}
+
 export default defineUserConfig({
   bundler: viteBundler({
     viteOptions: {
@@ -16,179 +151,42 @@ export default defineUserConfig({
     },
   }),
 
-  lang: 'zh-CN',
-  title: 'Authn.tech',
-  description: '关注身份认证与授权技术的中文站点',
+  locales: {
+    '/': { lang: 'zh-CN', title: 'Authn.tech', description: '身份认证与授权的中文工具站' },
+    '/en/': { lang: 'en-US', title: 'Authn.tech', description: 'Hands-on tools & docs for authentication and authorization' },
+    '/de/': { lang: 'de-DE', title: 'Authn.tech', description: 'Praktische Tools und Doku zu Authentifizierung und Autorisierung' },
+  },
 
   theme: defaultTheme({
     repo: 'authn-cn/authn-cn.github.io',
     docsDir: 'docs',
     editLink: false,
-    lastUpdatedText: '最近更新',
-    contributorsText: '贡献者',
 
-    navbar: [
-      { text: '首页', link: '/' },
-      {
-        text: '协议文档',
-        children: [
-          { text: 'SAML 2.0', link: '/saml/' },
-          { text: 'OAuth 2.0', link: '/oauth2/' },
-          { text: 'OIDC', link: '/oidc/' },
-          { text: 'WebAuthn / Passkey', link: '/webauthn/' },
-          { text: 'MFA / TOTP', link: '/mfa/' },
-        ],
+    locales: {
+      '/': {
+        selectLanguageName: '简体中文',
+        selectLanguageText: '语言',
+        lastUpdatedText: '最近更新',
+        contributorsText: '贡献者',
+        navbar: genNavbar('', T.zh),
+        sidebar: genSidebar('', T.zh),
       },
-      {
-        text: '在线工具',
-        children: [
-          { text: '工具总览', link: '/tools/' },
-          { text: 'JWT 解析与验签', link: '/tools/jwt.html' },
-          { text: 'JWT 签名生成', link: '/tools/jwt-sign.html' },
-          { text: 'JWK / 密钥生成', link: '/tools/jwk.html' },
-          { text: 'JWK / JWKS → PEM', link: '/tools/jwk-convert.html' },
-          { text: 'PEM → JWK', link: '/tools/pem-to-jwk.html' },
-          { text: 'PKCE 生成器', link: '/tools/pkce.html' },
-          { text: 'OIDC Discovery', link: '/tools/discovery.html' },
-          { text: 'TOTP 工具', link: '/tools/totp.html' },
-          { text: 'WebAuthn 演示', link: '/tools/webauthn.html' },
-          { text: 'SAML 编解码', link: '/tools/saml.html' },
-          { text: 'SAML Metadata 解析', link: '/tools/saml-metadata.html' },
-          { text: 'SAML Response 解析', link: '/tools/saml-parse.html' },
-          { text: 'X.509 证书解析', link: '/tools/cert.html' },
-          { text: 'PEM 解析器', link: '/tools/pem-parse.html' },
-          { text: 'Base64URL', link: '/tools/base64url.html' },
-        ],
+      '/en/': {
+        selectLanguageName: 'English',
+        selectLanguageText: 'Language',
+        lastUpdatedText: 'Last updated',
+        contributorsText: 'Contributors',
+        navbar: genNavbar('/en', T.en),
+        sidebar: genSidebar('/en', T.en),
       },
-      {
-        text: 'Mock 服务器',
-        children: [
-          { text: '概览 / 角色术语', link: '/mock/' },
-          { text: 'OIDC Mock', link: '/mock/oidc.html' },
-          { text: 'SAML Mock', link: '/mock/saml.html' },
-          { text: '邮件服务器', link: '/mock/mail.html' },
-          { text: 'OIDC 登录演示', link: '/mock/demo.html' },
-          { text: 'SAML 登录演示', link: '/mock/saml-demo.html' },
-        ],
+      '/de/': {
+        selectLanguageName: 'Deutsch',
+        selectLanguageText: 'Sprache',
+        lastUpdatedText: 'Zuletzt aktualisiert',
+        contributorsText: 'Mitwirkende',
+        navbar: genNavbar('/de', T.de),
+        sidebar: genSidebar('/de', T.de),
       },
-    ],
-
-    sidebar: {
-      '/saml/': [
-        {
-          text: 'SAML 2.0',
-          children: [
-            '/saml/README.md',
-            '/saml/concepts.md',
-            '/saml/flows.md',
-            '/saml/reference.md',
-          ],
-        },
-      ],
-      '/oauth2/': [
-        {
-          text: 'OAuth 2.0',
-          children: [
-            '/oauth2/README.md',
-            '/oauth2/concepts.md',
-            '/oauth2/flows.md',
-            '/oauth2/reference.md',
-          ],
-        },
-      ],
-      '/oidc/': [
-        {
-          text: 'OpenID Connect',
-          children: [
-            '/oidc/README.md',
-            '/oidc/concepts.md',
-            '/oidc/flows.md',
-            '/oidc/reference.md',
-          ],
-        },
-      ],
-      '/webauthn/': [
-        {
-          text: 'WebAuthn / Passkey',
-          children: [
-            '/webauthn/README.md',
-            '/webauthn/concepts.md',
-            '/webauthn/flows.md',
-            '/webauthn/reference.md',
-          ],
-        },
-      ],
-      '/mfa/': [
-        {
-          text: 'MFA / 一次性密码',
-          children: [
-            '/mfa/README.md',
-            '/mfa/totp.md',
-            '/mfa/reference.md',
-          ],
-        },
-      ],
-      '/tools/': [
-        {
-          text: '在线工具',
-          children: [
-            { text: '工具总览', link: '/tools/' },
-            {
-              text: 'JWT / JWK',
-              children: [
-                { text: 'JWT 解析', link: '/tools/jwt.html' },
-                { text: 'JWT 签名', link: '/tools/jwt-sign.html' },
-                { text: 'JWK 生成', link: '/tools/jwk.html' },
-                { text: 'JWK → PEM', link: '/tools/jwk-convert.html' },
-                { text: 'PEM → JWK', link: '/tools/pem-to-jwk.html' },
-              ],
-            },
-            {
-              text: 'OAuth2 / OIDC',
-              children: [
-                { text: 'PKCE 生成', link: '/tools/pkce.html' },
-                { text: 'Discovery', link: '/tools/discovery.html' },
-              ],
-            },
-            {
-              text: 'MFA / Passkey',
-              children: [
-                { text: 'TOTP', link: '/tools/totp.html' },
-                { text: 'WebAuthn', link: '/tools/webauthn.html' },
-              ],
-            },
-            {
-              text: 'SAML',
-              children: [
-                { text: '编解码', link: '/tools/saml.html' },
-                { text: 'Metadata 解析', link: '/tools/saml-metadata.html' },
-                { text: 'Response 解析', link: '/tools/saml-parse.html' },
-              ],
-            },
-            {
-              text: '证书 / 编码',
-              children: [
-                { text: 'X.509 证书', link: '/tools/cert.html' },
-                { text: 'PEM 解析', link: '/tools/pem-parse.html' },
-                { text: 'Base64URL', link: '/tools/base64url.html' },
-              ],
-            },
-          ],
-        },
-      ],
-      '/mock/': [
-        {
-          text: 'Mock 服务器',
-          children: [
-            { text: '概览 / 角色术语', link: '/mock/' },
-            { text: 'OIDC Mock', link: '/mock/oidc.html' },
-            { text: 'SAML Mock', link: '/mock/saml.html' },
-            { text: '邮件服务器', link: '/mock/mail.html' },
-            { text: 'OIDC 登录演示', link: '/mock/demo.html' },
-            { text: 'SAML 登录演示', link: '/mock/saml-demo.html' },
-          ],
-        },
-      ],
     },
   }),
 })
