@@ -29,6 +29,14 @@
       <div class="jwtio-block b-h">
         <div class="jwtio-block-title">HEADER：算法与类型</div>
         <pre class="jwtio-pre">{{ header || '—' }}</pre>
+        <table v-if="headerRows.length" class="jwtio-claims">
+          <tbody>
+            <tr v-for="r in headerRows" :key="r.key">
+              <td><code>{{ r.key }}</code></td>
+              <td>{{ r.desc }}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
       <div class="jwtio-block b-p">
@@ -43,6 +51,18 @@
             </tr>
           </tbody>
         </table>
+        <template v-if="claimRows.length">
+          <div class="jwtio-claims-cap">常见声明含义</div>
+          <table class="jwtio-claims">
+            <tbody>
+              <tr v-for="r in claimRows" :key="r.key">
+                <td><code>{{ r.key }}</code></td>
+                <td>{{ r.desc }}</td>
+              </tr>
+            </tbody>
+          </table>
+          <p v-if="hasCustom" class="jwtio-note" style="margin-top:.4rem">其余字段为自定义 / 厂商声明,不在标准之列。</p>
+        </template>
       </div>
 
       <div class="jwtio-block b-s">
@@ -97,10 +117,84 @@ const SAMPLE =
 const token = ref(SAMPLE)
 const header = ref('')
 const payload = ref('')
+const headerObj = ref(null)
+const payloadObj = ref(null)
 const alg = ref('')
 const parts = ref(null)
 const error = ref('')
 const timeClaims = ref([])
+
+// 常见 header 参数(JWS/JWT)
+const HEADER_CLAIMS = {
+  alg: '签名算法(Algorithm)',
+  typ: '类型,通常为 JWT',
+  cty: '内容类型(Content Type),嵌套 JWT 时用',
+  kid: '密钥 ID(Key ID),指明用哪个密钥验签',
+  jku: '公钥集(JWKS)的 URL',
+  jwk: '内嵌的验签公钥(JWK)',
+  x5u: 'X.509 证书链的 URL',
+  x5c: '内嵌的 X.509 证书链(base64 DER)',
+  x5t: 'X.509 证书的 SHA-1 指纹',
+  'x5t#S256': 'X.509 证书的 SHA-256 指纹',
+  crit: '必须被理解的扩展参数列表(Critical)',
+  enc: '内容加密算法(JWE)',
+}
+
+// 常见 payload 声明:RFC 7519 注册声明 + OIDC + OAuth + 常见厂商
+const PAYLOAD_CLAIMS = {
+  // RFC 7519 注册声明
+  iss: '签发者(Issuer),谁签发了此 token',
+  sub: '主题(Subject),用户/主体的唯一标识',
+  aud: '受众(Audience),token 的目标接收方',
+  exp: '过期时间(Expiration),此刻之后失效',
+  nbf: '生效时间(Not Before),此刻之前不可用',
+  iat: '签发时间(Issued At)',
+  jti: 'JWT 唯一 ID(JWT ID),可用于防重放',
+  // OIDC ID Token
+  nonce: '关联授权请求的随机值,防重放',
+  auth_time: '用户完成认证的时间',
+  acr: '认证上下文类别(Authentication Context Class Reference)',
+  amr: '认证方法(Authentication Methods),如 pwd/otp/mfa',
+  azp: '被授权方(Authorized Party),目标 client_id',
+  at_hash: 'access_token 的哈希,绑定 ID Token 与访问令牌',
+  c_hash: '授权码 code 的哈希',
+  s_hash: 'state 的哈希',
+  sid: '会话 ID(Session ID),用于单点登出',
+  // OIDC 标准用户资料声明
+  name: '全名',
+  given_name: '名',
+  family_name: '姓',
+  middle_name: '中间名',
+  nickname: '昵称',
+  preferred_username: '首选用户名',
+  profile: '个人资料页 URL',
+  picture: '头像 URL',
+  website: '个人网站',
+  email: '邮箱地址',
+  email_verified: '邮箱是否已验证',
+  gender: '性别',
+  birthdate: '生日',
+  zoneinfo: '时区',
+  locale: '语言/区域',
+  phone_number: '电话号码',
+  phone_number_verified: '电话是否已验证',
+  address: '地址',
+  updated_at: '资料最后更新时间',
+  // OAuth2 访问令牌(RFC 9068)与常见厂商
+  scope: '授权范围(Scopes),空格分隔',
+  scp: '授权范围(Scopes,数组形式,Azure AD)',
+  client_id: '客户端 ID',
+  roles: '角色列表',
+  groups: '用户组列表',
+  token_use: 'token 用途(如 access / id,AWS Cognito)',
+  cid: '客户端 ID(Okta)',
+  uid: '用户 ID(Okta)',
+  ver: 'token 版本',
+  tid: '租户 ID(Azure AD)',
+  oid: '对象 ID(Azure AD 用户)',
+  upn: '用户主体名(User Principal Name,Azure AD)',
+  appid: '应用 ID(Azure AD)',
+}
 
 const secret = ref('')
 const secretB64 = ref(false)
@@ -109,6 +203,17 @@ const verdict = ref('') // '' | 'valid' | 'invalid' | 'error:<msg>'
 
 const isHmac = computed(() => /^HS(256|384|512)$/.test(alg.value))
 const isAsym = computed(() => /^(RS|PS|ES)(256|384|512)$/.test(alg.value))
+
+const headerRows = computed(() => rowsFor(headerObj.value, HEADER_CLAIMS))
+const claimRows = computed(() => rowsFor(payloadObj.value, PAYLOAD_CLAIMS))
+const hasCustom = computed(() =>
+  payloadObj.value != null &&
+  Object.keys(payloadObj.value).some((k) => !(k in PAYLOAD_CLAIMS)))
+
+function rowsFor(obj, dict) {
+  if (!obj || typeof obj !== 'object') return []
+  return Object.keys(obj).filter((k) => k in dict).map((k) => ({ key: k, desc: dict[k] }))
+}
 
 const ALGS = {
   HS256: { kind: 'hmac', hash: 'SHA-256' },
@@ -153,6 +258,8 @@ function decode() {
   error.value = ''
   header.value = ''
   payload.value = ''
+  headerObj.value = null
+  payloadObj.value = null
   alg.value = ''
   parts.value = null
   timeClaims.value = []
@@ -168,6 +275,8 @@ function decode() {
   try {
     const h = JSON.parse(b64urlToText(segs[0]))
     const p = JSON.parse(b64urlToText(segs[1]))
+    headerObj.value = h
+    payloadObj.value = p
     header.value = JSON.stringify(h, null, 2)
     payload.value = JSON.stringify(p, null, 2)
     alg.value = typeof h.alg === 'string' ? h.alg : ''
@@ -341,6 +450,25 @@ decode()
   font-size: 0.8rem;
 }
 .jwtio-times td { padding: 0.2rem 0.4rem; border-top: 1px solid var(--vp-c-border, #eee); }
+.jwtio-claims-cap {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  opacity: 0.7;
+  margin: 0.8rem 0 0.3rem;
+}
+.jwtio-claims {
+  width: 100%;
+  margin-top: 0.5rem;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+.jwtio-claims td {
+  padding: 0.25rem 0.5rem;
+  border-top: 1px solid var(--vp-c-border, #eee);
+  vertical-align: top;
+}
+.jwtio-claims td:first-child { white-space: nowrap; width: 1%; }
 .jwtio-alg { font-size: 0.85rem; margin: 0.2rem 0 0.6rem; }
 .jwtio-lbl { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 0.3rem; }
 .jwtio-check { display: block; font-size: 0.78rem; margin-top: 0.4rem; opacity: 0.85; }
