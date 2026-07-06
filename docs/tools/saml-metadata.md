@@ -11,7 +11,7 @@ title: SAML Metadata 解析器
 </ClientOnly>
 
 ::: tip 试一试
-本站 Mock IdP 的 metadata 可直接拉取粘入:<https://authn-mock.lich-wang8718.workers.dev/saml/idp/metadata>
+本站 Mock IdP 的 metadata 可直接拉取粘入:<https://mock.authn.tech/saml/idp/metadata>
 :::
 
 详见 [SAML 核心概念](../saml/concepts.md) 中的 Metadata 说明。

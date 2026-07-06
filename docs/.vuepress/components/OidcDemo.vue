@@ -55,7 +55,7 @@
 <script setup>
 import { ref } from 'vue'
 
-const issuer = ref('https://authn-mock.lich-wang8718.workers.dev')
+const issuer = ref('https://mock.authn.tech')
 const scope = ref('openid profile email')
 const busy = ref(false)
 const error = ref('')

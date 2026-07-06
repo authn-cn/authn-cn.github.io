@@ -21,8 +21,8 @@ title: TOTP 工具
 </ClientOnly>
 
 ::: tip 与 Mock 联调
-本站 [Mock TOTP 验证器](https://authn-mock.lich-wang8718.workers.dev/totp/) 可用同一密钥在服务端算码/验证:
-`curl "https://authn-mock.lich-wang8718.workers.dev/totp/code?secret=<你的secret>"`
+本站 [Mock TOTP 验证器](https://mock.authn.tech/totp/) 可用同一密钥在服务端算码/验证:
+`curl "https://mock.authn.tech/totp/code?secret=<你的secret>"`
 :::
 
 原理见 [HOTP / TOTP 算法详解](../mfa/totp.md)。

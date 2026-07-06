@@ -12,7 +12,7 @@ title: WebAuthn 演示
 
 ::: tip 完整服务端流程
 本页只演示浏览器侧数据结构。要体验含<strong>服务端验签</strong>的完整注册/登录闭环,见自包含的
-[Mock WebAuthn RP](https://authn-mock.lich-wang8718.workers.dev/webauthn/)。
+[Mock WebAuthn RP](https://mock.authn.tech/webauthn/)。
 :::
 
 原理见 [WebAuthn 注册与认证流程](../webauthn/flows.md)。

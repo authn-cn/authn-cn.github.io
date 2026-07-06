@@ -2,7 +2,7 @@
   <div class="authn-tool">
     <p v-if="!supported" class="authn-error">当前浏览器不支持 WebAuthn(需 HTTPS 且有平台认证器/安全密钥)。</p>
     <template v-else>
-      <p>本演示在<strong>当前页面域</strong>(<code>{{ rpId }}</code>)内真实调用浏览器 WebAuthn API,创建/使用一个 Passkey,并解析展示浏览器返回的数据结构。纯前端,不涉及服务端(完整的服务端验签见 <a href="https://authn-mock.lich-wang8718.workers.dev/webauthn/" target="_blank">Mock WebAuthn RP</a>)。</p>
+      <p>本演示在<strong>当前页面域</strong>(<code>{{ rpId }}</code>)内真实调用浏览器 WebAuthn API,创建/使用一个 Passkey,并解析展示浏览器返回的数据结构。纯前端,不涉及服务端(完整的服务端验签见 <a href="https://mock.authn.tech/webauthn/" target="_blank">Mock WebAuthn RP</a>)。</p>
       <button class="authn-btn" @click="register">① 创建 Passkey（注册）</button>
       <button class="authn-btn secondary" :disabled="!created" @click="login">② 使用 Passkey（认证）</button>
       <p v-if="msg" :class="msgBad ? 'authn-error' : 'authn-note'">{{ msg }}</p>

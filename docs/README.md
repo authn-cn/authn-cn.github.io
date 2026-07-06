@@ -34,10 +34,10 @@ footer: Authn.tech · 用中文把认证与授权讲清楚
 
 已上线的 SAML / OIDC 双协议 Mock，四角色齐全，真实签名验签，可直接联调：
 
-- **OIDC OP** — `/.well-known` + 授权/令牌/JWKS 端点
-- **OIDC RP** — 连任意外部 OP，JWKS 验签
-- **资源服务器** — 校验 bearer token 的 scope
-- **SAML IdP / SP** — enveloped 签名，ACS 验签展示
+- **OP**(OpenID Provider,身份提供方)— `/.well-known` + 授权 / 令牌 / JWKS 端点
+- **RP**(Relying Party,客户端)— 连任意外部 OP,JWKS 验签
+- **RS**(Resource Server,受保护 API)— 校验 bearer token 的 scope
+- **SAML IdP / SP**(身份提供方 / 服务提供方)— enveloped 签名,ACS 验签展示
 
 👉 [查看 Mock 演示与端点说明](/mock/)
 
