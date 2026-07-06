@@ -29,6 +29,8 @@ SAML 一侧包含两个角色:**IdP**(签发方)与 **SP**(消费方),二者配�
 
 打开控制台点一下即可发起 SP-initiated 登录,并**展示验签结果与断言解析**。
 
+想在本站直接看效果?见**真实可点**的 [SAML 登录演示](./saml-demo.md),一键跑完签发→验签→解析并展示每步结果。
+
 ## 调用顺序(SP-initiated Web Browser SSO)
 
 以「你的 SP + Mock IdP」为例:

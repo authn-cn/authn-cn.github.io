@@ -32,7 +32,7 @@ function readTLV(buf, pos) {
     hdr = 2 + n
   }
   const start = pos + hdr
-  return { tag, start, end: start + len }
+  return { tag, pos, start, end: start + len }
 }
 function children(buf, node) {
   const out = []
@@ -125,4 +125,18 @@ export async function parseCertificate(input) {
     sha1Hex: hex(sha1),
     sha256Hex: hex(sha256),
   }
+}
+
+/**
+ * 从 X.509 证书(PEM 或 base64 DER)中提取 SubjectPublicKeyInfo(SPKI)DER 字节,
+ * 可直接喂给 crypto.subtle.importKey('spki', ...) 做验签。
+ */
+export function certToSpki(input) {
+  const der = pemToBytes(input)
+  const cert = readTLV(der, 0)
+  const [tbs] = children(der, cert)
+  const tk = children(der, tbs)
+  const idx = tk[0].tag === 0xa0 ? 1 : 0
+  const spki = tk[idx + 5]
+  return der.slice(spki.pos, spki.end)
 }
