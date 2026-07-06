@@ -30,6 +30,7 @@ Die Rollen, Endpunkte und Aufrufschritte auf beiden Seiten sind:
 - 🔷 [**OIDC / OAuth2 Mock**](./oidc.md) —— OP / RP / RS drei Rollen + Autorisierungscode + PKCE Aufruffolge
 - 🔶 [**SAML Mock**](./saml.md) —— IdP / SP zwei Rollen + Web Browser SSO Aufruffolge
 - 📬 [**Mail-Server**](./mail.md) —— Empfangen Sie `@authn.tech` E-Mails mit Email Routing, zeigen Sie online / API an und extrahieren Sie Einmal-Verifizierungscodes
+- 🗂 [**LDAP-Verzeichnis**](./ldap.md) —— HTTP/JSON-Verzeichnissuche-Emulator, wertet RFC 4515-Filter gegen ein Beispielverzeichnis aus (nicht das echte LDAP-Protokoll)
 
 ::: danger Nur zum Testen
 Die Signaturprivatsschlüssel sind öffentlich im [Quellcode](https://github.com/authn-cn/authn-mock) verfügbar, jeder kann von diesem Service ausgegebene Token / Assertions fälschen; Autorisierungscodes garantieren nicht Einzelnutzung (zustandslose Implementierung). **Kein Produktionssystem sollte Assertions oder Token dieses Mock-Services vertrauen.**

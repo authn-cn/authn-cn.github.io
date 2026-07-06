@@ -28,6 +28,7 @@ footer: Authn.tech · 用中文把认证与授权讲清楚
 - **OAuth 2.0 / OIDC** — [PKCE 生成器](/tools/pkce.html)、[OIDC Discovery 查看器](/tools/discovery.html)、[JWK 查看](/tools/jwk.html)、[JWK → PEM](/tools/jwk-convert.html)、[PEM → JWK](/tools/pem-to-jwk.html)
 - **SAML** — [报文编解码](/tools/saml.html)、[Response 解析](/tools/saml-parse.html)、[Metadata 解析](/tools/saml-metadata.html)
 - **MFA / Passkey** — [TOTP 动态码](/tools/totp.html)、[WebAuthn 演示](/tools/webauthn.html)
+- **LDAP** — [搜索过滤器构建器](/tools/ldap-filter.html)
 - **通用** — [Base64URL 编解码](/tools/base64url.html)、[证书查看](/tools/cert.html)、[PEM 解析器](/tools/pem-parse.html)
 
 ## Mock 服务器
@@ -48,3 +49,4 @@ footer: Authn.tech · 用中文把认证与授权讲清楚
 - 想实现"**用 XX 账号登录**"？看 [OIDC 概述](/oidc/)。
 - 想做**无密码 / 抗钓鱼登录**（Passkey）？看 [WebAuthn 概述](/webauthn/)。
 - 想加**第二因素**（动态验证码）？看 [MFA / TOTP 概述](/mfa/)。
+- 想查/验证**目录里的用户与组**？看 [LDAP 概述](/ldap/)。

@@ -11,25 +11,25 @@ const T = {
     home: '首页', protocols: '协议文档', tools: '在线工具', mock: 'Mock 服务器',
     mfaH: 'MFA / 一次性密码', toolsH: '在线工具', mockH: 'Mock 服务器',
     allTools: '工具总览', certGroup: '证书 / 编码',
-    overview: '概览 / 角色术语', mail: '邮件服务器', oidcDemo: 'OIDC 登录演示', samlDemo: 'SAML 登录演示',
+    overview: '概览 / 角色术语', mail: '邮件服务器', ldapDir: 'LDAP 目录', oidcDemo: 'OIDC 登录演示', samlDemo: 'SAML 登录演示',
     jwt: 'JWT 解析', jwtSign: 'JWT 签名', jwk: 'JWK 生成', pkce: 'PKCE 生成', saml: 'SAML 编解码',
-    cert: 'X.509 证书', pemParse: 'PEM 解析',
+    cert: 'X.509 证书', pemParse: 'PEM 解析', ldapFilter: 'LDAP 过滤器',
   },
   en: {
     home: 'Home', protocols: 'Protocols', tools: 'Tools', mock: 'Mock Servers',
     mfaH: 'MFA / OTP', toolsH: 'Online Tools', mockH: 'Mock Servers',
     allTools: 'All Tools', certGroup: 'Certs / Encoding',
-    overview: 'Overview & Roles', mail: 'Mail Server', oidcDemo: 'OIDC Login Demo', samlDemo: 'SAML Login Demo',
+    overview: 'Overview & Roles', mail: 'Mail Server', ldapDir: 'LDAP Directory', oidcDemo: 'OIDC Login Demo', samlDemo: 'SAML Login Demo',
     jwt: 'JWT Decode', jwtSign: 'JWT Sign', jwk: 'JWK Gen', pkce: 'PKCE Gen', saml: 'SAML Codec',
-    cert: 'X.509 Cert', pemParse: 'PEM Inspect',
+    cert: 'X.509 Cert', pemParse: 'PEM Inspect', ldapFilter: 'LDAP Filter',
   },
   de: {
     home: 'Startseite', protocols: 'Protokolle', tools: 'Tools', mock: 'Mock-Server',
     mfaH: 'MFA / OTP', toolsH: 'Online-Tools', mockH: 'Mock-Server',
     allTools: 'Alle Tools', certGroup: 'Zertifikate / Kodierung',
-    overview: 'Übersicht & Rollen', mail: 'Mail-Server', oidcDemo: 'OIDC-Login-Demo', samlDemo: 'SAML-Login-Demo',
+    overview: 'Übersicht & Rollen', mail: 'Mail-Server', ldapDir: 'LDAP-Verzeichnis', oidcDemo: 'OIDC-Login-Demo', samlDemo: 'SAML-Login-Demo',
     jwt: 'JWT dekodieren', jwtSign: 'JWT signieren', jwk: 'JWK erzeugen', pkce: 'PKCE erzeugen', saml: 'SAML-Codec',
-    cert: 'X.509-Zertifikat', pemParse: 'PEM prüfen',
+    cert: 'X.509-Zertifikat', pemParse: 'PEM prüfen', ldapFilter: 'LDAP-Filter',
   },
 }
 
@@ -46,6 +46,7 @@ function genNavbar(prefix, t) {
         { text: 'OIDC', link: p('/oidc/') },
         { text: 'WebAuthn / Passkey', link: p('/webauthn/') },
         { text: 'MFA / TOTP', link: p('/mfa/') },
+        { text: 'LDAP', link: p('/ldap/') },
       ],
     },
     {
@@ -67,6 +68,7 @@ function genNavbar(prefix, t) {
         { text: t.cert, link: p('/tools/cert.html') },
         { text: t.pemParse, link: p('/tools/pem-parse.html') },
         { text: 'Base64URL', link: p('/tools/base64url.html') },
+        { text: t.ldapFilter, link: p('/tools/ldap-filter.html') },
       ],
     },
     {
@@ -76,6 +78,7 @@ function genNavbar(prefix, t) {
         { text: 'OIDC Mock', link: p('/mock/oidc.html') },
         { text: 'SAML Mock', link: p('/mock/saml.html') },
         { text: t.mail, link: p('/mock/mail.html') },
+        { text: t.ldapDir, link: p('/mock/ldap.html') },
         { text: t.oidcDemo, link: p('/mock/demo.html') },
         { text: t.samlDemo, link: p('/mock/saml-demo.html') },
       ],
@@ -91,6 +94,7 @@ function genSidebar(prefix, t) {
     [p('/oidc/')]: [{ text: 'OpenID Connect', children: [p('/oidc/README.md'), p('/oidc/concepts.md'), p('/oidc/flows.md'), p('/oidc/reference.md')] }],
     [p('/webauthn/')]: [{ text: 'WebAuthn / Passkey', children: [p('/webauthn/README.md'), p('/webauthn/concepts.md'), p('/webauthn/flows.md'), p('/webauthn/reference.md')] }],
     [p('/mfa/')]: [{ text: t.mfaH, children: [p('/mfa/README.md'), p('/mfa/totp.md'), p('/mfa/reference.md')] }],
+    [p('/ldap/')]: [{ text: 'LDAP', children: [p('/ldap/README.md'), p('/ldap/concepts.md'), p('/ldap/flows.md'), p('/ldap/reference.md')] }],
     [p('/tools/')]: [
       {
         text: t.toolsH,
@@ -121,6 +125,9 @@ function genSidebar(prefix, t) {
             { text: t.pemParse, link: p('/tools/pem-parse.html') },
             { text: 'Base64URL', link: p('/tools/base64url.html') },
           ] },
+          { text: 'LDAP', children: [
+            { text: t.ldapFilter, link: p('/tools/ldap-filter.html') },
+          ] },
         ],
       },
     ],
@@ -132,6 +139,7 @@ function genSidebar(prefix, t) {
           { text: 'OIDC Mock', link: p('/mock/oidc.html') },
           { text: 'SAML Mock', link: p('/mock/saml.html') },
           { text: t.mail, link: p('/mock/mail.html') },
+          { text: t.ldapDir, link: p('/mock/ldap.html') },
           { text: t.oidcDemo, link: p('/mock/demo.html') },
           { text: t.samlDemo, link: p('/mock/saml-demo.html') },
         ],

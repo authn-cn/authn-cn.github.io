@@ -28,6 +28,7 @@ Pure browser-side execution with data staying local, ready to use anytime:
 - **OAuth 2.0 / OIDC** — [PKCE Generator](/en/tools/pkce.html), [OIDC Discovery Viewer](/en/tools/discovery.html), [JWK Viewer](/en/tools/jwk.html), [JWK → PEM](/en/tools/jwk-convert.html), [PEM → JWK](/en/tools/pem-to-jwk.html)
 - **SAML** — [Message Encoder/Decoder](/en/tools/saml.html), [Response Parser](/en/tools/saml-parse.html), [Metadata Parser](/en/tools/saml-metadata.html)
 - **MFA / Passkey** — [TOTP Generator](/en/tools/totp.html), [WebAuthn Demo](/en/tools/webauthn.html)
+- **LDAP** — [Search Filter Builder](/en/tools/ldap-filter.html)
 - **General** — [Base64URL Encoder/Decoder](/en/tools/base64url.html), [Certificate Viewer](/en/tools/cert.html), [PEM Parser](/en/tools/pem-parse.html)
 
 ## Mock Server
@@ -48,3 +49,4 @@ Live SAML / OIDC dual-protocol Mock with all four roles, real signature verifica
 - Want to implement "**login with XX account**"? See [OIDC Overview](/en/oidc/).
 - Want to do **passwordless / phishing-resistant login** (Passkey)? See [WebAuthn Overview](/en/webauthn/).
 - Want to add **second factor** (dynamic verification codes)? See [MFA / TOTP Overview](/en/mfa/).
+- Want to look up / verify **users and groups in a directory**? See [LDAP Overview](/en/ldap/).

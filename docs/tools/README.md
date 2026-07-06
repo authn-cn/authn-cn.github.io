@@ -41,6 +41,12 @@ title: 工具总览
 | [PEM 解析器](./pem-parse.md) | 识别任意 PEM 块类型(证书/CSR/公私钥/CRL 等),显示 DER 长度与密钥算法 |
 | [Base64URL 编解码](./base64url.md) | 文本 ↔ Base64 / Base64URL 互转 |
 
+## LDAP
+
+| 工具 | 用途 |
+|------|------|
+| [LDAP 过滤器构建器](./ldap-filter.md) | 可视化拼装 RFC 4515 搜索过滤器(AND/OR/NOT、自动转义),可直接对 [Mock LDAP](../mock/ldap.md) 示例目录测试 |
+
 ::: tip 配套 Mock 服务
 想端到端联调?见 [Mock 服务器](../mock/):OIDC OP/RP、资源服务器、SAML IdP/SP 四角色齐全,含真实可点的 [OIDC 登录演示](../mock/demo.md)。有想要的工具欢迎到 [GitHub](https://github.com/authn-cn/authn-cn.github.io/issues) 提 issue。
 :::

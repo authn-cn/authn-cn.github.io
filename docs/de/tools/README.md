@@ -41,6 +41,12 @@ Diese Website bietet eine Reihe von Online-Tools für die Fehlersuche von Authen
 | [PEM-Parser](./pem-parse.md) | Erkenne beliebige PEM-Blocktypen (Zertifikat/CSR/öffentlich/privat/CRL usw.), zeige DER-Länge und Schlüsselalgorithmus |
 | [Base64URL-Codierung/Decodierung](./base64url.md) | Text ↔ Base64 / Base64URL gegenseitige Konvertierung |
 
+## LDAP
+
+| Tool | Zweck |
+|------|------|
+| [LDAP-Filtergenerator](./ldap-filter.md) | RFC 4515-Suchfilter visuell zusammenstellen (AND/OR/NOT, automatisches Escaping), direkt gegen das [Mock LDAP](../mock/ldap.md)-Beispielverzeichnis testen |
+
 ::: tip Begleitender Mock-Service
 Wollen Sie End-to-End-Tests? Siehe [Mock-Server](../mock/): OIDC OP/RP, Ressourcenserver, SAML IdP/SP vollständige vier Rollen, inklusive echter [OIDC-Anmeldungs-Demo](../mock/demo.md). Gewünschte Tools können Sie gerne auf [GitHub](https://github.com/authn-cn/authn-cn.github.io/issues) einreichen.
 :::

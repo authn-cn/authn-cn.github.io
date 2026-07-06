@@ -30,6 +30,7 @@ The roles, endpoints, and step-by-step call sequences on both sides are:
 - 🔷 [**OIDC / OAuth2 Mock**](./oidc.md) — OP / RP / RS three roles + Authorization Code + PKCE call sequence
 - 🔶 [**SAML Mock**](./saml.md) — IdP / SP two roles + Web Browser SSO call sequence
 - 📬 [**Mail Server**](./mail.md) — Receive `@authn.tech` emails via Email Routing, view online / via API, extract one-time verification codes
+- 🗂 [**LDAP Directory**](./ldap.md) — HTTP/JSON directory search emulator, evaluates RFC 4515 filters against a sample directory (not the real LDAP protocol)
 
 ::: danger Testing Only
 The signing private keys are public in the [source code](https://github.com/authn-cn/authn-mock); anyone can forge tokens / assertions issued by this service; authorization codes are not guaranteed single-use (stateless implementation). **No production system should trust tokens or assertions from the Mock service.**

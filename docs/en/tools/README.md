@@ -41,6 +41,12 @@ This site provides a set of online tools for debugging authentication protocols.
 | [PEM Parser](./pem-parse.md) | Identify any PEM block type (certificate/CSR/public/private key/CRL), show DER length and key algorithm |
 | [Base64URL Encoder/Decoder](./base64url.md) | Text ↔ Base64 / Base64URL conversion |
 
+## LDAP
+
+| Tool | Purpose |
+|------|---------|
+| [LDAP Filter Builder](./ldap-filter.md) | Visually assemble RFC 4515 search filters (AND/OR/NOT, auto-escaping), test directly against the [Mock LDAP](../mock/ldap.md) sample directory |
+
 ::: tip Companion Mock Service
 Need end-to-end integration testing? See [Mock Server](../mock/): OIDC OP/RP, resource server, SAML IdP/SP with all four roles plus clickable [OIDC login demo](../mock/demo.md). Feature requests welcome on [GitHub](https://github.com/authn-cn/authn-cn.github.io/issues).
 :::

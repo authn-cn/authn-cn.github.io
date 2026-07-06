@@ -28,6 +28,7 @@ Laufen rein im Browser, Daten bleiben lokal, sofort einsatzbereit:
 - **OAuth 2.0 / OIDC** — [PKCE-Generator](/de/tools/pkce.html), [OIDC Discovery-Viewer](/de/tools/discovery.html), [JWK-Viewer](/de/tools/jwk.html), [JWK → PEM](/de/tools/jwk-convert.html), [PEM → JWK](/de/tools/pem-to-jwk.html)
 - **SAML** — [Nachrichtencoding/Decoding](/de/tools/saml.html), [Response-Parser](/de/tools/saml-parse.html), [Metadata-Parser](/de/tools/saml-metadata.html)
 - **MFA / Passkey** — [TOTP-Code-Generator](/de/tools/totp.html), [WebAuthn-Demo](/de/tools/webauthn.html)
+- **LDAP** — [Suchfilter-Generator](/de/tools/ldap-filter.html)
 - **Allgemein** — [Base64URL-Codierung/Decodierung](/de/tools/base64url.html), [Zertifikat-Viewer](/de/tools/cert.html), [PEM-Parser](/de/tools/pem-parse.html)
 
 ## Mock-Server
@@ -48,3 +49,4 @@ SAML- / OIDC-Dual-Protocol-Mock mit vollständigen vier Rollen, echten Signature
 - Wollen Sie **"Mit XX-Konto anmelden"** implementieren? Siehe [OIDC-Übersicht](/de/oidc/).
 - Wollen Sie **passwortlose / phishing-resistente Anmeldung** (Passkey) implementieren? Siehe [WebAuthn-Übersicht](/de/webauthn/).
 - Wollen Sie **zweiten Faktor** (dynamische Verifizierungscodes) hinzufügen? Siehe [MFA / TOTP-Übersicht](/de/mfa/).
+- Wollen Sie **Benutzer und Gruppen in einem Verzeichnis** nachschlagen / verifizieren? Siehe [LDAP-Übersicht](/de/ldap/).
