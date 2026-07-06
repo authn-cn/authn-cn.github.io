@@ -47,6 +47,7 @@ export default defineUserConfig({
           { text: 'JWT 签名生成', link: '/tools/jwt-sign.html' },
           { text: 'JWK / 密钥生成', link: '/tools/jwk.html' },
           { text: 'JWK / JWKS → PEM', link: '/tools/jwk-convert.html' },
+          { text: 'PEM → JWK', link: '/tools/pem-to-jwk.html' },
           { text: 'PKCE 生成器', link: '/tools/pkce.html' },
           { text: 'OIDC Discovery', link: '/tools/discovery.html' },
           { text: 'TOTP 工具', link: '/tools/totp.html' },
@@ -55,6 +56,7 @@ export default defineUserConfig({
           { text: 'SAML Metadata 解析', link: '/tools/saml-metadata.html' },
           { text: 'SAML Response 解析', link: '/tools/saml-parse.html' },
           { text: 'X.509 证书解析', link: '/tools/cert.html' },
+          { text: 'PEM 解析器', link: '/tools/pem-parse.html' },
           { text: 'Base64URL', link: '/tools/base64url.html' },
         ],
       },
@@ -129,7 +131,7 @@ export default defineUserConfig({
             '/tools/README.md',
             {
               text: 'JWT / JWK',
-              children: ['/tools/jwt.md', '/tools/jwt-sign.md', '/tools/jwk.md', '/tools/jwk-convert.md'],
+              children: ['/tools/jwt.md', '/tools/jwt-sign.md', '/tools/jwk.md', '/tools/jwk-convert.md', '/tools/pem-to-jwk.md'],
             },
             {
               text: 'OAuth2 / OIDC',
@@ -145,7 +147,7 @@ export default defineUserConfig({
             },
             {
               text: '证书 / 编码',
-              children: ['/tools/cert.md', '/tools/base64url.md'],
+              children: ['/tools/cert.md', '/tools/pem-parse.md', '/tools/base64url.md'],
             },
           ],
         },

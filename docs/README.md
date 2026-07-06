@@ -25,10 +25,10 @@ footer: Authn.tech · 用中文把认证与授权讲清楚
 纯浏览器端运行，数据不出本地，随开随用：
 
 - **JWT** — [解析器](/tools/jwt.html)（jwt.io 风格，三段高亮 + 签名验证）、[签名生成](/tools/jwt-sign.html)
-- **OAuth 2.0 / OIDC** — [PKCE 生成器](/tools/pkce.html)、[OIDC Discovery 查看器](/tools/discovery.html)、[JWK 查看](/tools/jwk.html)、[JWK → PEM 转换](/tools/jwk-convert.html)
+- **OAuth 2.0 / OIDC** — [PKCE 生成器](/tools/pkce.html)、[OIDC Discovery 查看器](/tools/discovery.html)、[JWK 查看](/tools/jwk.html)、[JWK → PEM](/tools/jwk-convert.html)、[PEM → JWK](/tools/pem-to-jwk.html)
 - **SAML** — [报文编解码](/tools/saml.html)、[Response 解析](/tools/saml-parse.html)、[Metadata 解析](/tools/saml-metadata.html)
 - **MFA / Passkey** — [TOTP 动态码](/tools/totp.html)、[WebAuthn 演示](/tools/webauthn.html)
-- **通用** — [Base64URL 编解码](/tools/base64url.html)、[证书查看](/tools/cert.html)
+- **通用** — [Base64URL 编解码](/tools/base64url.html)、[证书查看](/tools/cert.html)、[PEM 解析器](/tools/pem-parse.html)
 
 ## Mock 服务器
 

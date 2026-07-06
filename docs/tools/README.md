@@ -14,6 +14,7 @@ title: 工具总览
 | [JWT 签名生成](./jwt-sign.md) | 填 Payload + 密钥生成签名 token,可一键生成测试密钥对 |
 | [JWK / 密钥生成](./jwk.md) | 生成 RSA/EC 密钥对,导出 JWK、JWKS、PEM,含 RFC 7638 `kid` |
 | [JWK / JWKS → PEM](./jwk-convert.md) | 把 JWK/JWKS 转成 PEM 公钥,展示 `kty`/`alg`/`use`/`kid` 与 thumbprint |
+| [PEM → JWK](./pem-to-jwk.md) | 把 PEM 公钥(SPKI)/ 私钥(PKCS#8)转成 JWK,附 RFC 7638 `kid` |
 
 ## OAuth2 / OIDC
 
@@ -37,6 +38,7 @@ title: 工具总览
 | [SAML Metadata 解析](./saml-metadata.md) | 解析 metadata:角色、entityID、端点、NameIDFormat,内嵌证书展示有效期/指纹 |
 | [SAML Response 解析](./saml-parse.md) | 结构化展示 Response/Assertion:Subject、Conditions、Attributes、签名算法 |
 | [X.509 证书解析](./cert.md) | 解析 PEM/DER 证书:主体、颁发者、有效期、公钥/签名算法、SHA-1/SHA-256 指纹 |
+| [PEM 解析器](./pem-parse.md) | 识别任意 PEM 块类型(证书/CSR/公私钥/CRL 等),显示 DER 长度与密钥算法 |
 | [Base64URL 编解码](./base64url.md) | 文本 ↔ Base64 / Base64URL 互转 |
 
 ::: tip 配套 Mock 服务
