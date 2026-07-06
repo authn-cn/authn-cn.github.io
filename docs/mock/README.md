@@ -14,20 +14,16 @@ title: Mock 服务器
 
 ## 角色与术语
 
-认证流程里的每一方都有固定称呼。下表是本 Mock 覆盖的角色:
+以 **OAuth 2.0(RFC 6749)** 定义的四个角色名为准;**OIDC**(OpenID Connect Core)与 **SAML 2.0** 只是同一批角色的不同叫法。下表按“同一角色,不同规范里的名字”对齐:
 
-| 缩写 | 全称 | 中文 | 在流程里做什么 |
-|------|------|------|----------------|
-| **RO** | Resource Owner | 资源所有者(终端用户) | 数据的主人,授予同意;本 Mock 中即测试用户 alice / bob |
-| **OP** | OpenID Provider | OIDC 身份提供方 / 令牌签发方 | 验证用户身份、签发 `id_token` / `access_token` |
-| **RP** | Relying Party | 依赖方 / 客户端(即 OAuth2 的 Client) | 把用户重定向到 OP 登录、消费并校验令牌 |
-| **RS** | Resource Server | 资源服务器 / 受保护 API | 校验 `access_token` 后返回受保护数据 |
-| **IdP** | Identity Provider | SAML 身份提供方 | 验证用户身份、签发签名的 SAML 断言 |
-| **SP** | Service Provider | SAML 服务提供方 / 受信应用 | 发起登录、接收并验签 IdP 的断言 |
+| OAuth 2.0(RFC 6749) | OIDC | SAML 2.0 | 中文 / 职责 | 本 Mock |
+|------|------|------|------|------|
+| Resource Owner | End-User | Principal(Subject) | 资源所有者 / 终端用户,授予同意 | 测试用户 alice / bob |
+| Authorization Server | OpenID Provider(OP) | Identity Provider(IdP) | 签发方:验证身份、签发令牌 / 断言 | `/oidc/*`、`/saml/idp/*` |
+| Client | Relying Party(RP) | Service Provider(SP) | 消费方:发起登录、校验令牌 / 断言 | `/rp/`、`/saml/sp/*` |
+| Resource Server | Resource Server | —— | 资源服务器 / 受保护 API | `/rs/api` |
 
-> **OAuth 2.0** 定义四个角色:Resource Owner(用户)、Client(客户端)、Authorization Server(授权服务器)、Resource Server(资源服务器)。**OIDC** 在其上把 Authorization Server 叫作 **OP**、把 Client 叫作 **RP**——所以 **RP 就是 Client**,而 **Resource Owner(RO)是另一个角色,即终端用户本人**。
->
-> 其中 Resource Owner 是人、不是可 Mock 的服务(本站由授权页选择 alice / bob 代表),因此下文只展开可对接的三个服务角色:**OP · RP · RS**。SAML 一侧对应 **IdP · SP**,与 OIDC 互相对应:OP≈IdP(签发方)、RP≈SP(消费方)。
+> RFC 6749 用的名字是 **Resource Owner / Client / Authorization Server / Resource Server**。OIDC 把 Authorization Server 叫作 **OP**、把 Client 叫作 **RP**;SAML 则叫 **IdP / SP**——都是同一批角色的别名。其中 **Resource Owner 是人**(不是可对接的服务),本站由授权页选择 alice / bob 代表,因此下文只展开可对接的服务角色。
 
 两侧的角色、端点与分步调用顺序分别见:
 

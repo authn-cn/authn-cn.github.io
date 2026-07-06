@@ -4,11 +4,11 @@ title: OIDC Mock
 
 # OIDC / OAuth2 Mock
 
-OIDC / OAuth2 一侧包含三个角色:**OP**(签发方)、**RP**(客户端)、**RS**(受保护 API)。术语与整体说明见 [Mock 概览](./README.md)。
+OAuth 2.0(RFC 6749)一侧有三个可对接的服务角色:**Authorization Server**(OIDC 里叫 OpenID Provider / OP)、**Client**(OIDC 里叫 Relying Party / RP)、**Resource Server**。术语对照与整体说明见 [Mock 概览](./README.md)。
 
 **服务地址:<https://mock.authn.tech/>**
 
-## OP —— OpenID Provider(身份提供方 / 令牌签发方)
+## Authorization Server(OIDC:OpenID Provider / OP)
 
 | 端点 | 路径 |
 |------|------|
@@ -23,7 +23,7 @@ OIDC / OAuth2 一侧包含三个角色:**OP**(签发方)、**RP**(客户端)、*
 - 两个固定测试用户 **alice** / **bob**;授权请求追加 `&user=alice` 可跳过用户选择页(CI 免交互)。
 - CORS 全开,可直接从浏览器前端调用。
 
-## RP —— Relying Party(依赖方 / 客户端)
+## Client(OIDC:Relying Party / RP)
 
 **控制台:<https://mock.authn.tech/rp/>**
 
@@ -31,7 +31,7 @@ OIDC / OAuth2 一侧包含三个角色:**OP**(签发方)、**RP**(客户端)、*
 
 > 回调地址 `https://mock.authn.tech/rp/callback` 需加入外部 OP 的白名单。
 
-## RS —— Resource Server(资源服务器 / 受保护 API)
+## Resource Server(资源服务器 / 受保护 API)
 
 **说明页:<https://mock.authn.tech/rs/>** · 受保护端点 `GET /rs/api`
 
