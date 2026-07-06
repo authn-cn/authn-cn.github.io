@@ -63,7 +63,9 @@ export default defineUserConfig({
       {
         text: 'Mock 服务器',
         children: [
-          { text: '端点与说明', link: '/mock/' },
+          { text: '概览 / 角色术语', link: '/mock/' },
+          { text: 'OIDC Mock', link: '/mock/oidc.html' },
+          { text: 'SAML Mock', link: '/mock/saml.html' },
           { text: 'OIDC 登录演示', link: '/mock/demo.html' },
         ],
       },
@@ -128,26 +130,46 @@ export default defineUserConfig({
         {
           text: '在线工具',
           children: [
-            '/tools/README.md',
+            { text: '工具总览', link: '/tools/' },
             {
               text: 'JWT / JWK',
-              children: ['/tools/jwt.md', '/tools/jwt-sign.md', '/tools/jwk.md', '/tools/jwk-convert.md', '/tools/pem-to-jwk.md'],
+              children: [
+                { text: 'JWT 解析', link: '/tools/jwt.html' },
+                { text: 'JWT 签名', link: '/tools/jwt-sign.html' },
+                { text: 'JWK 生成', link: '/tools/jwk.html' },
+                { text: 'JWK → PEM', link: '/tools/jwk-convert.html' },
+                { text: 'PEM → JWK', link: '/tools/pem-to-jwk.html' },
+              ],
             },
             {
               text: 'OAuth2 / OIDC',
-              children: ['/tools/pkce.md', '/tools/discovery.md'],
+              children: [
+                { text: 'PKCE 生成', link: '/tools/pkce.html' },
+                { text: 'Discovery', link: '/tools/discovery.html' },
+              ],
             },
             {
               text: 'MFA / Passkey',
-              children: ['/tools/totp.md', '/tools/webauthn.md'],
+              children: [
+                { text: 'TOTP', link: '/tools/totp.html' },
+                { text: 'WebAuthn', link: '/tools/webauthn.html' },
+              ],
             },
             {
               text: 'SAML',
-              children: ['/tools/saml.md', '/tools/saml-metadata.md', '/tools/saml-parse.md'],
+              children: [
+                { text: '编解码', link: '/tools/saml.html' },
+                { text: 'Metadata 解析', link: '/tools/saml-metadata.html' },
+                { text: 'Response 解析', link: '/tools/saml-parse.html' },
+              ],
             },
             {
               text: '证书 / 编码',
-              children: ['/tools/cert.md', '/tools/pem-parse.md', '/tools/base64url.md'],
+              children: [
+                { text: 'X.509 证书', link: '/tools/cert.html' },
+                { text: 'PEM 解析', link: '/tools/pem-parse.html' },
+                { text: 'Base64URL', link: '/tools/base64url.html' },
+              ],
             },
           ],
         },
@@ -155,7 +177,12 @@ export default defineUserConfig({
       '/mock/': [
         {
           text: 'Mock 服务器',
-          children: ['/mock/README.md', '/mock/demo.md'],
+          children: [
+            { text: '概览 / 角色术语', link: '/mock/' },
+            { text: 'OIDC Mock', link: '/mock/oidc.html' },
+            { text: 'SAML Mock', link: '/mock/saml.html' },
+            { text: 'OIDC 登录演示', link: '/mock/demo.html' },
+          ],
         },
       ],
     },

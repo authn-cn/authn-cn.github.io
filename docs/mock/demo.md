@@ -4,7 +4,7 @@ title: OIDC 登录演示
 
 # OIDC 登录演示（真实流程）
 
-下面是一个**真实可点**的 OpenID Connect 登录演示,后端是本站的 [Mock OIDC OP](./README.md)。点击按钮后:
+下面是一个**真实可点**的 OpenID Connect 登录演示,后端是本站的 [Mock OIDC OP](./oidc.md)。点击按钮后:
 
 1. 浏览器生成 PKCE（`code_verifier` / `code_challenge`）与 `state`、`nonce`,跳转到 Mock OP 的授权端点;
 2. 在 Mock OP 选择一个测试用户（alice / bob）——它没有密码,点谁就是谁;
@@ -23,7 +23,7 @@ title: OIDC 登录演示
 - **`aud` 校验**:确认 ID Token 的 `aud` 是本客户端。
 - **令牌与身份分离**:`access_token` 用于调 `userinfo`,`id_token` 用于确认"用户是谁"。
 
-想手动逐步操作、或在自己的应用里接入,见 [Mock 服务器端点与快速开始](./README.md);想解析任意 JWT,用 [JWT 解析器](../tools/jwt.md)。
+想手动逐步操作、或在自己的应用里接入,见 [OIDC Mock 端点与调用顺序](./oidc.md);想解析任意 JWT,用 [JWT 解析器](../tools/jwt.md)。
 
 <script setup>
 import OidcDemo from '@components/OidcDemo.vue'
