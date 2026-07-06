@@ -2,7 +2,7 @@
 home: true
 title: Startseite
 heroText: Authn.tech
-tagline: Authentifizierungs- und Autorisierungswerkzeuge auf Deutsch — Online-Tools · Mock-Server · Protokolldokumentation
+tagline: Praxisnahe Tools für Authentifizierung & Autorisierung — Online-Tools · Mock-Server · Protokolldoku
 actions:
   - text: Online-Tools öffnen
     link: /de/tools/

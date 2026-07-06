@@ -2,9 +2,9 @@
   <div class="authn-tool">
     <div class="authn-row">
       <div class="authn-field">
-        <label class="authn-label">算法 alg</label>
+        <label class="authn-label">{{ t('algLabel') }}</label>
         <select v-model="alg" class="authn-select">
-          <optgroup label="HMAC（对称密钥）">
+          <optgroup :label="t('hmacGroup')">
             <option>HS256</option><option>HS384</option><option>HS512</option>
           </optgroup>
           <optgroup label="RSA">
@@ -18,37 +18,88 @@
       </div>
     </div>
 
-    <label class="authn-label">Payload（JSON）</label>
+    <label class="authn-label">{{ t('payloadLabel') }}</label>
     <textarea v-model="payload" class="authn-textarea" rows="7" spellcheck="false"></textarea>
-    <button class="authn-btn secondary" @click="fillTimes">填入 iat / exp（现在 / +1h）</button>
+    <button class="authn-btn secondary" @click="fillTimes">{{ t('fillTimesBtn') }}</button>
 
     <template v-if="isHmac">
-      <label class="authn-label">Secret（HMAC）</label>
+      <label class="authn-label">{{ t('secretLabel') }}</label>
       <input v-model="secret" class="authn-input" spellcheck="false" placeholder="your-256-bit-secret" />
     </template>
     <template v-else>
-      <label class="authn-label">私钥 PEM（PKCS#8,与 alg 匹配）</label>
+      <label class="authn-label">{{ t('privPemLabel') }}</label>
       <textarea v-model="privPem" class="authn-textarea" rows="5" spellcheck="false" placeholder="-----BEGIN PRIVATE KEY-----&#10;...&#10;-----END PRIVATE KEY-----"></textarea>
-      <button class="authn-btn secondary" :disabled="busy" @click="genKey">生成匹配的测试密钥对</button>
+      <button class="authn-btn secondary" :disabled="busy" @click="genKey">{{ t('genKeyBtn') }}</button>
       <pre v-if="genPubPem" class="authn-pre">{{ genPubPem }}</pre>
     </template>
 
     <p></p>
-    <button class="authn-btn" :disabled="busy" @click="sign">签名生成 JWT</button>
+    <button class="authn-btn" :disabled="busy" @click="sign">{{ t('signBtn') }}</button>
     <p v-if="error" class="authn-error">{{ error }}</p>
 
     <template v-if="token">
-      <label class="authn-label">生成的 JWT</label>
+      <label class="authn-label">{{ t('tokenLabel') }}</label>
       <div class="jwt-colored">
         <span class="c-h">{{ token.split('.')[0] }}</span><span class="c-dot">.</span><span class="c-p">{{ token.split('.')[1] }}</span><span class="c-dot">.</span><span class="c-s">{{ token.split('.')[2] }}</span>
       </div>
-      <p class="authn-note">可复制到 <a href="./jwt.html">JWT 验签工具</a> 用对应密钥/公钥验证。密钥与签名均在浏览器本地完成,不上传。</p>
+      <p class="authn-note" v-html="t('note')"></p>
     </template>
   </div>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
+import { useT } from './i18n.js'
+
+const messages = {
+  zh: {
+    algLabel: '算法 alg',
+    hmacGroup: 'HMAC（对称密钥）',
+    payloadLabel: 'Payload（JSON）',
+    fillTimesBtn: '填入 iat / exp（现在 / +1h）',
+    secretLabel: 'Secret（HMAC）',
+    privPemLabel: '私钥 PEM（PKCS#8,与 alg 匹配）',
+    genKeyBtn: '生成匹配的测试密钥对',
+    signBtn: '签名生成 JWT',
+    tokenLabel: '生成的 JWT',
+    note: '可复制到 <a href="./jwt.html">JWT 验签工具</a> 用对应密钥/公钥验证。密钥与签名均在浏览器本地完成,不上传。',
+    genKeyFail: '生成密钥失败：',
+    payloadInvalid: 'Payload 不是合法 JSON',
+    signFail: '签名失败：',
+  },
+  en: {
+    algLabel: 'Algorithm (alg)',
+    hmacGroup: 'HMAC (symmetric key)',
+    payloadLabel: 'Payload (JSON)',
+    fillTimesBtn: 'Fill iat / exp (now / +1h)',
+    secretLabel: 'Secret (HMAC)',
+    privPemLabel: 'Private key PEM (PKCS#8, must match alg)',
+    genKeyBtn: 'Generate matching test key pair',
+    signBtn: 'Sign to generate JWT',
+    tokenLabel: 'Generated JWT',
+    note: 'Copy to the <a href="./jwt.html">JWT verification tool</a> to verify with the matching key/public key. Signing and keys are handled entirely in your browser and never uploaded.',
+    genKeyFail: 'Key generation failed: ',
+    payloadInvalid: 'Payload is not valid JSON',
+    signFail: 'Signing failed: ',
+  },
+  de: {
+    algLabel: 'Algorithmus (alg)',
+    hmacGroup: 'HMAC (symmetrischer Schlüssel)',
+    payloadLabel: 'Payload (JSON)',
+    fillTimesBtn: 'iat / exp einfügen (jetzt / +1h)',
+    secretLabel: 'Secret (HMAC)',
+    privPemLabel: 'Privater Schlüssel PEM (PKCS#8, muss zum alg passen)',
+    genKeyBtn: 'Passendes Test-Schlüsselpaar erzeugen',
+    signBtn: 'Signieren und JWT erzeugen',
+    tokenLabel: 'Erzeugtes JWT',
+    note: 'Kann in das <a href="./jwt.html">JWT-Prüfwerkzeug</a> kopiert werden, um mit dem passenden Schlüssel/öffentlichen Schlüssel zu verifizieren. Schlüssel und Signatur werden vollständig lokal im Browser verarbeitet und nicht hochgeladen.',
+    genKeyFail: 'Schlüsselerzeugung fehlgeschlagen: ',
+    payloadInvalid: 'Payload ist kein gültiges JSON',
+    signFail: 'Signieren fehlgeschlagen: ',
+  },
+}
+const t = useT(messages)
+
 const alg = ref('HS256')
 const payload = ref('')
 const secret = ref('your-256-bit-secret')
@@ -109,7 +160,7 @@ async function genKey() {
     privPem.value = pem('PRIVATE KEY', await crypto.subtle.exportKey('pkcs8', kp.privateKey))
     genPubPem.value = pem('PUBLIC KEY', await crypto.subtle.exportKey('spki', kp.publicKey))
   } catch (e) {
-    error.value = '生成密钥失败：' + (e.message || String(e))
+    error.value = t('genKeyFail') + (e.message || String(e))
   } finally {
     busy.value = false
   }
@@ -121,7 +172,7 @@ async function sign() {
   busy.value = true
   try {
     let payloadObj
-    try { payloadObj = JSON.parse(payload.value) } catch { throw new Error('Payload 不是合法 JSON') }
+    try { payloadObj = JSON.parse(payload.value) } catch { throw new Error(t('payloadInvalid')) }
     const cfg = ALGS[alg.value]
     const headerSeg = b64urlStr(JSON.stringify({ alg: alg.value, typ: 'JWT' }))
     const payloadSeg = b64urlStr(JSON.stringify(payloadObj))
@@ -146,7 +197,7 @@ async function sign() {
     }
     token.value = headerSeg + '.' + payloadSeg + '.' + b64urlBytes(new Uint8Array(sigBuf))
   } catch (e) {
-    error.value = '签名失败：' + (e.message || String(e))
+    error.value = t('signFail') + (e.message || String(e))
   } finally {
     busy.value = false
   }

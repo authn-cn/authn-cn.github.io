@@ -2,7 +2,7 @@
   <div class="authn-tool">
     <label class="authn-label">SAML Metadata XML</label>
     <textarea v-model="input" class="authn-textarea" rows="7" spellcheck="false"
-      placeholder="粘贴 EntityDescriptor / EntitiesDescriptor XML" @input="parse"></textarea>
+      :placeholder="t('inputPlaceholder')" @input="parse"></textarea>
     <p v-if="error" class="authn-error">{{ error }}</p>
 
     <div v-for="(ent, i) in entities" :key="i" class="md-entity">
@@ -18,7 +18,7 @@
 
         <template v-if="role.endpoints.length">
           <table class="authn-table">
-            <thead><tr><th>端点</th><th>Binding</th><th>Location</th></tr></thead>
+            <thead><tr><th>{{ t('endpointCol') }}</th><th>Binding</th><th>Location</th></tr></thead>
             <tbody>
               <tr v-for="(ep, k) in role.endpoints" :key="k">
                 <td>{{ ep.kind }}</td><td>{{ ep.binding }}</td><td style="word-break:break-all">{{ ep.location }}</td>
@@ -27,28 +27,84 @@
           </table>
         </template>
 
-        <p v-if="role.nameIdFormats.length" class="authn-note">NameIDFormat：{{ role.nameIdFormats.join('、') }}</p>
+        <p v-if="role.nameIdFormats.length" class="authn-note">{{ t('nameIdFormatPrefix') }}{{ role.nameIdFormats.join('、') }}</p>
 
         <div v-for="(cert, m) in role.certs" :key="m" class="md-cert">
-          <p class="authn-note">证书（use={{ cert.use || '未指定' }}）</p>
+          <p class="authn-note">{{ t('certUsePrefix') }}（use={{ cert.use || t('unspecified') }}）</p>
           <table v-if="cert.info" class="authn-table"><tbody>
             <tr><td>Subject</td><td style="word-break:break-all">{{ cert.info.subject }}</td></tr>
-            <tr><td>有效期</td><td>{{ cert.info.notBefore.str }} → {{ cert.info.notAfter.str }}
-              <span :class="cert.info.expired ? 'authn-bad' : 'authn-ok'">{{ cert.info.expired ? '已过期' : cert.info.notYet ? '尚未生效' : '有效' }}</span></td></tr>
-            <tr><td>公钥/签名</td><td>{{ cert.info.pubAlg }} / {{ cert.info.sigAlg }}</td></tr>
+            <tr><td>{{ t('validityLabel') }}</td><td>{{ cert.info.notBefore.str }} → {{ cert.info.notAfter.str }}
+              <span :class="cert.info.expired ? 'authn-bad' : 'authn-ok'">{{ cert.info.expired ? t('expired') : cert.info.notYet ? t('notYetValid') : t('valid') }}</span></td></tr>
+            <tr><td>{{ t('pubSigLabel') }}</td><td>{{ cert.info.pubAlg }} / {{ cert.info.sigAlg }}</td></tr>
             <tr><td>SHA-256</td><td style="word-break:break-all">{{ cert.info.sha256Hex }}</td></tr>
           </tbody></table>
           <p v-else class="authn-error">{{ cert.err }}</p>
         </div>
       </div>
     </div>
-    <p v-if="entities.length" class="authn-note">纯浏览器本地解析,不上传。可把证书粘到 <a href="./cert.html">X.509 解析</a> 看更多字段。</p>
+    <p v-if="entities.length" class="authn-note" v-html="t('localOnlyNote')"></p>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
 import { parseCertificate } from './x509.js'
+import { useT } from './i18n.js'
+
+const messages = {
+  zh: {
+    inputPlaceholder: '粘贴 EntityDescriptor / EntitiesDescriptor XML',
+    endpointCol: '端点',
+    nameIdFormatPrefix: 'NameIDFormat：',
+    certUsePrefix: '证书',
+    unspecified: '未指定',
+    validityLabel: '有效期',
+    expired: '已过期',
+    notYetValid: '尚未生效',
+    valid: '有效',
+    pubSigLabel: '公钥/签名',
+    localOnlyNote: '纯浏览器本地解析,不上传。可把证书粘到 <a href="./cert.html">X.509 解析</a> 看更多字段。',
+    xmlParseError: 'XML 解析错误',
+    xmlParseFailPrefix: 'XML 解析失败：',
+    noEntityDescriptor: '未找到 EntityDescriptor。',
+    certParseFailPrefix: '证书解析失败：',
+  },
+  en: {
+    inputPlaceholder: 'Paste EntityDescriptor / EntitiesDescriptor XML',
+    endpointCol: 'Endpoint',
+    nameIdFormatPrefix: 'NameIDFormat: ',
+    certUsePrefix: 'Certificate',
+    unspecified: 'unspecified',
+    validityLabel: 'Validity',
+    expired: 'Expired',
+    notYetValid: 'Not yet valid',
+    valid: 'Valid',
+    pubSigLabel: 'Public key / Signature',
+    localOnlyNote: 'Parsed entirely in your browser; nothing is uploaded. You can paste the certificate into the <a href="./cert.html">X.509 parser</a> for more fields.',
+    xmlParseError: 'XML parse error',
+    xmlParseFailPrefix: 'XML parsing failed: ',
+    noEntityDescriptor: 'No EntityDescriptor found.',
+    certParseFailPrefix: 'Certificate parsing failed: ',
+  },
+  de: {
+    inputPlaceholder: 'EntityDescriptor-/EntitiesDescriptor-XML einfügen',
+    endpointCol: 'Endpunkt',
+    nameIdFormatPrefix: 'NameIDFormat: ',
+    certUsePrefix: 'Zertifikat',
+    unspecified: 'nicht angegeben',
+    validityLabel: 'Gültigkeit',
+    expired: 'Abgelaufen',
+    notYetValid: 'Noch nicht gültig',
+    valid: 'Gültig',
+    pubSigLabel: 'Öffentlicher Schlüssel/Signatur',
+    localOnlyNote: 'Wird vollständig lokal im Browser verarbeitet, nichts wird hochgeladen. Das Zertifikat kann in den <a href="./cert.html">X.509-Parser</a> eingefügt werden, um weitere Felder zu sehen.',
+    xmlParseError: 'XML-Parsefehler',
+    xmlParseFailPrefix: 'XML-Verarbeitung fehlgeschlagen: ',
+    noEntityDescriptor: 'Kein EntityDescriptor gefunden.',
+    certParseFailPrefix: 'Zertifikatverarbeitung fehlgeschlagen: ',
+  },
+}
+const t = useT(messages)
 
 const input = ref('')
 const error = ref('')
@@ -68,14 +124,14 @@ async function parse() {
   let doc
   try {
     doc = new DOMParser().parseFromString(input.value, 'text/xml')
-    if (doc.getElementsByTagName('parsererror').length) throw new Error('XML 解析错误')
+    if (doc.getElementsByTagName('parsererror').length) throw new Error(t('xmlParseError'))
   } catch (e) {
-    error.value = 'XML 解析失败：' + (e.message || '')
+    error.value = t('xmlParseFailPrefix') + (e.message || '')
     return
   }
   const eds = tag(doc.documentElement, 'EntityDescriptor')
   const list = eds.length ? eds : (doc.documentElement.localName === 'EntityDescriptor' ? [doc.documentElement] : [])
-  if (!list.length) { error.value = '未找到 EntityDescriptor。'; return }
+  if (!list.length) { error.value = t('noEntityDescriptor'); return }
 
   const result = []
   for (const ed of list) {
@@ -98,7 +154,7 @@ async function parse() {
             try {
               certs.push({ use, info: await parseCertificate(x.textContent.trim()) })
             } catch (e) {
-              certs.push({ use, err: '证书解析失败：' + (e.message || '') })
+              certs.push({ use, err: t('certParseFailPrefix') + (e.message || '') })
             }
           }
         }

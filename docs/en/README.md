@@ -2,7 +2,7 @@
 home: true
 title: Home
 heroText: Authn.tech
-tagline: Chinese authentication and authorization tools — Online tools · Mock server · Protocol docs
+tagline: Hands-on tools for authentication & authorization — Online tools · Mock servers · Protocol docs
 actions:
   - text: Open Online Tools
     link: /en/tools/
@@ -16,8 +16,8 @@ features:
   - title: 🚀 Mock Server
     details: Live SAML / OIDC dual-protocol Mock with all four roles (IdP / SP / OP / RP) plus resource server, real signature verification, for integration testing, E2E testing, and learning.
   - title: 📖 Protocol Docs
-    details: Systematic Chinese documentation for SAML 2.0, OAuth 2.0, OIDC, WebAuthn/Passkey, MFA/TOTP — core concepts, typical flows, key parameters, oriented towards engineering practice.
-footer: Authn.tech · Making authentication and authorization clear in Chinese
+    details: Systematic documentation for SAML 2.0, OAuth 2.0, OIDC, WebAuthn/Passkey, MFA/TOTP — core concepts, typical flows, key parameters, oriented towards engineering practice.
+footer: Authn.tech · Authentication & authorization, clearly explained
 ---
 
 ## Online Tools

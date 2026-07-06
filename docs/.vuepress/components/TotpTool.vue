@@ -2,72 +2,72 @@
   <div class="authn-tool">
     <!-- ============ 1. 已保存的 TOTP(管理,最常用)============ -->
     <template v-if="saved.length">
-      <div class="totp-section">已保存的 TOTP(浏览器本地)</div>
+      <div class="totp-section">{{ t('savedSectionTitle') }}</div>
       <table class="totp-list">
         <tbody>
           <tr v-for="s in saved" :key="s.id">
             <td class="totp-list-name">
-              <div><strong>{{ s.issuer || '(无 issuer)' }}</strong></div>
+              <div><strong>{{ s.issuer || t('noIssuer') }}</strong></div>
               <div class="totp-list-acct">{{ s.account }}</div>
             </td>
             <td class="totp-list-code">{{ savedCodes[s.id]?.code || '------' }}</td>
             <td class="totp-list-rem">{{ savedCodes[s.id]?.remaining ?? '' }}<span v-if="savedCodes[s.id]">s</span></td>
             <td class="totp-list-btns">
-              <button class="authn-btn sm" @click="copyText(savedCodes[s.id]?.code)">复制</button>
-              <button class="authn-btn sm" @click="loadSaved(s)">编辑</button>
-              <button class="authn-btn sm danger" @click="removeSaved(s.id)">删除</button>
+              <button class="authn-btn sm" @click="copyText(savedCodes[s.id]?.code)">{{ t('copyBtn') }}</button>
+              <button class="authn-btn sm" @click="loadSaved(s)">{{ t('editBtn') }}</button>
+              <button class="authn-btn sm danger" @click="removeSaved(s.id)">{{ t('deleteBtn') }}</button>
             </td>
           </tr>
         </tbody>
       </table>
-      <p class="authn-note">列表保存在本机 localStorage,可跨刷新保留。“编辑”会把该条载入下方编辑区。</p>
+      <p class="authn-note">{{ t('savedListNotePre') }}{{ t('editBtn') }}{{ t('savedListNotePost') }}</p>
     </template>
 
     <!-- ============ 2. 导入 ============ -->
-    <div class="totp-section">导入</div>
+    <div class="totp-section">{{ t('importSectionTitle') }}</div>
     <div class="totp-import">
       <div class="authn-field">
-        <label class="authn-label">从二维码图片导入</label>
+        <label class="authn-label">{{ t('importQrLabel') }}</label>
         <input type="file" accept="image/*" class="authn-input" @change="onQrFile" />
       </div>
       <div class="authn-field" style="flex:2">
-        <label class="authn-label">或粘贴 otpauth:// URI</label>
+        <label class="authn-label">{{ t('importUriLabel') }}</label>
         <div style="display:flex;gap:.5rem">
           <input v-model="importUri" class="authn-input" spellcheck="false" placeholder="otpauth://totp/Issuer:acct?secret=..." />
-          <button class="authn-btn" @click="importFromUri">导入</button>
+          <button class="authn-btn" @click="importFromUri">{{ t('importBtn') }}</button>
         </div>
       </div>
     </div>
     <p v-if="importMsg" :class="importOk ? 'authn-ok' : 'authn-bad'">{{ importMsg }}</p>
 
     <!-- ============ 3. 生成 / 编辑 / 校验(较少用)============ -->
-    <div class="totp-section">生成 / 编辑</div>
+    <div class="totp-section">{{ t('genSectionTitle') }}</div>
 
     <!-- 当前验证码 + 复制 / 收藏 / 保存(高频动作提前)-->
     <template v-if="!error && secret">
       <div class="totp-code">
         <div class="totp-digits">{{ code }}</div>
         <div class="totp-count">{{ remaining }}s</div>
-        <button class="authn-btn totp-copy" @click="copyText(code)">复制</button>
+        <button class="authn-btn totp-copy" @click="copyText(code)">{{ t('copyBtn') }}</button>
       </div>
       <div class="totp-actions">
-        <button class="authn-btn" @click="saveCurrent">➕ 保存到本地列表</button>
-        <button class="authn-btn" @click="pinToUrl">🔖 放进地址栏(Ctrl+D 收藏)</button>
-        <button class="authn-btn" @click="copyText(shareUrl)">复制收藏链接</button>
+        <button class="authn-btn" @click="saveCurrent">{{ t('saveToListBtn') }}</button>
+        <button class="authn-btn" @click="pinToUrl">{{ t('pinToUrlBtn') }}</button>
+        <button class="authn-btn" @click="copyText(shareUrl)">{{ t('copyShareLinkBtn') }}</button>
       </div>
       <p class="authn-note totp-warn">
-        ⚠ 收藏链接会把 secret 明文放进 URL / 书签 / 浏览器本地存储,<strong>仅用于测试密钥</strong>,勿存放生产密钥。
+        {{ t('shareWarnPre') }}<strong>{{ t('shareWarnStrong') }}</strong>{{ t('shareWarnPost') }}
       </p>
     </template>
 
     <!-- 参数编辑区 -->
     <div class="authn-row">
       <div class="authn-field">
-        <label class="authn-label">Secret（Base32）</label>
+        <label class="authn-label">{{ t('secretLabel') }}</label>
         <input v-model="secret" class="authn-input" spellcheck="false" @input="onChange" />
       </div>
       <div class="authn-field" style="display:flex;align-items:flex-end;gap:.5rem">
-        <button class="authn-btn" @click="genSecret">随机生成</button>
+        <button class="authn-btn" @click="genSecret">{{ t('genSecretBtn') }}</button>
       </div>
     </div>
     <div class="authn-row">
@@ -76,13 +76,13 @@
         <input v-model="issuer" class="authn-input" @input="onChange" />
       </div>
       <div class="authn-field">
-        <label class="authn-label">账户</label>
+        <label class="authn-label">{{ t('accountLabel') }}</label>
         <input v-model="account" class="authn-input" @input="onChange" />
       </div>
     </div>
     <div class="authn-row">
       <div class="authn-field">
-        <label class="authn-label">period(秒)</label>
+        <label class="authn-label">{{ t('periodLabel') }}</label>
         <input v-model.number="period" type="number" class="authn-input" @input="onChange" />
       </div>
       <div class="authn-field">
@@ -102,17 +102,17 @@
       <label class="authn-label">otpauth:// URI</label>
       <pre class="authn-pre">{{ otpauth }}</pre>
 
-      <img v-if="qr" :src="qr" alt="otpauth 二维码" class="totp-qr" />
-      <p class="authn-note">用 Google Authenticator / Authy 等扫码添加。密钥与验证码均在浏览器本地计算,不上传。</p>
+      <img v-if="qr" :src="qr" :alt="t('qrAlt')" class="totp-qr" />
+      <p class="authn-note">{{ t('qrNote') }}</p>
 
-      <label class="authn-label">校验一个验证码</label>
+      <label class="authn-label">{{ t('checkCodeLabel') }}</label>
       <div class="authn-row">
         <div class="authn-field">
-          <input v-model="check" class="authn-input" placeholder="输入 6/8 位验证码" @input="doCheck" />
+          <input v-model="check" class="authn-input" :placeholder="t('checkPlaceholder')" @input="doCheck" />
         </div>
         <div class="authn-field" style="display:flex;align-items:center">
-          <span v-if="checkResult === 'ok'" class="authn-ok">✔ 有效(±1 时间窗)</span>
-          <span v-else-if="checkResult === 'bad'" class="authn-bad">✗ 无效</span>
+          <span v-if="checkResult === 'ok'" class="authn-ok">{{ t('checkOk') }}</span>
+          <span v-else-if="checkResult === 'bad'" class="authn-bad">{{ t('checkBad') }}</span>
         </div>
       </div>
     </template>
@@ -121,6 +121,134 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useT } from './i18n.js'
+
+const messages = {
+  zh: {
+    savedSectionTitle: '已保存的 TOTP(浏览器本地)',
+    noIssuer: '(无 issuer)',
+    copyBtn: '复制',
+    editBtn: '编辑',
+    deleteBtn: '删除',
+    savedListNotePre: '列表保存在本机 localStorage,可跨刷新保留。“',
+    savedListNotePost: '”会把该条载入下方编辑区。',
+    importSectionTitle: '导入',
+    importQrLabel: '从二维码图片导入',
+    importUriLabel: '或粘贴 otpauth:// URI',
+    importBtn: '导入',
+    genSectionTitle: '生成 / 编辑',
+    saveToListBtn: '➕ 保存到本地列表',
+    pinToUrlBtn: '🔖 放进地址栏(Ctrl+D 收藏)',
+    copyShareLinkBtn: '复制收藏链接',
+    shareWarnPre: '⚠ 收藏链接会把 secret 明文放进 URL / 书签 / 浏览器本地存储,',
+    shareWarnStrong: '仅用于测试密钥',
+    shareWarnPost: ',勿存放生产密钥。',
+    secretLabel: 'Secret（Base32）',
+    genSecretBtn: '随机生成',
+    accountLabel: '账户',
+    periodLabel: 'period(秒)',
+    qrAlt: 'otpauth 二维码',
+    qrNote: '用 Google Authenticator / Authy 等扫码添加。密钥与验证码均在浏览器本地计算,不上传。',
+    checkCodeLabel: '校验一个验证码',
+    checkPlaceholder: '输入 6/8 位验证码',
+    checkOk: '✔ 有效(±1 时间窗)',
+    checkBad: '✗ 无效',
+    secretInvalidChar: 'secret 含非 Base32 字符',
+    importedFromUri: '已导入 otpauth URI。',
+    importFailedPre: '导入失败:',
+    notOtpauthUri: '不是 otpauth://totp URI',
+    uriMissingSecret: 'URI 缺少 secret',
+    cannotLoadImage: '无法加载图片',
+    noQrDetected: '未识别到二维码',
+    importedFromQr: '已从二维码导入。',
+    scanFailedPre: '扫码失败:',
+    errorCode: '错误',
+    alreadyInList: '该 TOTP 已在列表中。',
+  },
+  en: {
+    savedSectionTitle: 'Saved TOTPs (local to this browser)',
+    noIssuer: '(no issuer)',
+    copyBtn: 'Copy',
+    editBtn: 'Edit',
+    deleteBtn: 'Delete',
+    savedListNotePre: 'The list is kept in local localStorage and survives refreshes. "',
+    savedListNotePost: '" loads that entry into the edit area below.',
+    importSectionTitle: 'Import',
+    importQrLabel: 'Import from a QR code image',
+    importUriLabel: 'Or paste an otpauth:// URI',
+    importBtn: 'Import',
+    genSectionTitle: 'Generate / Edit',
+    saveToListBtn: '➕ Save to local list',
+    pinToUrlBtn: '🔖 Pin to address bar (Ctrl+D to bookmark)',
+    copyShareLinkBtn: 'Copy bookmark link',
+    shareWarnPre: '⚠ The bookmark link puts the secret in plain text into the URL / bookmarks / browser local storage, ',
+    shareWarnStrong: 'for test secrets only',
+    shareWarnPost: ' — do not store production secrets this way.',
+    secretLabel: 'Secret (Base32)',
+    genSecretBtn: 'Generate randomly',
+    accountLabel: 'Account',
+    periodLabel: 'period (seconds)',
+    qrAlt: 'otpauth QR code',
+    qrNote: 'Scan with Google Authenticator / Authy etc. The secret and codes are computed locally in your browser and never uploaded.',
+    checkCodeLabel: 'Verify a code',
+    checkPlaceholder: 'Enter a 6/8-digit code',
+    checkOk: '✔ Valid (±1 time step)',
+    checkBad: '✗ Invalid',
+    secretInvalidChar: 'secret contains non-Base32 characters',
+    importedFromUri: 'otpauth URI imported.',
+    importFailedPre: 'Import failed: ',
+    notOtpauthUri: 'Not an otpauth://totp URI',
+    uriMissingSecret: 'URI is missing secret',
+    cannotLoadImage: 'Failed to load image',
+    noQrDetected: 'No QR code detected',
+    importedFromQr: 'Imported from QR code.',
+    scanFailedPre: 'Scan failed: ',
+    errorCode: 'Error',
+    alreadyInList: 'This TOTP is already in the list.',
+  },
+  de: {
+    savedSectionTitle: 'Gespeicherte TOTPs (lokal im Browser)',
+    noIssuer: '(kein Issuer)',
+    copyBtn: 'Kopieren',
+    editBtn: 'Bearbeiten',
+    deleteBtn: 'Löschen',
+    savedListNotePre: 'Die Liste wird im lokalen localStorage gespeichert und bleibt nach einem Neuladen erhalten. „',
+    savedListNotePost: '" lädt diesen Eintrag in den Bearbeitungsbereich unten.',
+    importSectionTitle: 'Import',
+    importQrLabel: 'Aus QR-Code-Bild importieren',
+    importUriLabel: 'Oder otpauth://-URI einfügen',
+    importBtn: 'Importieren',
+    genSectionTitle: 'Erstellen / Bearbeiten',
+    saveToListBtn: '➕ In lokaler Liste speichern',
+    pinToUrlBtn: '🔖 In Adressleiste anheften (Strg+D zum Speichern)',
+    copyShareLinkBtn: 'Lesezeichen-Link kopieren',
+    shareWarnPre: '⚠ Der Lesezeichen-Link legt das Secret im Klartext in URL / Lesezeichen / lokalem Browser-Speicher ab, ',
+    shareWarnStrong: 'nur für Test-Secrets',
+    shareWarnPost: ' — Produktions-Secrets nicht auf diese Weise speichern.',
+    secretLabel: 'Secret (Base32)',
+    genSecretBtn: 'Zufällig generieren',
+    accountLabel: 'Konto',
+    periodLabel: 'period (Sekunden)',
+    qrAlt: 'otpauth-QR-Code',
+    qrNote: 'Mit Google Authenticator / Authy o. Ä. scannen. Secret und Codes werden lokal im Browser berechnet und nicht hochgeladen.',
+    checkCodeLabel: 'Einen Code prüfen',
+    checkPlaceholder: '6-/8-stelligen Code eingeben',
+    checkOk: '✔ Gültig (±1 Zeitfenster)',
+    checkBad: '✗ Ungültig',
+    secretInvalidChar: 'secret enthält nicht-Base32-Zeichen',
+    importedFromUri: 'otpauth-URI importiert.',
+    importFailedPre: 'Import fehlgeschlagen: ',
+    notOtpauthUri: 'Keine otpauth://totp-URI',
+    uriMissingSecret: 'URI enthält kein secret',
+    cannotLoadImage: 'Bild konnte nicht geladen werden',
+    noQrDetected: 'Kein QR-Code erkannt',
+    importedFromQr: 'Aus QR-Code importiert.',
+    scanFailedPre: 'Scan fehlgeschlagen: ',
+    errorCode: 'Fehler',
+    alreadyInList: 'Dieser TOTP ist bereits in der Liste.',
+  },
+}
+const t = useT(messages)
 
 const B32 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'
 const STORE_KEY = 'authn_totp_saved'
@@ -164,7 +292,7 @@ function b32decode(s) {
   const out = []
   for (const ch of clean) {
     const idx = B32.indexOf(ch)
-    if (idx === -1) throw new Error('secret 含非 Base32 字符')
+    if (idx === -1) throw new Error(t('secretInvalidChar'))
     value = (value << 5) | idx; bits += 5
     if (bits >= 8) { bits -= 8; out.push((value >>> bits) & 0xff) }
   }
@@ -220,7 +348,7 @@ async function tick() {
         code: await hotp(b32decode(s.secret), Math.floor(now / sp), s.digits, s.algorithm),
         remaining: sp - (now % sp),
       }
-    } catch { savedCodes.value[s.id] = { code: '错误', remaining: 0 } }
+    } catch { savedCodes.value[s.id] = { code: t('errorCode'), remaining: 0 } }
   }
 }
 async function doCheck() {
@@ -243,11 +371,11 @@ async function doCheck() {
 // ---------- 导入:otpauth URI ----------
 function parseOtpauth(uri) {
   const u = (uri || '').trim()
-  if (!/^otpauth:\/\/totp\//i.test(u)) throw new Error('不是 otpauth://totp URI')
+  if (!/^otpauth:\/\/totp\//i.test(u)) throw new Error(t('notOtpauthUri'))
   const url = new URL(u)
   const params = url.searchParams
   const sec = params.get('secret')
-  if (!sec) throw new Error('URI 缺少 secret')
+  if (!sec) throw new Error(t('uriMissingSecret'))
   const label = decodeURIComponent(url.pathname.replace(/^\/+/, ''))
   let iss = params.get('issuer') || ''
   let acct = label
@@ -277,9 +405,9 @@ function applyParsed(o) {
 function importFromUri() {
   try {
     applyParsed(parseOtpauth(importUri.value))
-    importOk.value = true; importMsg.value = '已导入 otpauth URI。'
+    importOk.value = true; importMsg.value = t('importedFromUri')
   } catch (e) {
-    importOk.value = false; importMsg.value = '导入失败:' + (e.message || e)
+    importOk.value = false; importMsg.value = t('importFailedPre') + (e.message || e)
   }
 }
 
@@ -298,7 +426,7 @@ function fileToImageData(file) {
       URL.revokeObjectURL(objUrl)
       resolve(data)
     }
-    img.onerror = () => { URL.revokeObjectURL(objUrl); reject(new Error('无法加载图片')) }
+    img.onerror = () => { URL.revokeObjectURL(objUrl); reject(new Error(t('cannotLoadImage'))) }
     img.src = objUrl
   })
 }
@@ -310,12 +438,12 @@ async function onQrFile(e) {
     const imgData = await fileToImageData(file)
     const jsQR = (await import('jsqr')).default
     const result = jsQR(imgData.data, imgData.width, imgData.height)
-    if (!result || !result.data) throw new Error('未识别到二维码')
+    if (!result || !result.data) throw new Error(t('noQrDetected'))
     applyParsed(parseOtpauth(result.data))
-    importOk.value = true; importMsg.value = '已从二维码导入。'
+    importOk.value = true; importMsg.value = t('importedFromQr')
   } catch (err) {
     importOk.value = false
-    importMsg.value = '扫码失败:' + (err.message || err)
+    importMsg.value = t('scanFailedPre') + (err.message || err)
   } finally {
     e.target.value = '' // 允许重复选同一文件
   }
@@ -355,7 +483,7 @@ function saveCurrent() {
   }
   // 去重:同 secret+issuer+account 视为同一条
   const dup = saved.value.find((s) => s.secret === entry.secret && s.issuer === entry.issuer && s.account === entry.account)
-  if (dup) { importOk.value = true; importMsg.value = '该 TOTP 已在列表中。'; return }
+  if (dup) { importOk.value = true; importMsg.value = t('alreadyInList'); return }
   saved.value = [...saved.value, entry]
   persist()
   tick()

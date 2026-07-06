@@ -1,8 +1,8 @@
 <template>
   <div class="authn-tool">
-    <label class="authn-label">JWK 或 JWKS（JSON）</label>
+    <label class="authn-label">{{ t('inputLabel') }}</label>
     <textarea v-model="input" class="authn-textarea" rows="7" spellcheck="false"
-      placeholder='{"kty":"RSA","n":"...","e":"AQAB"} 或 {"keys":[...]}' @input="convert"></textarea>
+      :placeholder="t('inputPlaceholder')" @input="convert"></textarea>
     <p v-if="error" class="authn-error">{{ error }}</p>
 
     <div v-for="(k, i) in keys" :key="i" class="jwk-card">
@@ -10,19 +10,67 @@
         <tr><td><strong>kty</strong></td><td>{{ k.meta.kty }}<span v-if="k.meta.crv">（{{ k.meta.crv }}）</span></td></tr>
         <tr v-if="k.meta.alg"><td><strong>alg</strong></td><td>{{ k.meta.alg }}</td></tr>
         <tr v-if="k.meta.use"><td><strong>use</strong></td><td>{{ k.meta.use }}</td></tr>
-        <tr><td><strong>kid（原始）</strong></td><td style="word-break:break-all">{{ k.meta.kid || '（无）' }}</td></tr>
-        <tr><td><strong>kid（RFC 7638 指纹）</strong></td><td style="word-break:break-all">{{ k.thumbprint }}</td></tr>
-        <tr v-if="k.isPrivate"><td><strong>类型</strong></td><td>含私钥字段(仅导出公钥 PEM)</td></tr>
+        <tr><td><strong>{{ t('kidOriginalLabel') }}</strong></td><td style="word-break:break-all">{{ k.meta.kid || t('none') }}</td></tr>
+        <tr><td><strong>{{ t('kidThumbprintLabel') }}</strong></td><td style="word-break:break-all">{{ k.thumbprint }}</td></tr>
+        <tr v-if="k.isPrivate"><td><strong>{{ t('typeLabel') }}</strong></td><td>{{ t('containsPrivate') }}</td></tr>
       </tbody></table>
-      <label class="authn-label">公钥 PEM（SPKI）</label>
+      <label class="authn-label">{{ t('pubPemLabel') }}</label>
       <pre class="authn-pre">{{ k.pem }}</pre>
     </div>
-    <p v-if="keys.length" class="authn-note">仅导出公钥 PEM。密钥在浏览器本地转换,不上传。可配合 <a href="./jwt.html">JWT 验签</a>。</p>
+    <p v-if="keys.length" class="authn-note" v-html="t('note')"></p>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
+import { useT } from './i18n.js'
+
+const messages = {
+  zh: {
+    inputLabel: 'JWK 或 JWKS（JSON）',
+    inputPlaceholder: '{"kty":"RSA","n":"...","e":"AQAB"} 或 {"keys":[...]}',
+    kidOriginalLabel: 'kid（原始）',
+    kidThumbprintLabel: 'kid（RFC 7638 指纹）',
+    none: '（无）',
+    typeLabel: '类型',
+    containsPrivate: '含私钥字段(仅导出公钥 PEM)',
+    pubPemLabel: '公钥 PEM（SPKI）',
+    note: '仅导出公钥 PEM。密钥在浏览器本地转换,不上传。可配合 <a href="./jwt.html">JWT 验签</a>。',
+    notJson: '不是合法 JSON。',
+    unsupportedKty: '暂不支持 kty=',
+    convertFail: '转换失败：',
+  },
+  en: {
+    inputLabel: 'JWK or JWKS (JSON)',
+    inputPlaceholder: '{"kty":"RSA","n":"...","e":"AQAB"} or {"keys":[...]}',
+    kidOriginalLabel: 'kid (original)',
+    kidThumbprintLabel: 'kid (RFC 7638 thumbprint)',
+    none: '(none)',
+    typeLabel: 'Type',
+    containsPrivate: 'Contains private key fields (only public key PEM is exported)',
+    pubPemLabel: 'Public key PEM (SPKI)',
+    note: 'Only the public key PEM is exported. Keys are converted locally in your browser and never uploaded. Can be used together with the <a href="./jwt.html">JWT verification</a> tool.',
+    notJson: 'Not valid JSON.',
+    unsupportedKty: 'kty not supported yet: ',
+    convertFail: 'Conversion failed: ',
+  },
+  de: {
+    inputLabel: 'JWK oder JWKS (JSON)',
+    inputPlaceholder: '{"kty":"RSA","n":"...","e":"AQAB"} oder {"keys":[...]}',
+    kidOriginalLabel: 'kid (Original)',
+    kidThumbprintLabel: 'kid (RFC 7638 Thumbprint)',
+    none: '(keine)',
+    typeLabel: 'Typ',
+    containsPrivate: 'Enthält Felder des privaten Schlüssels (es wird nur die PEM des öffentlichen Schlüssels exportiert)',
+    pubPemLabel: 'Öffentlicher Schlüssel PEM (SPKI)',
+    note: 'Es wird nur die PEM des öffentlichen Schlüssels exportiert. Schlüssel werden lokal im Browser konvertiert und nicht hochgeladen. Kann zusammen mit dem Werkzeug <a href="./jwt.html">JWT-Prüfung</a> verwendet werden.',
+    notJson: 'Kein gültiges JSON.',
+    unsupportedKty: 'kty wird noch nicht unterstützt: ',
+    convertFail: 'Konvertierung fehlgeschlagen: ',
+  },
+}
+const t = useT(messages)
+
 const input = ref('')
 const error = ref('')
 const keys = ref([])
@@ -51,13 +99,13 @@ async function convert() {
   keys.value = []
   if (!input.value.trim()) return
   let parsed
-  try { parsed = JSON.parse(input.value) } catch { error.value = '不是合法 JSON。'; return }
+  try { parsed = JSON.parse(input.value) } catch { error.value = t('notJson'); return }
   const list = Array.isArray(parsed.keys) ? parsed.keys : [parsed]
 
   const out = []
   for (const jwk of list) {
     try {
-      if (jwk.kty !== 'RSA' && jwk.kty !== 'EC') throw new Error(`暂不支持 kty=${jwk.kty}`)
+      if (jwk.kty !== 'RSA' && jwk.kty !== 'EC') throw new Error(t('unsupportedKty') + jwk.kty)
       // 仅取公钥部分
       const pub = jwk.kty === 'RSA'
         ? { kty: 'RSA', n: jwk.n, e: jwk.e }
@@ -74,7 +122,7 @@ async function convert() {
         isPrivate: !!jwk.d,
       })
     } catch (e) {
-      out.push({ meta: { kty: jwk.kty }, thumbprint: '—', pem: '转换失败：' + (e.message || String(e)), isPrivate: false })
+      out.push({ meta: { kty: jwk.kty }, thumbprint: '—', pem: t('convertFail') + (e.message || String(e)), isPrivate: false })
     }
   }
   keys.value = out

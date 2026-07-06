@@ -2,13 +2,13 @@
   <div class="jwtio">
     <!-- ============ 左栏:Encoded ============ -->
     <section class="jwtio-col">
-      <h3 class="jwtio-h">编码 Encoded</h3>
+      <h3 class="jwtio-h">{{ t('encodedTitle') }}</h3>
       <textarea
         v-model="token"
         class="jwtio-input"
         spellcheck="false"
         rows="8"
-        placeholder="粘贴 JWT（支持 Bearer 前缀）"
+        :placeholder="t('tokenPlaceholder')"
         @input="onTokenInput"
       ></textarea>
       <div v-if="parts" class="jwtio-colored" aria-hidden="true">
@@ -24,10 +24,10 @@
 
     <!-- ============ 右栏:Decoded ============ -->
     <section class="jwtio-col">
-      <h3 class="jwtio-h">解码 Decoded</h3>
+      <h3 class="jwtio-h">{{ t('decodedTitle') }}</h3>
 
       <div class="jwtio-block b-h">
-        <div class="jwtio-block-title">HEADER：算法与类型</div>
+        <div class="jwtio-block-title">{{ t('headerBlockTitle') }}</div>
         <pre class="jwtio-pre">{{ header || '—' }}</pre>
         <table v-if="headerRows.length" class="jwtio-claims">
           <tbody>
@@ -40,7 +40,7 @@
       </div>
 
       <div class="jwtio-block b-p">
-        <div class="jwtio-block-title">PAYLOAD：数据</div>
+        <div class="jwtio-block-title">{{ t('payloadBlockTitle') }}</div>
         <pre class="jwtio-pre">{{ payload || '—' }}</pre>
         <table v-if="timeClaims.length" class="jwtio-times">
           <tbody>
@@ -52,7 +52,7 @@
           </tbody>
         </table>
         <template v-if="claimRows.length">
-          <div class="jwtio-claims-cap">常见声明含义</div>
+          <div class="jwtio-claims-cap">{{ t('commonClaimsCaption') }}</div>
           <table class="jwtio-claims">
             <tbody>
               <tr v-for="r in claimRows" :key="r.key">
@@ -61,30 +61,30 @@
               </tr>
             </tbody>
           </table>
-          <p v-if="hasCustom" class="jwtio-note" style="margin-top:.4rem">其余字段为自定义 / 厂商声明,不在标准之列。</p>
+          <p v-if="hasCustom" class="jwtio-note" style="margin-top:.4rem">{{ t('customClaimsNote') }}</p>
         </template>
       </div>
 
       <div class="jwtio-block b-s">
         <div class="jwtio-block-title">
           VERIFY SIGNATURE
-          <span v-if="verdict === 'valid'" class="badge ok">✔ 签名有效</span>
-          <span v-else-if="verdict === 'invalid'" class="badge bad">✗ 签名无效</span>
+          <span v-if="verdict === 'valid'" class="badge ok">✔ {{ t('sigValid') }}</span>
+          <span v-else-if="verdict === 'invalid'" class="badge bad">✗ {{ t('sigInvalid') }}</span>
           <span v-else-if="verdict.startsWith('error')" class="badge warn">{{ verdict.slice(6) }}</span>
         </div>
 
-        <p class="jwtio-alg">算法：<code>{{ alg || '—' }}</code></p>
+        <p class="jwtio-alg">{{ t('algorithmLabel') }}<code>{{ alg || '—' }}</code></p>
 
         <template v-if="isHmac">
-          <label class="jwtio-lbl">Secret（HMAC 共享密钥）</label>
+          <label class="jwtio-lbl">{{ t('secretLabel') }}</label>
           <input v-model="secret" class="jwtio-key" spellcheck="false" placeholder="your-256-bit-secret" @input="verify" />
           <label class="jwtio-check">
-            <input type="checkbox" v-model="secretB64" @change="verify" /> secret 是 base64url 编码
+            <input type="checkbox" v-model="secretB64" @change="verify" /> {{ t('secretB64Label') }}
           </label>
         </template>
 
         <template v-else-if="isAsym">
-          <label class="jwtio-lbl">Public Key（PEM / SPKI 格式）</label>
+          <label class="jwtio-lbl">{{ t('pubkeyLabel') }}</label>
           <textarea
             v-model="pubkey"
             class="jwtio-key"
@@ -95,13 +95,13 @@
           ></textarea>
         </template>
 
-        <p v-else-if="alg === 'none'" class="jwtio-note">该 token 声明 <code>alg: none</code>,没有签名可验证——这种 token 绝不可被信任。</p>
-        <p v-else-if="alg" class="jwtio-note">暂不支持在浏览器验证 <code>{{ alg }}</code>。</p>
+        <p v-else-if="alg === 'none'" class="jwtio-note">{{ t('algNoneNotePre') }} <code>alg: none</code>{{ t('algNoneNotePost') }}</p>
+        <p v-else-if="alg" class="jwtio-note">{{ t('algUnsupportedPre') }} <code>{{ alg }}</code>{{ t('algUnsupportedPost') }}</p>
       </div>
 
       <p class="jwtio-note">
-        解码 ≠ 验证:JWT 前两段只是 base64 编码,任何人都能读。只有在上方填入正确的密钥/公钥并显示
-        <strong>✔ 签名有效</strong> 后,其中的 claims 才可信。所有运算都在你的浏览器本地完成,token 与密钥不会上传。
+        {{ t('footerNotePre') }}
+        <strong>{{ t('footerNoteStrong') }}</strong>{{ t('footerNotePost') }}
       </p>
     </section>
   </div>
@@ -109,6 +109,117 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import { useT, useLocaleKey } from './i18n.js'
+
+const messages = {
+  zh: {
+    encodedTitle: '编码 Encoded',
+    tokenPlaceholder: '粘贴 JWT（支持 Bearer 前缀）',
+    decodedTitle: '解码 Decoded',
+    headerBlockTitle: 'HEADER：算法与类型',
+    payloadBlockTitle: 'PAYLOAD：数据',
+    commonClaimsCaption: '常见声明含义',
+    customClaimsNote: '其余字段为自定义 / 厂商声明,不在标准之列。',
+    sigValid: '签名有效',
+    sigInvalid: '签名无效',
+    algorithmLabel: '算法：',
+    secretLabel: 'Secret（HMAC 共享密钥）',
+    secretB64Label: 'secret 是 base64url 编码',
+    pubkeyLabel: 'Public Key（PEM / SPKI 格式）',
+    algNoneNotePre: '该 token 声明',
+    algNoneNotePost: ',没有签名可验证——这种 token 绝不可被信任。',
+    algUnsupportedPre: '暂不支持在浏览器验证',
+    algUnsupportedPost: '。',
+    footerNotePre: '解码 ≠ 验证:JWT 前两段只是 base64 编码,任何人都能读。只有在上方填入正确的密钥/公钥并显示',
+    footerNoteStrong: '✔ 签名有效',
+    footerNotePost: ' 后,其中的 claims 才可信。所有运算都在你的浏览器本地完成,token 与密钥不会上传。',
+    invalidJwt: (n) => `无效的 JWT：应由 2~3 段组成,实际为 ${n} 段。`,
+    decodeFailed: '解码失败：某一段不是合法的 Base64URL 编码 JSON。',
+    expired: '已过期',
+    validRemaining: (d) => `有效（剩余 ${d}）`,
+    notYetValid: '尚未生效',
+    alreadyValid: '已生效',
+    ago: (d) => `${d}前`,
+    secretInvalid: '密钥无效',
+    pubkeyParseFailed: '公钥解析失败（需 PEM/SPKI）',
+    secondsUnit: (n) => `${n} 秒`,
+    minutesUnit: (n) => `${n} 分钟`,
+    hoursUnit: (n) => `${n} 小时`,
+    daysUnit: (n) => `${n} 天`,
+  },
+  en: {
+    encodedTitle: 'Encoded',
+    tokenPlaceholder: 'Paste a JWT (Bearer prefix supported)',
+    decodedTitle: 'Decoded',
+    headerBlockTitle: 'HEADER: ALGORITHM & TOKEN TYPE',
+    payloadBlockTitle: 'PAYLOAD: DATA',
+    commonClaimsCaption: 'Common claim meanings',
+    customClaimsNote: 'The remaining fields are custom / vendor-specific claims, not part of the standard.',
+    sigValid: 'Signature Verified',
+    sigInvalid: 'Invalid Signature',
+    algorithmLabel: 'Algorithm: ',
+    secretLabel: 'Secret (HMAC shared secret)',
+    secretB64Label: 'secret is base64url encoded',
+    pubkeyLabel: 'Public Key (PEM / SPKI format)',
+    algNoneNotePre: 'This token declares',
+    algNoneNotePost: ', so there is no signature to verify — such a token must never be trusted.',
+    algUnsupportedPre: 'Browser verification is not yet supported for',
+    algUnsupportedPost: '.',
+    footerNotePre: 'Decoded ≠ verified: the first two segments of a JWT are just base64-encoded, and anyone can read them. The claims can only be trusted once you enter the correct secret/public key above and see',
+    footerNoteStrong: '✔ Signature Verified',
+    footerNotePost: ' — all computation happens locally in your browser; the token and key are never uploaded.',
+    invalidJwt: (n) => `Invalid JWT: expected 2-3 segments, got ${n}.`,
+    decodeFailed: 'Decoding failed: one of the segments is not valid Base64URL-encoded JSON.',
+    expired: 'Expired',
+    validRemaining: (d) => `Valid (expires in ${d})`,
+    notYetValid: 'Not yet valid',
+    alreadyValid: 'Already valid',
+    ago: (d) => `${d} ago`,
+    secretInvalid: 'Invalid secret',
+    pubkeyParseFailed: 'Failed to parse public key (PEM/SPKI required)',
+    secondsUnit: (n) => `${n}s`,
+    minutesUnit: (n) => `${n}m`,
+    hoursUnit: (n) => `${n}h`,
+    daysUnit: (n) => `${n}d`,
+  },
+  de: {
+    encodedTitle: 'Encoded',
+    tokenPlaceholder: 'JWT einfügen (Bearer-Präfix wird unterstützt)',
+    decodedTitle: 'Decoded',
+    headerBlockTitle: 'HEADER: ALGORITHMUS & TOKEN-TYP',
+    payloadBlockTitle: 'PAYLOAD: DATEN',
+    commonClaimsCaption: 'Bedeutung gängiger Claims',
+    customClaimsNote: 'Die übrigen Felder sind benutzerdefinierte / herstellerspezifische Claims und nicht Teil des Standards.',
+    sigValid: 'Signatur gültig',
+    sigInvalid: 'Signatur ungültig',
+    algorithmLabel: 'Algorithmus: ',
+    secretLabel: 'Secret (gemeinsamer HMAC-Schlüssel)',
+    secretB64Label: 'Secret ist base64url-kodiert',
+    pubkeyLabel: 'Public Key (PEM-/SPKI-Format)',
+    algNoneNotePre: 'Dieses Token deklariert',
+    algNoneNotePost: ', es gibt also keine Signatur zu prüfen — einem solchen Token darf niemals vertraut werden.',
+    algUnsupportedPre: 'Die Verifizierung im Browser wird für',
+    algUnsupportedPost: 'noch nicht unterstützt.',
+    footerNotePre: 'Decodiert ≠ verifiziert: Die ersten beiden Segmente eines JWT sind nur base64-kodiert und können von jedem gelesen werden. Die Claims sind erst vertrauenswürdig, wenn oben der richtige Secret-/Public-Key eingetragen wurde und',
+    footerNoteStrong: '✔ Signatur gültig',
+    footerNotePost: ' angezeigt wird. Alle Berechnungen erfolgen lokal in deinem Browser; Token und Schlüssel werden nicht hochgeladen.',
+    invalidJwt: (n) => `Ungültiges JWT: erwartet werden 2–3 Segmente, tatsächlich sind es ${n}.`,
+    decodeFailed: 'Decodierung fehlgeschlagen: Eines der Segmente ist kein gültiges Base64URL-kodiertes JSON.',
+    expired: 'Abgelaufen',
+    validRemaining: (d) => `Gültig (noch ${d})`,
+    notYetValid: 'Noch nicht gültig',
+    alreadyValid: 'Bereits gültig',
+    ago: (d) => `vor ${d}`,
+    secretInvalid: 'Ungültiges Secret',
+    pubkeyParseFailed: 'Public Key konnte nicht geparst werden (PEM/SPKI erforderlich)',
+    secondsUnit: (n) => `${n} Sek.`,
+    minutesUnit: (n) => `${n} Min.`,
+    hoursUnit: (n) => `${n} Std.`,
+    daysUnit: (n) => `${n} Tage`,
+  },
+}
+const t = useT(messages)
+const localeKey = useLocaleKey()
 
 // 预填 jwt.io 经典 HS256 示例(secret = your-256-bit-secret 可验证通过)
 const SAMPLE =
@@ -125,76 +236,218 @@ const error = ref('')
 const timeClaims = ref([])
 
 // 常见 header 参数(JWS/JWT)
-const HEADER_CLAIMS = {
-  alg: '签名算法(Algorithm)',
-  typ: '类型,通常为 JWT',
-  cty: '内容类型(Content Type),嵌套 JWT 时用',
-  kid: '密钥 ID(Key ID),指明用哪个密钥验签',
-  jku: '公钥集(JWKS)的 URL',
-  jwk: '内嵌的验签公钥(JWK)',
-  x5u: 'X.509 证书链的 URL',
-  x5c: '内嵌的 X.509 证书链(base64 DER)',
-  x5t: 'X.509 证书的 SHA-1 指纹',
-  'x5t#S256': 'X.509 证书的 SHA-256 指纹',
-  crit: '必须被理解的扩展参数列表(Critical)',
-  enc: '内容加密算法(JWE)',
+const HEADER_CLAIMS_I18N = {
+  zh: {
+    alg: '签名算法(Algorithm)',
+    typ: '类型,通常为 JWT',
+    cty: '内容类型(Content Type),嵌套 JWT 时用',
+    kid: '密钥 ID(Key ID),指明用哪个密钥验签',
+    jku: '公钥集(JWKS)的 URL',
+    jwk: '内嵌的验签公钥(JWK)',
+    x5u: 'X.509 证书链的 URL',
+    x5c: '内嵌的 X.509 证书链(base64 DER)',
+    x5t: 'X.509 证书的 SHA-1 指纹',
+    'x5t#S256': 'X.509 证书的 SHA-256 指纹',
+    crit: '必须被理解的扩展参数列表(Critical)',
+    enc: '内容加密算法(JWE)',
+  },
+  en: {
+    alg: 'Signature algorithm (Algorithm)',
+    typ: 'Type, typically JWT',
+    cty: 'Content Type, used for nested JWTs',
+    kid: 'Key ID, identifies which key to use for signature verification',
+    jku: 'URL of the JSON Web Key Set (JWKS)',
+    jwk: 'Embedded public key (JWK) used for signature verification',
+    x5u: 'URL of the X.509 certificate chain',
+    x5c: 'Embedded X.509 certificate chain (base64 DER)',
+    x5t: 'SHA-1 thumbprint of the X.509 certificate',
+    'x5t#S256': 'SHA-256 thumbprint of the X.509 certificate',
+    crit: 'List of extension parameters that must be understood (Critical)',
+    enc: 'Content encryption algorithm (JWE)',
+  },
+  de: {
+    alg: 'Signaturalgorithmus (Algorithm)',
+    typ: 'Typ, in der Regel JWT',
+    cty: 'Content Type, für verschachtelte JWTs',
+    kid: 'Key ID, gibt an, welcher Schlüssel zur Signaturprüfung verwendet wird',
+    jku: 'URL des JSON Web Key Set (JWKS)',
+    jwk: 'Eingebetteter öffentlicher Schlüssel (JWK) zur Signaturprüfung',
+    x5u: 'URL der X.509-Zertifikatskette',
+    x5c: 'Eingebettete X.509-Zertifikatskette (base64 DER)',
+    x5t: 'SHA-1-Fingerabdruck des X.509-Zertifikats',
+    'x5t#S256': 'SHA-256-Fingerabdruck des X.509-Zertifikats',
+    crit: 'Liste zwingend zu verstehender Erweiterungsparameter (Critical)',
+    enc: 'Verschlüsselungsalgorithmus für den Inhalt (JWE)',
+  },
 }
 
 // 常见 payload 声明:RFC 7519 注册声明 + OIDC + OAuth + 常见厂商
-const PAYLOAD_CLAIMS = {
-  // RFC 7519 注册声明
-  iss: '签发者(Issuer),谁签发了此 token',
-  sub: '主题(Subject),用户/主体的唯一标识',
-  aud: '受众(Audience),token 的目标接收方',
-  exp: '过期时间(Expiration),此刻之后失效',
-  nbf: '生效时间(Not Before),此刻之前不可用',
-  iat: '签发时间(Issued At)',
-  jti: 'JWT 唯一 ID(JWT ID),可用于防重放',
-  // OIDC ID Token
-  nonce: '关联授权请求的随机值,防重放',
-  auth_time: '用户完成认证的时间',
-  acr: '认证上下文类别(Authentication Context Class Reference)',
-  amr: '认证方法(Authentication Methods),如 pwd/otp/mfa',
-  azp: '被授权方(Authorized Party),目标 client_id',
-  at_hash: 'access_token 的哈希,绑定 ID Token 与访问令牌',
-  c_hash: '授权码 code 的哈希',
-  s_hash: 'state 的哈希',
-  sid: '会话 ID(Session ID),用于单点登出',
-  // OIDC 标准用户资料声明
-  name: '全名',
-  given_name: '名',
-  family_name: '姓',
-  middle_name: '中间名',
-  nickname: '昵称',
-  preferred_username: '首选用户名',
-  profile: '个人资料页 URL',
-  picture: '头像 URL',
-  website: '个人网站',
-  email: '邮箱地址',
-  email_verified: '邮箱是否已验证',
-  gender: '性别',
-  birthdate: '生日',
-  zoneinfo: '时区',
-  locale: '语言/区域',
-  phone_number: '电话号码',
-  phone_number_verified: '电话是否已验证',
-  address: '地址',
-  updated_at: '资料最后更新时间',
-  // OAuth2 访问令牌(RFC 9068)与常见厂商
-  scope: '授权范围(Scopes),空格分隔',
-  scp: '授权范围(Scopes,数组形式,Azure AD)',
-  client_id: '客户端 ID',
-  roles: '角色列表',
-  groups: '用户组列表',
-  token_use: 'token 用途(如 access / id,AWS Cognito)',
-  cid: '客户端 ID(Okta)',
-  uid: '用户 ID(Okta)',
-  ver: 'token 版本',
-  tid: '租户 ID(Azure AD)',
-  oid: '对象 ID(Azure AD 用户)',
-  upn: '用户主体名(User Principal Name,Azure AD)',
-  appid: '应用 ID(Azure AD)',
+const PAYLOAD_CLAIMS_I18N = {
+  zh: {
+    // RFC 7519 注册声明
+    iss: '签发者(Issuer),谁签发了此 token',
+    sub: '主题(Subject),用户/主体的唯一标识',
+    aud: '受众(Audience),token 的目标接收方',
+    exp: '过期时间(Expiration),此刻之后失效',
+    nbf: '生效时间(Not Before),此刻之前不可用',
+    iat: '签发时间(Issued At)',
+    jti: 'JWT 唯一 ID(JWT ID),可用于防重放',
+    // OIDC ID Token
+    nonce: '关联授权请求的随机值,防重放',
+    auth_time: '用户完成认证的时间',
+    acr: '认证上下文类别(Authentication Context Class Reference)',
+    amr: '认证方法(Authentication Methods),如 pwd/otp/mfa',
+    azp: '被授权方(Authorized Party),目标 client_id',
+    at_hash: 'access_token 的哈希,绑定 ID Token 与访问令牌',
+    c_hash: '授权码 code 的哈希',
+    s_hash: 'state 的哈希',
+    sid: '会话 ID(Session ID),用于单点登出',
+    // OIDC 标准用户资料声明
+    name: '全名',
+    given_name: '名',
+    family_name: '姓',
+    middle_name: '中间名',
+    nickname: '昵称',
+    preferred_username: '首选用户名',
+    profile: '个人资料页 URL',
+    picture: '头像 URL',
+    website: '个人网站',
+    email: '邮箱地址',
+    email_verified: '邮箱是否已验证',
+    gender: '性别',
+    birthdate: '生日',
+    zoneinfo: '时区',
+    locale: '语言/区域',
+    phone_number: '电话号码',
+    phone_number_verified: '电话是否已验证',
+    address: '地址',
+    updated_at: '资料最后更新时间',
+    // OAuth2 访问令牌(RFC 9068)与常见厂商
+    scope: '授权范围(Scopes),空格分隔',
+    scp: '授权范围(Scopes,数组形式,Azure AD)',
+    client_id: '客户端 ID',
+    roles: '角色列表',
+    groups: '用户组列表',
+    token_use: 'token 用途(如 access / id,AWS Cognito)',
+    cid: '客户端 ID(Okta)',
+    uid: '用户 ID(Okta)',
+    ver: 'token 版本',
+    tid: '租户 ID(Azure AD)',
+    oid: '对象 ID(Azure AD 用户)',
+    upn: '用户主体名(User Principal Name,Azure AD)',
+    appid: '应用 ID(Azure AD)',
+  },
+  en: {
+    // RFC 7519 registered claims
+    iss: 'Issuer, who issued this token',
+    sub: 'Subject, the unique identifier of the user/principal',
+    aud: 'Audience, the intended recipient(s) of the token',
+    exp: 'Expiration time, invalid after this moment',
+    nbf: 'Not Before, invalid until this moment',
+    iat: 'Issued At time',
+    jti: 'JWT ID, unique identifier that can help prevent replay',
+    // OIDC ID Token
+    nonce: 'Random value tied to the authorization request, prevents replay',
+    auth_time: 'Time the user completed authentication',
+    acr: 'Authentication Context Class Reference',
+    amr: 'Authentication Methods used, e.g. pwd/otp/mfa',
+    azp: 'Authorized Party, the intended client_id',
+    at_hash: 'Hash of the access_token, binds the ID Token to the access token',
+    c_hash: 'Hash of the authorization code',
+    s_hash: 'Hash of the state',
+    sid: 'Session ID, used for single logout',
+    // OIDC standard profile claims
+    name: 'Full name',
+    given_name: 'Given name',
+    family_name: 'Family name',
+    middle_name: 'Middle name',
+    nickname: 'Nickname',
+    preferred_username: 'Preferred username',
+    profile: 'Profile page URL',
+    picture: 'Profile picture URL',
+    website: 'Personal website',
+    email: 'Email address',
+    email_verified: 'Whether the email has been verified',
+    gender: 'Gender',
+    birthdate: 'Birthdate',
+    zoneinfo: 'Time zone',
+    locale: 'Language/locale',
+    phone_number: 'Phone number',
+    phone_number_verified: 'Whether the phone number has been verified',
+    address: 'Address',
+    updated_at: 'Time the profile was last updated',
+    // OAuth2 access tokens (RFC 9068) and common vendor claims
+    scope: 'Authorization scopes, space-separated',
+    scp: 'Authorization scopes (array form, Azure AD)',
+    client_id: 'Client ID',
+    roles: 'List of roles',
+    groups: 'List of groups',
+    token_use: 'Intended use of the token (e.g. access / id, AWS Cognito)',
+    cid: 'Client ID (Okta)',
+    uid: 'User ID (Okta)',
+    ver: 'Token version',
+    tid: 'Tenant ID (Azure AD)',
+    oid: 'Object ID (Azure AD user)',
+    upn: 'User Principal Name (Azure AD)',
+    appid: 'Application ID (Azure AD)',
+  },
+  de: {
+    // RFC 7519 registrierte Claims
+    iss: 'Issuer, wer dieses Token ausgestellt hat',
+    sub: 'Subject, eindeutige Kennung des Benutzers/Principals',
+    aud: 'Audience, der/die vorgesehene(n) Empfänger des Tokens',
+    exp: 'Expiration, ungültig nach diesem Zeitpunkt',
+    nbf: 'Not Before, ungültig vor diesem Zeitpunkt',
+    iat: 'Issued At, Ausstellungszeitpunkt',
+    jti: 'JWT ID, eindeutige Kennung, hilft gegen Replay-Angriffe',
+    // OIDC ID Token
+    nonce: 'Zufallswert der Autorisierungsanfrage, verhindert Replay-Angriffe',
+    auth_time: 'Zeitpunkt, zu dem sich der Benutzer authentifiziert hat',
+    acr: 'Authentication Context Class Reference',
+    amr: 'Verwendete Authentifizierungsmethoden (Authentication Methods), z. B. pwd/otp/mfa',
+    azp: 'Authorized Party, die vorgesehene client_id',
+    at_hash: 'Hash des access_token, verknüpft ID Token und Access Token',
+    c_hash: 'Hash des Autorisierungscodes (code)',
+    s_hash: 'Hash des state-Parameters',
+    sid: 'Session ID, für Single Logout',
+    // OIDC Standard-Profil-Claims
+    name: 'Vollständiger Name',
+    given_name: 'Vorname',
+    family_name: 'Nachname',
+    middle_name: 'Zweiter Vorname',
+    nickname: 'Spitzname',
+    preferred_username: 'Bevorzugter Benutzername',
+    profile: 'URL der Profilseite',
+    picture: 'URL des Profilbilds',
+    website: 'Persönliche Website',
+    email: 'E-Mail-Adresse',
+    email_verified: 'Ob die E-Mail-Adresse verifiziert wurde',
+    gender: 'Geschlecht',
+    birthdate: 'Geburtsdatum',
+    zoneinfo: 'Zeitzone',
+    locale: 'Sprache/Region',
+    phone_number: 'Telefonnummer',
+    phone_number_verified: 'Ob die Telefonnummer verifiziert wurde',
+    address: 'Adresse',
+    updated_at: 'Zeitpunkt der letzten Profilaktualisierung',
+    // OAuth2-Access-Token (RFC 9068) und gängige Hersteller-Claims
+    scope: 'Berechtigungsbereiche (Scopes), durch Leerzeichen getrennt',
+    scp: 'Berechtigungsbereiche (Scopes, Array-Form, Azure AD)',
+    client_id: 'Client-ID',
+    roles: 'Liste der Rollen',
+    groups: 'Liste der Gruppen',
+    token_use: 'Verwendungszweck des Tokens (z. B. access / id, AWS Cognito)',
+    cid: 'Client-ID (Okta)',
+    uid: 'Benutzer-ID (Okta)',
+    ver: 'Token-Version',
+    tid: 'Tenant-ID (Azure AD)',
+    oid: 'Objekt-ID (Azure AD-Benutzer)',
+    upn: 'User Principal Name (Azure AD)',
+    appid: 'Anwendungs-ID (Azure AD)',
+  },
 }
+const HEADER_CLAIMS = HEADER_CLAIMS_I18N.zh
+const PAYLOAD_CLAIMS = PAYLOAD_CLAIMS_I18N.zh
 
 const secret = ref('')
 const secretB64 = ref(false)
@@ -204,8 +457,11 @@ const verdict = ref('') // '' | 'valid' | 'invalid' | 'error:<msg>'
 const isHmac = computed(() => /^HS(256|384|512)$/.test(alg.value))
 const isAsym = computed(() => /^(RS|PS|ES)(256|384|512)$/.test(alg.value))
 
-const headerRows = computed(() => rowsFor(headerObj.value, HEADER_CLAIMS))
-const claimRows = computed(() => rowsFor(payloadObj.value, PAYLOAD_CLAIMS))
+const activeHeaderClaims = computed(() => HEADER_CLAIMS_I18N[localeKey.value] || HEADER_CLAIMS_I18N.zh)
+const activePayloadClaims = computed(() => PAYLOAD_CLAIMS_I18N[localeKey.value] || PAYLOAD_CLAIMS_I18N.zh)
+
+const headerRows = computed(() => rowsFor(headerObj.value, activeHeaderClaims.value))
+const claimRows = computed(() => rowsFor(payloadObj.value, activePayloadClaims.value))
 const hasCustom = computed(() =>
   payloadObj.value != null &&
   Object.keys(payloadObj.value).some((k) => !(k in PAYLOAD_CLAIMS)))
@@ -269,7 +525,7 @@ function decode() {
   const segs = raw.split('.')
   parts.value = segs
   if (segs.length < 2 || segs.length > 3) {
-    error.value = `无效的 JWT：应由 2~3 段组成,实际为 ${segs.length} 段。`
+    error.value = t('invalidJwt')(segs.length)
     return
   }
   try {
@@ -290,19 +546,19 @@ function decode() {
         let bad = false
         if (name === 'exp') {
           bad = p[name] < now
-          status = bad ? '已过期' : `有效（剩余 ${fmtDur(p[name] - now)}）`
+          status = bad ? t('expired') : t('validRemaining')(fmtDur(p[name] - now))
         } else if (name === 'nbf') {
           bad = p[name] > now
-          status = bad ? '尚未生效' : '已生效'
+          status = bad ? t('notYetValid') : t('alreadyValid')
         } else {
-          status = `${fmtDur(now - p[name])}前`
+          status = t('ago')(fmtDur(now - p[name]))
         }
         items.push({ name, local, status, bad })
       }
     }
     timeClaims.value = items
   } catch {
-    error.value = '解码失败：某一段不是合法的 Base64URL 编码 JSON。'
+    error.value = t('decodeFailed')
   }
 }
 
@@ -340,16 +596,16 @@ async function verify() {
     }
     verdict.value = ok ? 'valid' : 'invalid'
   } catch (e) {
-    verdict.value = 'error:' + (cfg.kind === 'hmac' ? '密钥无效' : '公钥解析失败（需 PEM/SPKI）')
+    verdict.value = 'error:' + (cfg.kind === 'hmac' ? t('secretInvalid') : t('pubkeyParseFailed'))
   }
 }
 
 function fmtDur(sec) {
   sec = Math.abs(sec)
-  if (sec < 60) return `${sec} 秒`
-  if (sec < 3600) return `${Math.floor(sec / 60)} 分钟`
-  if (sec < 86400) return `${Math.floor(sec / 3600)} 小时`
-  return `${Math.floor(sec / 86400)} 天`
+  if (sec < 60) return t('secondsUnit')(sec)
+  if (sec < 3600) return t('minutesUnit')(Math.floor(sec / 60))
+  if (sec < 86400) return t('hoursUnit')(Math.floor(sec / 3600))
+  return t('daysUnit')(Math.floor(sec / 86400))
 }
 
 decode()

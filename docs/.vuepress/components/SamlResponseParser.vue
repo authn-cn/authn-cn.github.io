@@ -1,8 +1,8 @@
 <template>
   <div class="authn-tool">
-    <label class="authn-label">SAML Response / Assertion（base64、完整 URL 或 XML）</label>
+    <label class="authn-label">{{ t('inputLabel') }}</label>
     <textarea v-model="input" class="authn-textarea" rows="6" spellcheck="false"
-      placeholder="粘贴 SAMLResponse 的值、含 SAMLResponse 的 URL,或原始 XML" @input="parse"></textarea>
+      :placeholder="t('inputPlaceholder')" @input="parse"></textarea>
     <p v-if="error" class="authn-error">{{ error }}</p>
 
     <template v-if="result">
@@ -23,13 +23,76 @@
           </tbody></table>
         </template>
       </div>
-      <p class="authn-note">纯浏览器本地解析,不上传。本工具展示字段结构;签名<strong>有效性</strong>需由 SP 用 IdP 证书验证。</p>
+      <p class="authn-note" v-html="t('localOnlyNote')"></p>
     </template>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
+import { useT } from './i18n.js'
+
+const messages = {
+  zh: {
+    inputLabel: 'SAML Response / Assertion（base64、完整 URL 或 XML）',
+    inputPlaceholder: '粘贴 SAMLResponse 的值、含 SAMLResponse 的 URL,或原始 XML',
+    localOnlyNote: '纯浏览器本地解析,不上传。本工具展示字段结构;签名<strong>有效性</strong>需由 SP 用 IdP 证书验证。',
+    notYetValid: '尚未生效',
+    expired: '已过期',
+    validNow: '在有效期内',
+    xmlParseError: 'XML 解析错误',
+    typeLabel: '类型',
+    topSignatureLabel: '顶层 Signature',
+    signaturePresent: '有',
+    signatureAbsent: '无',
+    validityLabel: '时效',
+    signAlgLabel: '签名算法',
+    noSignature: '无签名',
+    digestAlgLabel: '摘要算法',
+    parseFailPrefix: '解析失败：',
+    parseFailDefault: '输入不是合法的 SAML 报文',
+  },
+  en: {
+    inputLabel: 'SAML Response / Assertion (base64, full URL, or XML)',
+    inputPlaceholder: 'Paste the SAMLResponse value, a URL containing SAMLResponse, or raw XML',
+    localOnlyNote: 'Parsed entirely in your browser; nothing is uploaded. This tool shows the field structure; signature <strong>validity</strong> must be verified by the SP using the IdP certificate.',
+    notYetValid: 'Not yet valid',
+    expired: 'Expired',
+    validNow: 'Currently valid',
+    xmlParseError: 'XML parse error',
+    typeLabel: 'Type',
+    topSignatureLabel: 'Top-level Signature',
+    signaturePresent: 'Present',
+    signatureAbsent: 'Absent',
+    validityLabel: 'Validity',
+    signAlgLabel: 'Signature algorithm',
+    noSignature: 'No signature',
+    digestAlgLabel: 'Digest algorithm',
+    parseFailPrefix: 'Parsing failed: ',
+    parseFailDefault: 'Input is not a valid SAML message',
+  },
+  de: {
+    inputLabel: 'SAML Response / Assertion (base64, vollständige URL oder XML)',
+    inputPlaceholder: 'SAMLResponse-Wert, eine URL mit SAMLResponse oder rohes XML einfügen',
+    localOnlyNote: 'Wird vollständig lokal im Browser verarbeitet, nichts wird hochgeladen. Dieses Werkzeug zeigt die Feldstruktur; die <strong>Gültigkeit</strong> der Signatur muss vom SP mit dem IdP-Zertifikat geprüft werden.',
+    notYetValid: 'Noch nicht gültig',
+    expired: 'Abgelaufen',
+    validNow: 'Derzeit gültig',
+    xmlParseError: 'XML-Parsefehler',
+    typeLabel: 'Typ',
+    topSignatureLabel: 'Signature (oberste Ebene)',
+    signaturePresent: 'Vorhanden',
+    signatureAbsent: 'Nicht vorhanden',
+    validityLabel: 'Gültigkeitsdauer',
+    signAlgLabel: 'Signaturalgorithmus',
+    noSignature: 'Keine Signatur',
+    digestAlgLabel: 'Digest-Algorithmus',
+    parseFailPrefix: 'Verarbeitung fehlgeschlagen: ',
+    parseFailDefault: 'Die Eingabe ist keine gültige SAML-Nachricht',
+  },
+}
+const t = useT(messages)
+
 const input = ref('')
 const error = ref('')
 const result = ref(null)
@@ -55,9 +118,9 @@ function A(el, local, attr) {
 }
 function timeStatus(notBefore, notOnOrAfter) {
   const now = Date.now()
-  if (notBefore && now < Date.parse(notBefore)) return ['尚未生效', 'authn-bad']
-  if (notOnOrAfter && now >= Date.parse(notOnOrAfter)) return ['已过期', 'authn-bad']
-  return ['在有效期内', 'authn-ok']
+  if (notBefore && now < Date.parse(notBefore)) return [t('notYetValid'), 'authn-bad']
+  if (notOnOrAfter && now >= Date.parse(notOnOrAfter)) return [t('expired'), 'authn-bad']
+  return [t('validNow'), 'authn-ok']
 }
 
 async function parse() {
@@ -81,19 +144,19 @@ async function parse() {
     }
 
     const doc = new DOMParser().parseFromString(xml, 'text/xml')
-    if (doc.getElementsByTagName('parsererror').length) throw new Error('XML 解析错误')
+    if (doc.getElementsByTagName('parsererror').length) throw new Error(t('xmlParseError'))
     const root = doc.documentElement
 
     const statusCode = A(root, 'StatusCode', 'Value')
     const responseRows = [
-      ['类型', root.localName],
+      [t('typeLabel'), root.localName],
       ['ID', root.getAttribute('ID')],
       ['IssueInstant', root.getAttribute('IssueInstant')],
       ['Destination', root.getAttribute('Destination')],
       ['InResponseTo', root.getAttribute('InResponseTo')],
       ['Issuer', T(root, 'Issuer')],
       ['StatusCode', statusCode ? statusCode.replace('urn:oasis:names:tc:SAML:2.0:status:', '') : undefined],
-      ['顶层 Signature', root.getElementsByTagNameNS('http://www.w3.org/2000/09/xmldsig#', 'Signature').length ? '有' : '无'],
+      [t('topSignatureLabel'), root.getElementsByTagNameNS('http://www.w3.org/2000/09/xmldsig#', 'Signature').length ? t('signaturePresent') : t('signatureAbsent')],
     ].filter((r) => r[1] !== null && r[1] !== undefined)
 
     const assertions = []
@@ -112,13 +175,13 @@ async function parse() {
         ['Recipient', A(as, 'SubjectConfirmationData', 'Recipient')],
         ['InResponseTo', A(as, 'SubjectConfirmationData', 'InResponseTo')],
         ['Conditions', nb || noa ? `${nb || '—'} → ${noa || '—'}` : undefined, ''],
-        ['时效', nb || noa ? tstat : undefined, tcls],
+        [t('validityLabel'), nb || noa ? tstat : undefined, tcls],
         ['Audience', T(as, 'Audience')],
         ['AuthnInstant', A(as, 'AuthnStatement', 'AuthnInstant')],
         ['AuthnContextClassRef', (T(as, 'AuthnContextClassRef') || '').replace('urn:oasis:names:tc:SAML:2.0:ac:classes:', '') || undefined],
         ['SessionIndex', A(as, 'AuthnStatement', 'SessionIndex')],
-        ['签名算法', sigMethod ? sigMethod.replace(/^.*[#]/, '') : '无签名'],
-        ['摘要算法', A(as, 'DigestMethod', 'Algorithm') ? A(as, 'DigestMethod', 'Algorithm').replace(/^.*[#]/, '') : undefined],
+        [t('signAlgLabel'), sigMethod ? sigMethod.replace(/^.*[#]/, '') : t('noSignature')],
+        [t('digestAlgLabel'), A(as, 'DigestMethod', 'Algorithm') ? A(as, 'DigestMethod', 'Algorithm').replace(/^.*[#]/, '') : undefined],
       ].filter((r) => r[1] !== null && r[1] !== undefined)
 
       const attrs = []
@@ -132,7 +195,7 @@ async function parse() {
 
     result.value = { response: responseRows, assertions }
   } catch (e) {
-    error.value = '解析失败：' + (e.message || '输入不是合法的 SAML 报文')
+    error.value = t('parseFailPrefix') + (e.message || t('parseFailDefault'))
   }
 }
 </script>
