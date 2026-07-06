@@ -27,5 +27,11 @@
   },
   "dependencies": {
     "qrcode": "^1.5.4"
+  },
+  "pnpm": {
+    "overrides": {
+      "rollup@>=4.0.0 <4.59.0": ">=4.59.0",
+      "js-yaml@3": "3.15.0"
+    }
   }
 }
