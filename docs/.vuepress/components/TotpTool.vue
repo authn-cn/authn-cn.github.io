@@ -1,6 +1,66 @@
 <template>
   <div class="authn-tool">
-    <!-- ============ 生成 / 计算 ============ -->
+    <!-- ============ 1. 已保存的 TOTP(管理,最常用)============ -->
+    <template v-if="saved.length">
+      <div class="totp-section">已保存的 TOTP(浏览器本地)</div>
+      <table class="totp-list">
+        <tbody>
+          <tr v-for="s in saved" :key="s.id">
+            <td class="totp-list-name">
+              <div><strong>{{ s.issuer || '(无 issuer)' }}</strong></div>
+              <div class="totp-list-acct">{{ s.account }}</div>
+            </td>
+            <td class="totp-list-code">{{ savedCodes[s.id]?.code || '------' }}</td>
+            <td class="totp-list-rem">{{ savedCodes[s.id]?.remaining ?? '' }}<span v-if="savedCodes[s.id]">s</span></td>
+            <td class="totp-list-btns">
+              <button class="authn-btn sm" @click="copyText(savedCodes[s.id]?.code)">复制</button>
+              <button class="authn-btn sm" @click="loadSaved(s)">编辑</button>
+              <button class="authn-btn sm danger" @click="removeSaved(s.id)">删除</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="authn-note">列表保存在本机 localStorage,可跨刷新保留。“编辑”会把该条载入下方编辑区。</p>
+    </template>
+
+    <!-- ============ 2. 导入 ============ -->
+    <div class="totp-section">导入</div>
+    <div class="totp-import">
+      <div class="authn-field">
+        <label class="authn-label">从二维码图片导入</label>
+        <input type="file" accept="image/*" class="authn-input" @change="onQrFile" />
+      </div>
+      <div class="authn-field" style="flex:2">
+        <label class="authn-label">或粘贴 otpauth:// URI</label>
+        <div style="display:flex;gap:.5rem">
+          <input v-model="importUri" class="authn-input" spellcheck="false" placeholder="otpauth://totp/Issuer:acct?secret=..." />
+          <button class="authn-btn" @click="importFromUri">导入</button>
+        </div>
+      </div>
+    </div>
+    <p v-if="importMsg" :class="importOk ? 'authn-ok' : 'authn-bad'">{{ importMsg }}</p>
+
+    <!-- ============ 3. 生成 / 编辑 / 校验(较少用)============ -->
+    <div class="totp-section">生成 / 编辑</div>
+
+    <!-- 当前验证码 + 复制 / 收藏 / 保存(高频动作提前)-->
+    <template v-if="!error && secret">
+      <div class="totp-code">
+        <div class="totp-digits">{{ code }}</div>
+        <div class="totp-count">{{ remaining }}s</div>
+        <button class="authn-btn totp-copy" @click="copyText(code)">复制</button>
+      </div>
+      <div class="totp-actions">
+        <button class="authn-btn" @click="saveCurrent">➕ 保存到本地列表</button>
+        <button class="authn-btn" @click="pinToUrl">🔖 放进地址栏(Ctrl+D 收藏)</button>
+        <button class="authn-btn" @click="copyText(shareUrl)">复制收藏链接</button>
+      </div>
+      <p class="authn-note totp-warn">
+        ⚠ 收藏链接会把 secret 明文放进 URL / 书签 / 浏览器本地存储,<strong>仅用于测试密钥</strong>,勿存放生产密钥。
+      </p>
+    </template>
+
+    <!-- 参数编辑区 -->
     <div class="authn-row">
       <div class="authn-field">
         <label class="authn-label">Secret（Base32）</label>
@@ -35,46 +95,15 @@
       </div>
     </div>
 
-    <!-- ============ 导入:扫码 / URI ============ -->
-    <div class="totp-import">
-      <div class="authn-field">
-        <label class="authn-label">从二维码图片导入</label>
-        <input type="file" accept="image/*" class="authn-input" @change="onQrFile" />
-      </div>
-      <div class="authn-field" style="flex:2">
-        <label class="authn-label">或粘贴 otpauth:// URI</label>
-        <div style="display:flex;gap:.5rem">
-          <input v-model="importUri" class="authn-input" spellcheck="false" placeholder="otpauth://totp/Issuer:acct?secret=..." />
-          <button class="authn-btn" @click="importFromUri">导入</button>
-        </div>
-      </div>
-    </div>
-    <p v-if="importMsg" :class="importOk ? 'authn-ok' : 'authn-bad'">{{ importMsg }}</p>
-
     <p v-if="error" class="authn-error">{{ error }}</p>
 
+    <!-- otpauth URI / 二维码 / 校验(最少用)-->
     <template v-if="!error && secret">
-      <div class="totp-code">
-        <div class="totp-digits">{{ code }}</div>
-        <div class="totp-count">{{ remaining }}s</div>
-        <button class="authn-btn totp-copy" @click="copyText(code)">复制</button>
-      </div>
-
       <label class="authn-label">otpauth:// URI</label>
       <pre class="authn-pre">{{ otpauth }}</pre>
 
       <img v-if="qr" :src="qr" alt="otpauth 二维码" class="totp-qr" />
       <p class="authn-note">用 Google Authenticator / Authy 等扫码添加。密钥与验证码均在浏览器本地计算,不上传。</p>
-
-      <!-- ============ 收藏 / 保存 ============ -->
-      <div class="totp-actions">
-        <button class="authn-btn" @click="pinToUrl">🔖 放进地址栏(Ctrl+D 收藏)</button>
-        <button class="authn-btn" @click="copyText(shareUrl)">复制收藏链接</button>
-        <button class="authn-btn" @click="saveCurrent">➕ 保存到本地列表</button>
-      </div>
-      <p class="authn-note totp-warn">
-        ⚠ 收藏链接会把 secret 明文放进 URL / 书签 / 浏览器本地存储,<strong>仅用于测试密钥</strong>,勿存放生产密钥。
-      </p>
 
       <label class="authn-label">校验一个验证码</label>
       <div class="authn-row">
@@ -86,29 +115,6 @@
           <span v-else-if="checkResult === 'bad'" class="authn-bad">✗ 无效</span>
         </div>
       </div>
-    </template>
-
-    <!-- ============ 已保存的 TOTP 列表 ============ -->
-    <template v-if="saved.length">
-      <label class="authn-label" style="margin-top:1.2rem">已保存的 TOTP(浏览器本地)</label>
-      <table class="totp-list">
-        <tbody>
-          <tr v-for="s in saved" :key="s.id">
-            <td class="totp-list-name">
-              <div><strong>{{ s.issuer || '(无 issuer)' }}</strong></div>
-              <div class="totp-list-acct">{{ s.account }}</div>
-            </td>
-            <td class="totp-list-code">{{ savedCodes[s.id]?.code || '------' }}</td>
-            <td class="totp-list-rem">{{ savedCodes[s.id]?.remaining ?? '' }}<span v-if="savedCodes[s.id]">s</span></td>
-            <td class="totp-list-btns">
-              <button class="authn-btn sm" @click="copyText(savedCodes[s.id]?.code)">复制</button>
-              <button class="authn-btn sm" @click="loadSaved(s)">编辑</button>
-              <button class="authn-btn sm danger" @click="removeSaved(s.id)">删除</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <p class="authn-note">列表保存在本机 localStorage,可跨刷新保留。“编辑”会把该条载入上方编辑区。</p>
     </template>
   </div>
 </template>
@@ -361,7 +367,6 @@ function removeSaved(id) {
 }
 function loadSaved(s) {
   applyParsed({ ...s })
-  if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
 async function copyText(t) {
@@ -378,6 +383,15 @@ onUnmounted(() => timer && clearInterval(timer))
 </script>
 
 <style scoped>
+.totp-section {
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  margin: 1.4rem 0 0.6rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid var(--vp-c-border, #eee);
+}
+.totp-section:first-child { margin-top: 0; }
 .totp-code { display: flex; align-items: baseline; gap: 1rem; margin: 0.6rem 0; }
 .totp-digits { font-family: ui-monospace, monospace; font-size: 2.2rem; letter-spacing: 0.3rem; color: #3eaf7c; font-weight: 700; }
 .totp-count { font-size: 1rem; opacity: 0.7; }
