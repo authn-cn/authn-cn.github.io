@@ -11,7 +11,7 @@ title: Base64URL 编解码
 </ClientOnly>
 
 ::: tip 区别
-**Base64URL** 用 `-` `_` 替换标准 Base64 的 `+` `/`,并去掉末尾 `=` 填充,以便安全地放进 URL 与 JWT。
+**Base64URL** 用 `-` `_` 替换标准 Base64 的 `+` `/`,并去掉末尾 `=` 填充,以便安全地放进 URL 与 JWT。为什么 JWT 各段用它,见 [JWT / JOSE 文档](../jwt/)。
 :::
 
 <script setup>

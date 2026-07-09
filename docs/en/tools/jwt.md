@@ -30,6 +30,10 @@ Header.Payload.Signature
 The first two segments of a JWT are only encoded, not encrypted — anyone can decode them. Only when you enter the correct secret/public key in this tool and see **✔ Signature valid** are the claims trustworthy; servers must further validate `iss` / `aud` / `exp`. See the ID Token validation checklist in [OIDC Core Concepts](../oidc/concepts.md).
 :::
 
+::: tip Learn More About JWT
+Where the JWT format belongs (why it's independent of OAuth2/OIDC), the three-segment structure, the verification process and common pitfalls, and which of the three OIDC tokens (ID / Access / Refresh) are JWTs — see the [JWT / JOSE documentation](../jwt/).
+:::
+
 <script setup>
 import JwtDecoder from '@components/JwtDecoder.vue'
 </script>

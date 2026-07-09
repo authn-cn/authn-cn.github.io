@@ -30,6 +30,10 @@ Header.Payload.Signature
 Die ersten zwei Segmente von JWT sind nur codiert, nicht verschlüsselt, jeder kann sie decodieren. Nur wenn Sie in diesem Tool den korrekten Schlüssel/Öffentlichschlüssel eingeben und **✔ Signatur gültig** sehen, sind die darin enthaltenen Claims vertrauenswürdig; der Server muss auch weiterhin `iss` / `aud` / `exp` validieren. Details siehe [OIDC Kernkonzepte](../oidc/concepts.md) ID-Token-Verifizierungsprüfliste.
 :::
 
+::: tip Mehr über JWT erfahren
+Die Zugehörigkeit des Formats (warum JWT unabhängig von OAuth2/OIDC ist), die dreiteilige Struktur, der Ablauf der Signaturprüfung und häufige Fallstricke sowie welche der drei OIDC-Tokens (ID / Access / Refresh) JWTs sind, siehe [JWT- / JOSE-Dokumentation](../jwt/).
+:::
+
 <script setup>
 import JwtDecoder from '@components/JwtDecoder.vue'
 </script>

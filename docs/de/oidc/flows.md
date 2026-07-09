@@ -82,7 +82,7 @@ Antwort:
 
 ### Schritt 5: RP validiert ID Token
 
-Führe die [Validierungsprüfliste aus Kernkonzepten](./concepts.md#validierungsprüfliste-für-rp) durch: Signaturverifizierung (JWKS), `iss`, `aud`, `exp`/`iat`, `nonce`. Nach erfolgreicher Validierung aller Punkte wird eine lokale Sitzung mit `iss + sub` als Schlüssel etabliert oder verknüpft — **damit ist die Anmeldung abgeschlossen**.
+Führe die [Validierungsprüfliste aus Kernkonzepten](./concepts.md#validierungsprufliste-fur-rp) durch: Signaturverifizierung (JWKS), `iss`, `aud`, `exp`/`iat`, `nonce`. Nach erfolgreicher Validierung aller Punkte wird eine lokale Sitzung mit `iss + sub` als Schlüssel etabliert oder verknüpft — **damit ist die Anmeldung abgeschlossen**.
 
 ### Schritt 6 (optional): UserInfo aufrufen für weitere Informationen
 

@@ -14,6 +14,10 @@ Geben Sie Payload und Schlüssel ein, um ein signiertes JWT zu generieren, prakt
 Bitte geben Sie keine Produktionsprivatschlüssel ein. Das generierte Token kann mit dem [JWT-Verifizierungstool](./jwt.md) validiert werden oder mit dem [JWK-Generator](./jwk.md) Schlüsselpaaren kombiniert werden.
 :::
 
+::: tip Welchen Algorithmus wählen
+Den Unterschied und die Einsatzszenarien von symmetrisch (`HS*`) und asymmetrisch (`RS*`/`PS*`/`ES*`) finden Sie in der [JWT- / JOSE-Dokumentation · Signaturalgorithmen](../jwt/concepts.md#signaturalgorithmen-symmetrisch-vs-asymmetrisch).
+:::
+
 <script setup>
 import JwtSigner from '@components/JwtSigner.vue'
 </script>

@@ -11,7 +11,7 @@ Convert between text and Base64 / Base64URL. JWT segments and SAML messages use 
 </ClientOnly>
 
 ::: tip Difference
-**Base64URL** replaces standard Base64's `+` `/` with `-` `_` and removes trailing `=` padding, for safe placement in URLs and JWTs.
+**Base64URL** replaces standard Base64's `+` `/` with `-` `_` and removes trailing `=` padding, for safe placement in URLs and JWTs. For why each JWT segment uses it, see the [JWT / JOSE documentation](../jwt/).
 :::
 
 <script setup>

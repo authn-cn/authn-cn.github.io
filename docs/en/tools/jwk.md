@@ -11,7 +11,7 @@ One-click RSA or EC key pair generation, export public/private JWK, JWKS (ready 
 </ClientOnly>
 
 ::: tip Use Together With
-Generated private key for [JWT Signing](./jwt-sign.md), public JWK/JWKS for [JWT Verification](./jwt.md).
+Generated private key for [JWT Signing](./jwt-sign.md), public JWK/JWKS for [JWT Verification](./jwt.md). For where JWK/JWKS fit within the JOSE family, see the [JWT / JOSE documentation](../jwt/).
 :::
 
 <script setup>

@@ -11,7 +11,7 @@ Mit einem Klick RSA- oder EC-Schlüsselpaare generieren, öffentliche/private JW
 </ClientOnly>
 
 ::: tip Kombinierte Nutzung
-Der generierte Privatschlüssel kann für [JWT-Signierung](./jwt-sign.md) verwendet werden, öffentlicher JWK/JWKS kann für [JWT-Verifizierung](./jwt.md) verwendet werden.
+Der generierte Privatschlüssel kann für [JWT-Signierung](./jwt-sign.md) verwendet werden, öffentlicher JWK/JWKS kann für [JWT-Verifizierung](./jwt.md) verwendet werden. Die Einordnung von JWK/JWKS in der JOSE-Familie siehe [JWT- / JOSE-Dokumentation](../jwt/).
 :::
 
 <script setup>

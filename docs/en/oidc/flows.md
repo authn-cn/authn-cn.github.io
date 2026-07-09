@@ -82,7 +82,7 @@ The `id_token` payload after decoding:
 
 ### Step 5: RP Validates ID Token
 
-Execute according to [the validation checklist in Core Concepts](./concepts.md#rp-validation-checklist-must-do): verify signature (JWKS), `iss`, `aud`, `exp`/`iat`, `nonce`. After all pass, establish/associate a local session using `iss + sub` as the key — **login is now complete**.
+Execute according to [the validation checklist in Core Concepts](./concepts.md#rp-s-validation-checklist-must-do): verify signature (JWKS), `iss`, `aud`, `exp`/`iat`, `nonce`. After all pass, establish/associate a local session using `iss + sub` as the key — **login is now complete**.
 
 ### Step 6 (Optional): Call UserInfo for Additional Data
 

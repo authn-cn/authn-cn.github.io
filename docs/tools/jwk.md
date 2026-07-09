@@ -11,7 +11,7 @@ title: JWK / 密钥对生成
 </ClientOnly>
 
 ::: tip 配套使用
-生成的私钥可用于 [JWT 签名](./jwt-sign.md),公钥 JWK/JWKS 可用于 [JWT 验签](./jwt.md)。
+生成的私钥可用于 [JWT 签名](./jwt-sign.md),公钥 JWK/JWKS 可用于 [JWT 验签](./jwt.md)。JWK/JWKS 在 JOSE 家族中的定位见 [JWT / JOSE 文档](../jwt/)。
 :::
 
 <script setup>

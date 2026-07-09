@@ -30,6 +30,10 @@ Header.Payload.Signature
 JWT 的前两段只是编码而非加密,任何人都能解码。只有在本工具中填入正确的密钥/公钥、看到 **✔ 签名有效** 后,其中的 claims 才可信;服务端还需进一步校验 `iss` / `aud` / `exp`。详见 [OIDC 核心概念](../oidc/concepts.md) 中的 ID Token 校验清单。
 :::
 
+::: tip 深入了解 JWT
+JWT 的格式归属(为何独立于 OAuth2/OIDC)、三段结构、验签流程与常见坑、以及 OIDC 三种 Token(ID / Access / Refresh)哪些是 JWT,详见 [JWT / JOSE 文档](../jwt/)。
+:::
+
 <script setup>
 import JwtDecoder from '@components/JwtDecoder.vue'
 </script>

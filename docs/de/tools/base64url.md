@@ -11,7 +11,7 @@ Gegenseitige Konvertierung zwischen Text und Base64 / Base64URL. JWTs verschiede
 </ClientOnly>
 
 ::: tip Unterschied
-**Base64URL** ersetzen die Standard-Base64 `+` `/` mit `-` `_` und entfernen die abschließenden `=` Polsterung, um sicher in URLs und JWT platziert zu werden.
+**Base64URL** ersetzen die Standard-Base64 `+` `/` mit `-` `_` und entfernen die abschließenden `=` Polsterung, um sicher in URLs und JWT platziert zu werden. Warum die einzelnen JWT-Segmente sie verwenden, siehe [JWT- / JOSE-Dokumentation](../jwt/).
 :::
 
 <script setup>
