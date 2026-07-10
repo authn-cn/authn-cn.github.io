@@ -14,6 +14,7 @@ const T = {
     overview: '概览 / 角色术语', mail: '邮件服务器', ldapDir: 'LDAP 目录', oidcDemo: 'OIDC 登录演示', samlDemo: 'SAML 登录演示',
     jwt: 'JWT 解析', jwtSign: 'JWT 签名', jwk: 'JWK 生成', pkce: 'PKCE 生成', saml: 'SAML 编解码',
     cert: 'X.509 证书', pemParse: 'PEM 解析', ldapFilter: 'LDAP 过滤器',
+    cnSso: '国内平台 SSO', feishuSaml: '飞书 SAML',
   },
   en: {
     home: 'Home', protocols: 'Protocols', tools: 'Tools', mock: 'Mock Servers',
@@ -22,6 +23,7 @@ const T = {
     overview: 'Overview & Roles', mail: 'Mail Server', ldapDir: 'LDAP Directory', oidcDemo: 'OIDC Login Demo', samlDemo: 'SAML Login Demo',
     jwt: 'JWT Decode', jwtSign: 'JWT Sign', jwk: 'JWK Gen', pkce: 'PKCE Gen', saml: 'SAML Codec',
     cert: 'X.509 Cert', pemParse: 'PEM Inspect', ldapFilter: 'LDAP Filter',
+    cnSso: 'China Platforms SSO', feishuSaml: 'Feishu SAML',
   },
   de: {
     home: 'Startseite', protocols: 'Protokolle', tools: 'Tools', mock: 'Mock-Server',
@@ -30,6 +32,7 @@ const T = {
     overview: 'Übersicht & Rollen', mail: 'Mail-Server', ldapDir: 'LDAP-Verzeichnis', oidcDemo: 'OIDC-Login-Demo', samlDemo: 'SAML-Login-Demo',
     jwt: 'JWT dekodieren', jwtSign: 'JWT signieren', jwk: 'JWK erzeugen', pkce: 'PKCE erzeugen', saml: 'SAML-Codec',
     cert: 'X.509-Zertifikat', pemParse: 'PEM prüfen', ldapFilter: 'LDAP-Filter',
+    cnSso: 'China-Plattform-SSO', feishuSaml: 'Feishu SAML',
   },
 }
 
@@ -48,6 +51,7 @@ function genNavbar(prefix, t) {
         { text: 'WebAuthn / Passkey', link: p('/webauthn/') },
         { text: 'MFA / TOTP', link: p('/mfa/') },
         { text: 'LDAP', link: p('/ldap/') },
+        { text: t.cnSso, link: p('/cn-sso/') },
       ],
     },
     {
@@ -66,6 +70,7 @@ function genNavbar(prefix, t) {
         { text: t.saml, link: p('/tools/saml.html') },
         { text: 'SAML Metadata', link: p('/tools/saml-metadata.html') },
         { text: 'SAML Response', link: p('/tools/saml-parse.html') },
+        { text: t.feishuSaml, link: p('/tools/feishu-saml.html') },
         { text: t.cert, link: p('/tools/cert.html') },
         { text: t.pemParse, link: p('/tools/pem-parse.html') },
         { text: 'Base64URL', link: p('/tools/base64url.html') },
@@ -97,6 +102,7 @@ function genSidebar(prefix, t) {
     [p('/webauthn/')]: [{ text: 'WebAuthn / Passkey', children: [p('/webauthn/README.md'), p('/webauthn/concepts.md'), p('/webauthn/flows.md'), p('/webauthn/reference.md')] }],
     [p('/mfa/')]: [{ text: t.mfaH, children: [p('/mfa/README.md'), p('/mfa/totp.md'), p('/mfa/reference.md')] }],
     [p('/ldap/')]: [{ text: 'LDAP', children: [p('/ldap/README.md'), p('/ldap/concepts.md'), p('/ldap/flows.md'), p('/ldap/reference.md')] }],
+    [p('/cn-sso/')]: [{ text: t.cnSso, children: [p('/cn-sso/README.md')] }],
     [p('/tools/')]: [
       {
         text: t.toolsH,
@@ -121,6 +127,7 @@ function genSidebar(prefix, t) {
             { text: t.saml, link: p('/tools/saml.html') },
             { text: 'SAML Metadata', link: p('/tools/saml-metadata.html') },
             { text: 'SAML Response', link: p('/tools/saml-parse.html') },
+            { text: t.feishuSaml, link: p('/tools/feishu-saml.html') },
           ] },
           { text: t.certGroup, children: [
             { text: t.cert, link: p('/tools/cert.html') },
