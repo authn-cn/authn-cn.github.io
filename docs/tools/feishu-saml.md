@@ -7,7 +7,7 @@ title: 飞书 SAML SSO 助手
 飞书作为 SP 接入企业 IdP 时**只支持 SAML 2.0,且不支持导入 IdP metadata**——只能在管理后台手工填字段。这个工具解决这一来一回的两个摩擦:
 
 - **解析 IdP Metadata → 飞书字段**:粘贴 Okta / Entra ID / ADFS / IDaaS 导出的 metadata,自动提取要粘到飞书的 **Issuer、登录地址、登出地址、NameID 格式**,以及**去掉 `-----BEGIN/END-----` 头尾**的 Public Certificate(飞书那个框只收裸 base64)。
-- **生成飞书 SP Metadata**:飞书不导出规范的 SP metadata 文件;把你在飞书 SSO 页复制到的 **ACS URL / SP Entity ID** 填进去,拼出一份标准 SP metadata(含证书与 NameIDFormat),上传给支持导入的 IdP。
+- **生成飞书 SP Metadata**:飞书的 SP 参数是**按区域固定**的(中国 feishu.cn / 国际 / 新加坡 / 日本),工具已内置。选区域即自动填好 **ACS URL / SP Entity ID**,拼出标准 SP metadata(含证书与 NameIDFormat),上传给支持导入的 IdP。
 
 <ClientOnly>
   <FeishuSamlHelper />

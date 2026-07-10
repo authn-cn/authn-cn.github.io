@@ -60,12 +60,21 @@
       <p class="authn-note" v-html="t('genIntro')"></p>
       <div class="authn-row">
         <div class="authn-field">
+          <label class="authn-label">{{ t('fRegion') }}</label>
+          <select v-model="region" class="authn-select" @change="applyRegion">
+            <option v-for="r in regionOptions" :key="r.key" :value="r.key">{{ r.label }}</option>
+          </select>
+        </div>
+      </div>
+      <p class="authn-note fs-warn" v-html="t('emailAttrNote')"></p>
+      <div class="authn-row">
+        <div class="authn-field">
           <label class="authn-label">{{ t('fEntityId') }}</label>
-          <input v-model.trim="spEntityId" class="authn-input" :placeholder="t('fEntityIdPh')" />
+          <input v-model.trim="spEntityId" class="authn-input" :placeholder="t('fEntityIdPh')" @input="region = 'custom'" />
         </div>
         <div class="authn-field">
           <label class="authn-label">{{ t('fAcs') }}</label>
-          <input v-model.trim="acsUrl" class="authn-input" :placeholder="t('fAcsPh')" />
+          <input v-model.trim="acsUrl" class="authn-input" :placeholder="t('fAcsPh')" @input="region = 'custom'" />
         </div>
       </div>
       <div class="authn-row">
@@ -127,11 +136,18 @@ const messages = {
     parseWarn: '⚠️ 飞书里证书是<strong>写死</strong>的:当 IdP 轮换签名证书时,必须回飞书手动更新此处,否则登录会突然失败。纯浏览器本地解析,不上传。',
     copy: '复制',
     copied: '已复制 ✓',
-    genIntro: '飞书没有导出规范的 SP metadata 文件。把你在<strong>飞书 SSO 配置页复制到的参数</strong>填在下面,即可拼出一份标准 SP metadata,用于上传到 Okta / Entra ID 等<strong>支持导入 metadata</strong> 的 IdP。',
-    fEntityId: 'SP Entity ID(飞书提供)',
-    fEntityIdPh: '飞书 SSO 页显示的 SP 标识 / Issuer',
-    fAcs: 'ACS URL(Reply / Assertion URL,飞书提供) *',
-    fAcsPh: '飞书 SSO 页复制的 Reply URL',
+    genIntro: '飞书 / Lark 的 SP 参数是<strong>按区域固定</strong>的(与你的企业无关)。选好区域即自动填好,生成的标准 SP metadata 可上传到 Okta / Entra ID 等<strong>支持导入 metadata</strong> 的 IdP;飞书本身不吃 metadata,直接照下面的值填进 IdP 即可。',
+    fRegion: '飞书 / Lark 区域(自动填入固定 SP 参数)',
+    regionFeishu: '飞书(中国 feishu.cn)',
+    regionLark: 'Lark(国际 larksuite.com)',
+    regionSg: 'Lark(新加坡 sg.larksuite.com)',
+    regionJp: 'Lark(日本 jp.larksuite.com)',
+    regionCustom: '自定义',
+    emailAttrNote: '⚠️ 飞书按<strong>邮箱</strong>匹配成员:必须在 IdP 侧让断言包含 <code>email</code> 属性(值为用户邮箱),且与飞书成员邮箱一致。企业域名(<code>xxx.feishu.cn</code>)只在员工登录时输入,不出现在这些 SP 参数里。',
+    fEntityId: 'SP Entity ID(Audience URI)',
+    fEntityIdPh: '按区域固定,如 https://www.feishu.cn',
+    fAcs: 'ACS URL(Single Sign-On URL) *',
+    fAcsPh: '按区域固定的 call_back 地址',
     fSlo: '登出地址 SLO URL',
     fSloPh: '可选,留空则不写入',
     fNameId: 'NameIDFormat',
@@ -172,11 +188,18 @@ const messages = {
     parseWarn: '⚠️ The certificate is <strong>hard-coded</strong> in Feishu: when the IdP rotates its signing certificate you must update it here manually, or logins will suddenly fail. Parsed locally in your browser; nothing is uploaded.',
     copy: 'Copy',
     copied: 'Copied ✓',
-    genIntro: 'Feishu does not export a proper SP metadata file. Fill in the parameters <strong>you copied from the Feishu SSO page</strong> below to assemble a standard SP metadata document you can upload to IdPs that <strong>support metadata import</strong> (Okta / Entra ID, etc.).',
-    fEntityId: 'SP Entity ID (from Feishu)',
-    fEntityIdPh: 'The SP identifier / Issuer shown on the Feishu SSO page',
-    fAcs: 'ACS URL (Reply / Assertion URL, from Feishu) *',
-    fAcsPh: 'The Reply URL copied from the Feishu SSO page',
+    genIntro: 'Feishu / Lark SP parameters are <strong>fixed per region</strong> (not per tenant). Pick a region and they fill in automatically; the resulting standard SP metadata can be uploaded to IdPs that <strong>support metadata import</strong> (Okta / Entra ID). Feishu itself doesn\'t import metadata — just type the values below into your IdP.',
+    fRegion: 'Feishu / Lark region (auto-fills the fixed SP params)',
+    regionFeishu: 'Feishu (China, feishu.cn)',
+    regionLark: 'Lark (Global, larksuite.com)',
+    regionSg: 'Lark (Singapore, sg.larksuite.com)',
+    regionJp: 'Lark (Japan, jp.larksuite.com)',
+    regionCustom: 'Custom',
+    emailAttrNote: '⚠️ Feishu matches members by <strong>email</strong>: the IdP assertion must include an <code>email</code> attribute (the user\'s email), matching the member\'s Feishu email. The enterprise domain (<code>xxx.feishu.cn</code>) is only typed at login time and does not appear in these SP params.',
+    fEntityId: 'SP Entity ID (Audience URI)',
+    fEntityIdPh: 'Fixed per region, e.g. https://www.feishu.cn',
+    fAcs: 'ACS URL (Single Sign-On URL) *',
+    fAcsPh: 'The region-fixed call_back URL',
     fSlo: 'Logout URL (SLO)',
     fSloPh: 'Optional; leave empty to omit',
     fNameId: 'NameIDFormat',
@@ -217,11 +240,18 @@ const messages = {
     parseWarn: '⚠️ Das Zertifikat ist in Feishu <strong>fest hinterlegt</strong>: Wenn der IdP sein Signaturzertifikat rotiert, muss es hier manuell aktualisiert werden, sonst schlagen Logins plötzlich fehl. Lokale Verarbeitung im Browser; nichts wird hochgeladen.',
     copy: 'Kopieren',
     copied: 'Kopiert ✓',
-    genIntro: 'Feishu exportiert keine ordentliche SP-Metadata-Datei. Trage unten die <strong>auf der Feishu-SSO-Seite kopierten Parameter</strong> ein, um eine standardkonforme SP-Metadata zu erzeugen, die du bei IdPs mit <strong>Metadata-Import</strong> (Okta / Entra ID usw.) hochladen kannst.',
-    fEntityId: 'SP Entity ID (von Feishu)',
-    fEntityIdPh: 'Auf der Feishu-SSO-Seite angezeigte SP-Kennung / Issuer',
-    fAcs: 'ACS-URL (Reply / Assertion URL, von Feishu) *',
-    fAcsPh: 'Die von der Feishu-SSO-Seite kopierte Reply-URL',
+    genIntro: 'Die SP-Parameter von Feishu / Lark sind <strong>pro Region fest</strong> (nicht pro Mandant). Region wählen — die Werte werden automatisch eingetragen; die erzeugte standardkonforme SP-Metadata kann bei IdPs mit <strong>Metadata-Import</strong> (Okta / Entra ID) hochgeladen werden. Feishu selbst importiert keine Metadata — die Werte unten einfach in den IdP eintragen.',
+    fRegion: 'Feishu-/Lark-Region (füllt die festen SP-Parameter aus)',
+    regionFeishu: 'Feishu (China, feishu.cn)',
+    regionLark: 'Lark (Global, larksuite.com)',
+    regionSg: 'Lark (Singapur, sg.larksuite.com)',
+    regionJp: 'Lark (Japan, jp.larksuite.com)',
+    regionCustom: 'Benutzerdefiniert',
+    emailAttrNote: '⚠️ Feishu ordnet Mitglieder per <strong>E-Mail</strong> zu: Die IdP-Assertion muss ein <code>email</code>-Attribut (die E-Mail des Benutzers) enthalten, das mit der Feishu-E-Mail des Mitglieds übereinstimmt. Die Unternehmensdomain (<code>xxx.feishu.cn</code>) wird nur beim Login eingegeben und taucht in diesen SP-Parametern nicht auf.',
+    fEntityId: 'SP Entity ID (Audience URI)',
+    fEntityIdPh: 'Pro Region fest, z. B. https://www.feishu.cn',
+    fAcs: 'ACS-URL (Single Sign-On URL) *',
+    fAcsPh: 'Die pro Region feste call_back-URL',
     fSlo: 'Logout-URL (SLO)',
     fSloPh: 'Optional; leer lassen zum Weglassen',
     fNameId: 'NameIDFormat',
@@ -320,8 +350,27 @@ async function parseIdp() {
 }
 
 // ---------- 模式 B:生成 ----------
-const spEntityId = ref('')
-const acsUrl = ref('')
+// 飞书 / Lark 各区域的固定 SP 参数(源自官方 SAML 配置文档)
+const PRESETS = {
+  feishu: { entityId: 'https://www.feishu.cn', acs: 'https://www.feishu.cn/suite/passport/authentication/idp/saml/call_back' },
+  lark: { entityId: 'https://www.larksuite.com', acs: 'https://www.larksuite.com/suite/passport/authentication/idp/saml/call_back' },
+  larksg: { entityId: 'https://www.sg.larksuite.com', acs: 'https://www.sg.larksuite.com/suite/passport/authentication/idp/saml/call_back' },
+  larkjp: { entityId: 'https://www-jp.larksuite.com', acs: 'https://www-jp.larksuite.com/suite/passport/authentication/idp/saml/call_back' },
+}
+const region = ref('feishu')
+const regionOptions = computed(() => [
+  { key: 'feishu', label: t('regionFeishu') },
+  { key: 'lark', label: t('regionLark') },
+  { key: 'larksg', label: t('regionSg') },
+  { key: 'larkjp', label: t('regionJp') },
+  { key: 'custom', label: t('regionCustom') },
+])
+const spEntityId = ref(PRESETS.feishu.entityId)
+const acsUrl = ref(PRESETS.feishu.acs)
+function applyRegion() {
+  const p = PRESETS[region.value]
+  if (p) { spEntityId.value = p.entityId; acsUrl.value = p.acs }
+}
 const sloUrl = ref('')
 const wantAssertionsSigned = ref(true)
 const authnRequestsSigned = ref(false)

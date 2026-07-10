@@ -7,7 +7,7 @@ title: Feishu SAML SSO Helper
 When Feishu acts as an SP integrating with a corporate IdP, it **only supports SAML 2.0, and it cannot import IdP metadata**—you have to fill in the fields by hand in the admin console. This tool removes the two points of friction in that round trip:
 
 - **Parse IdP Metadata → Feishu fields**: paste the metadata exported from Okta / Entra ID / ADFS / IDaaS, and it automatically extracts the **Issuer, login URL, logout URL, and NameID format** you need to paste into Feishu, plus the Public Certificate with the **`-----BEGIN/END-----` header and footer stripped off** (Feishu's field only accepts the bare base64).
-- **Generate Feishu SP Metadata**: Feishu does not export a proper SP metadata file; enter the **ACS URL / SP Entity ID** you copied from Feishu's SSO page, and it assembles a standard SP metadata document (including the certificate and NameIDFormat) to upload to any IdP that supports importing it.
+- **Generate Feishu SP Metadata**: Feishu's SP parameters are **fixed per region** (China feishu.cn / Global / Singapore / Japan) and are built into the tool. Pick a region and the **ACS URL / SP Entity ID** fill in automatically, assembling a standard SP metadata document (including the certificate and NameIDFormat) to upload to any IdP that supports importing it.
 
 <ClientOnly>
   <FeishuSamlHelper />

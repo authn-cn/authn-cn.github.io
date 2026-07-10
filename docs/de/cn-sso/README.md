@@ -34,9 +34,25 @@ Diese Aussagen beziehen sich auf **Richtung B (Feishu als IdP)** oder auf die F�
 
 > 🔧 Mit dem [Feishu-SAML-SSO-Helfer](../tools/feishu-saml.md) können Sie: die IdP-Metadata mit einem Klick in die oben genannten, manuell einzutragenden Felder parsen (das Zertifikat wird automatisch von den Kopf-/Fußzeilen befreit); und umgekehrt die SP-Metadata von Feishu erzeugen, um sie an den IdP hochzuladen.
 
-### Was Feishu dem IdP bereitstellt
+### Die SP-Parameter von Feishu sind fest (pro Region)
 
-Feishu **liefert keine** Metadata-Datei, sondern zeigt auf der SSO-Konfigurationsseite die kopierbare **Reply URL / Assertion URL (also ACS)** und die SP-Kennung an, die Sie manuell in den IdP einfügen. Wenn der IdP (z. B. Okta / Entra ID) den Import von SP-Metadata unterstützt, können Sie mit dem obigen Tool diese Parameter zu einer standardkonformen SP-Metadata zusammensetzen und dann hochladen.
+Feishu **liefert keine** Metadata-Datei, aber die benötigten SP-Parameter sind tatsächlich **feste Konstanten**, die nur pro Region (nicht pro Unternehmen) variieren. Gemäß der offiziellen Dokumentation einfach die folgenden Werte in den IdP eintragen:
+
+| Region / Login-Domain | ACS-URL (Single Sign-On URL) | SP Entity ID (Audience URI) |
+|------|------|------|
+| **Feishu China** (`*.feishu.cn`) | `https://www.feishu.cn/suite/passport/authentication/idp/saml/call_back` | `https://www.feishu.cn` |
+| Lark Global (`*.larksuite.com`) | `https://www.larksuite.com/suite/passport/authentication/idp/saml/call_back` | `https://www.larksuite.com` |
+| Lark Singapur (`*.sg.larksuite.com`) | `https://www.sg.larksuite.com/suite/passport/authentication/idp/saml/call_back` | `https://www.sg.larksuite.com` |
+| Lark Japan (`*.jp.larksuite.com`) | `https://www-jp.larksuite.com/suite/passport/authentication/idp/saml/call_back` | `https://www-jp.larksuite.com` |
+
+Wichtige Punkte:
+
+- Diese Werte sind **pro Region fest** und unabhängig von Ihrem Unternehmen. Die **Unternehmensdomain (`xxx.feishu.cn`) wird nur beim Login eingegeben**, um zum Mandanten zu routen — sie taucht in den SAML-Endpunkten nicht auf.
+- Die ACS-Bindung ist **HTTP-POST**; in Okta "Use this for Recipient URL and Destination URL" ankreuzen (Recipient / Destination = ACS).
+- Sie **müssen im IdP ein `email`-Attribut konfigurieren** (Wert = E-Mail des Benutzers); Feishu ordnet Mitglieder per E-Mail zu, beide Seiten müssen übereinstimmen.
+- Beim Eintragen des IdP-Zertifikats in Feishu die **Markierungen `-----BEGIN/END CERTIFICATE-----` entfernen** und nur den Inhalt behalten.
+
+> 🔧 Der [Feishu-SAML-SSO-Helfer](../tools/feishu-saml.md) hat diese pro Region festen Werte eingebaut: Region wählen — er erzeugt die standardkonforme SP-Metadata von Feishu, bereit zum Hochladen bei IdPs (Okta / Entra ID), die **Import unterstützen**.
 
 ### NameID und Benutzerabgleich
 
@@ -76,6 +92,7 @@ Die Aussagen auf dieser Seite stützen sich auf die folgenden offiziellen und ma
 - [Mit SSO bei Feishu anmelden — Feishu-Hilfecenter](https://www.feishu.cn/hc/zh-CN/articles/360043576234)
 - [Admin: SAML-2.0-SSO-Login konfigurieren (Beispiel Okta IdP)](https://www.feishu.cn/hc/zh-CN/articles/360049067599)
 - [Admin: SAML-2.0-SSO-Login konfigurieren (Beispiel Google Workspace IdP)](https://www.feishu.cn/hc/zh-CN/articles/335787416164)
+- [Feste SAML-Parameter von Lark je Region (Okta / Google)](https://www.larksuite.com/hc/en-US/articles/360048487935-admin-configure-saml-2.0-sso-login-okta-or-google)
 - [Integration eines Unternehmens-SSO-Systems mit dem Feishu-Identitätssystem](https://www.feishu.cn/hc/zh-CN/articles/879974570764)
 
 **DingTalk**

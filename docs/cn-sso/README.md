@@ -34,9 +34,25 @@ title: "国内平台 SSO 对接"
 
 > 🔧 用 [飞书 SAML SSO 助手](../tools/feishu-saml.md) 可以:把 IdP metadata 一键解析成上面这些要手填的字段(证书已自动去头尾);反向生成飞书的 SP metadata 上传给 IdP。
 
-### 飞书侧提供什么给 IdP
+### 飞书侧的 SP 参数是固定的(按区域)
 
-飞书**不给** metadata 文件,而是在 SSO 配置页显示可复制的 **Reply URL / Assertion URL(即 ACS)** 和 SP 标识,让你手动粘到 IdP 那边。若 IdP(如 Okta / Entra ID)支持导入 SP metadata,可用上面的工具把这些参数拼成标准 SP metadata 再上传。
+飞书**不给** metadata 文件,但它需要的 SP 参数其实是**固定常量**,只随区域(而非企业)变化——照官方文档把下面的值填进 IdP 即可:
+
+| 区域 / 登录域名 | ACS URL(Single Sign-On URL) | SP Entity ID(Audience URI) |
+|------|------|------|
+| **飞书 中国**(`*.feishu.cn`) | `https://www.feishu.cn/suite/passport/authentication/idp/saml/call_back` | `https://www.feishu.cn` |
+| Lark 国际(`*.larksuite.com`) | `https://www.larksuite.com/suite/passport/authentication/idp/saml/call_back` | `https://www.larksuite.com` |
+| Lark 新加坡(`*.sg.larksuite.com`) | `https://www.sg.larksuite.com/suite/passport/authentication/idp/saml/call_back` | `https://www.sg.larksuite.com` |
+| Lark 日本(`*.jp.larksuite.com`) | `https://www-jp.larksuite.com/suite/passport/authentication/idp/saml/call_back` | `https://www-jp.larksuite.com` |
+
+要点:
+
+- 这些值**只随区域固定**,和你的企业无关。**企业域名(`xxx.feishu.cn`)只在员工登录时输入**,用于路由到你的租户,不出现在 SAML 端点里。
+- ACS 绑定是 **HTTP-POST**;在 Okta 里勾选 "Use this for Recipient URL and Destination URL"(Recipient / Destination 同 ACS)。
+- **必须在 IdP 侧配置 `email` 属性**(值为用户邮箱),飞书按邮箱匹配成员——两边邮箱必须一致。
+- 填 IdP 证书到飞书时,**去掉 `-----BEGIN/END CERTIFICATE-----` 头尾**,只保留中间正文。
+
+> 🔧 [飞书 SAML SSO 助手](../tools/feishu-saml.md) 已内置以上各区域的固定值:选区域即自动生成飞书的标准 SP metadata,供 Okta / Entra ID 等**支持导入**的 IdP 直接上传。
 
 ### NameID 与用户匹配
 
@@ -76,6 +92,7 @@ title: "国内平台 SSO 对接"
 - [使用 SSO 登录飞书 —— 飞书帮助中心](https://www.feishu.cn/hc/zh-CN/articles/360043576234)
 - [管理员配置 SAML 2.0 SSO 登录(以 Okta IdP 为例)](https://www.feishu.cn/hc/zh-CN/articles/360049067599)
 - [管理员配置 SAML 2.0 SSO 登录(以 Google Workspace IdP 为例)](https://www.feishu.cn/hc/zh-CN/articles/335787416164)
+- [Lark 各区域 SAML 固定参数(Okta / Google)](https://www.larksuite.com/hc/en-US/articles/360048487935-admin-configure-saml-2.0-sso-login-okta-or-google)
 - [企业 SSO 系统与飞书身份系统集成解决方案](https://www.feishu.cn/hc/zh-CN/articles/879974570764)
 
 **钉钉**
