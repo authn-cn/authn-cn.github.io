@@ -66,3 +66,21 @@ Bei DingTalk ist die Lage noch "unstandardisierter":
 - [Feishu-SAML-SSO-Helfer](../tools/feishu-saml.md) — IdP-Metadata parsen / Feishu-SP-Metadata erzeugen
 - [SAML-Metadata-Parser](../tools/saml-metadata.md) · [SAML-Response-Parser](../tools/saml-parse.md) · [X.509-Zertifikatsanalyse](../tools/cert.md)
 - [SAML-2.0-Dokumentation](../saml/) · [OIDC-Dokumentation](../oidc/) · [OAuth-2.0-Dokumentation](../oauth2/)
+
+## Quellen
+
+Die Aussagen auf dieser Seite stützen sich auf die folgenden offiziellen und maßgeblichen Dokumente (alle auf Chinesisch; bei Änderungen gilt die jeweils aktuelle Herstellerdokumentation):
+
+**Feishu**
+
+- [Mit SSO bei Feishu anmelden — Feishu-Hilfecenter](https://www.feishu.cn/hc/zh-CN/articles/360043576234)
+- [Admin: SAML-2.0-SSO-Login konfigurieren (Beispiel Okta IdP)](https://www.feishu.cn/hc/zh-CN/articles/360049067599)
+- [Admin: SAML-2.0-SSO-Login konfigurieren (Beispiel Google Workspace IdP)](https://www.feishu.cn/hc/zh-CN/articles/335787416164)
+- [Integration eines Unternehmens-SSO-Systems mit dem Feishu-Identitätssystem](https://www.feishu.cn/hc/zh-CN/articles/879974570764)
+
+**DingTalk**
+
+- [Single-Sign-on-(SSO-)Überblick — DingTalk Open Platform](https://open.dingtalk.com/document/orgapp/sso-overview)
+- [SSO zu Anwendungen aus dem DingTalk-Workbench — Alibaba Cloud IDaaS](https://help.aliyun.com/zh/idaas/eiam/use-cases/log-on-to-applications-from-dingtalk-through-sso)
+- [Dedicated-DingTalk-SSO konfigurieren — Alibaba Cloud IDaaS](https://help.aliyun.com/zh/idaas/eiam/user-guide/dedicated-dingtalk-sso)
+- [Best Practices zur Integration von DingTalk-SSO (eigener OIDC-Adapter) — Guance](https://www.guance.com/learn/articles/guance-dingding-oidc)

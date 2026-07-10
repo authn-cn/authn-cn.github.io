@@ -66,3 +66,21 @@ title: "国内平台 SSO 对接"
 - [飞书 SAML SSO 助手](../tools/feishu-saml.md) —— 解析 IdP metadata / 生成飞书 SP metadata
 - [SAML Metadata 解析器](../tools/saml-metadata.md) · [SAML Response 解析器](../tools/saml-parse.md) · [X.509 证书解析](../tools/cert.md)
 - [SAML 2.0 文档](../saml/) · [OIDC 文档](../oidc/) · [OAuth 2.0 文档](../oauth2/)
+
+## 参考来源
+
+本页结论依据以下官方与权威文档(如页面改版,以各厂商最新文档为准):
+
+**飞书**
+
+- [使用 SSO 登录飞书 —— 飞书帮助中心](https://www.feishu.cn/hc/zh-CN/articles/360043576234)
+- [管理员配置 SAML 2.0 SSO 登录(以 Okta IdP 为例)](https://www.feishu.cn/hc/zh-CN/articles/360049067599)
+- [管理员配置 SAML 2.0 SSO 登录(以 Google Workspace IdP 为例)](https://www.feishu.cn/hc/zh-CN/articles/335787416164)
+- [企业 SSO 系统与飞书身份系统集成解决方案](https://www.feishu.cn/hc/zh-CN/articles/879974570764)
+
+**钉钉**
+
+- [单点登录(SSO)概述 —— 钉钉开放平台](https://open.dingtalk.com/document/orgapp/sso-overview)
+- [在钉钉工作台单点登录到应用 —— 阿里云 IDaaS](https://help.aliyun.com/zh/idaas/eiam/use-cases/log-on-to-applications-from-dingtalk-through-sso)
+- [配置专属钉钉单点登录 —— 阿里云 IDaaS](https://help.aliyun.com/zh/idaas/eiam/user-guide/dedicated-dingtalk-sso)
+- [集成钉钉 SSO(自定义 OIDC 适配)最佳实践 —— 观测云](https://www.guance.com/learn/articles/guance-dingding-oidc)
