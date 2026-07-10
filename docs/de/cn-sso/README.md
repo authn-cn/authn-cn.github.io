@@ -52,7 +52,7 @@ Wichtige Punkte:
 - Sie **müssen im IdP ein `email`-Attribut konfigurieren** (Wert = E-Mail des Benutzers); Feishu ordnet Mitglieder per E-Mail zu, beide Seiten müssen übereinstimmen.
 - Beim Eintragen des IdP-Zertifikats in Feishu die **Markierungen `-----BEGIN/END CERTIFICATE-----` entfernen** und nur den Inhalt behalten.
 
-> 🔧 Der [Feishu-SAML-SSO-Helfer](../tools/feishu-saml.md) hat diese pro Region festen Werte eingebaut: Region wählen — er erzeugt die standardkonforme SP-Metadata von Feishu, bereit zum Hochladen bei IdPs (Okta / Entra ID), die **Import unterstützen**.
+> 🔧 Der [Feishu-SAML-SSO-Helfer](../tools/feishu-saml.md) hat diese pro Region festen Werte eingebaut: Region wählen — er erzeugt die standardkonforme SP-Metadata von Feishu, bereit zum Hochladen bei IdPs (Okta / Entra ID), die **Import unterstützen**. Die erzeugte Metadata deklariert zudem das benötigte `email`-Attribut über `AttributeConsumingService` / `RequestedAttribute` (die reguläre SP↔IdP-Konvention); allerdings **geben Okta / Entra Attribute nicht automatisch anhand dessen frei** — das `email`-Attribut muss weiterhin manuell im IdP hinzugefügt werden. Nur wenige IdPs (z. B. Shibboleth) steuern die Freigabe über Metadata.
 
 ### NameID und Benutzerabgleich
 

@@ -52,7 +52,7 @@ title: "国内平台 SSO 对接"
 - **必须在 IdP 侧配置 `email` 属性**(值为用户邮箱),飞书按邮箱匹配成员——两边邮箱必须一致。
 - 填 IdP 证书到飞书时,**去掉 `-----BEGIN/END CERTIFICATE-----` 头尾**,只保留中间正文。
 
-> 🔧 [飞书 SAML SSO 助手](../tools/feishu-saml.md) 已内置以上各区域的固定值:选区域即自动生成飞书的标准 SP metadata,供 Okta / Entra ID 等**支持导入**的 IdP 直接上传。
+> 🔧 [飞书 SAML SSO 助手](../tools/feishu-saml.md) 已内置以上各区域的固定值:选区域即自动生成飞书的标准 SP metadata,供 Okta / Entra ID 等**支持导入**的 IdP 直接上传。生成的 metadata 还会用 `AttributeConsumingService` / `RequestedAttribute` 声明所需的 `email` 属性(标准 SP↔IdP 的正规做法);不过 Okta / Entra **不会据此自动释放属性**,仍需在 IdP 侧手工加 `email` 属性——Shibboleth 等少数 IdP 才能按 metadata 驱动释放。
 
 ### NameID 与用户匹配
 

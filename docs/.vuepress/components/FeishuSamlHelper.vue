@@ -92,6 +92,7 @@
       <div class="authn-row">
         <label class="fs-check"><input type="checkbox" v-model="wantAssertionsSigned" /> WantAssertionsSigned</label>
         <label class="fs-check"><input type="checkbox" v-model="authnRequestsSigned" /> AuthnRequestsSigned</label>
+        <label class="fs-check"><input type="checkbox" v-model="requestEmail" /> {{ t('fRequestEmail') }}</label>
       </div>
       <label class="authn-label">{{ t('fCert') }} <span class="authn-note">{{ t('optional') }}</span></label>
       <textarea v-model="spCertPem" class="authn-textarea" rows="5" spellcheck="false"
@@ -144,6 +145,7 @@ const messages = {
     regionJp: 'Lark(日本 jp.larksuite.com)',
     regionCustom: '自定义',
     emailAttrNote: '⚠️ 飞书按<strong>邮箱</strong>匹配成员:必须在 IdP 侧让断言包含 <code>email</code> 属性(值为用户邮箱),且与飞书成员邮箱一致。企业域名(<code>xxx.feishu.cn</code>)只在员工登录时输入,不出现在这些 SP 参数里。',
+    fRequestEmail: 'metadata 声明 email 属性',
     fEntityId: 'SP Entity ID(Audience URI)',
     fEntityIdPh: '按区域固定,如 https://www.feishu.cn',
     fAcs: 'ACS URL(Single Sign-On URL) *',
@@ -196,6 +198,7 @@ const messages = {
     regionJp: 'Lark (Japan, jp.larksuite.com)',
     regionCustom: 'Custom',
     emailAttrNote: '⚠️ Feishu matches members by <strong>email</strong>: the IdP assertion must include an <code>email</code> attribute (the user\'s email), matching the member\'s Feishu email. The enterprise domain (<code>xxx.feishu.cn</code>) is only typed at login time and does not appear in these SP params.',
+    fRequestEmail: 'Declare email attribute in metadata',
     fEntityId: 'SP Entity ID (Audience URI)',
     fEntityIdPh: 'Fixed per region, e.g. https://www.feishu.cn',
     fAcs: 'ACS URL (Single Sign-On URL) *',
@@ -248,6 +251,7 @@ const messages = {
     regionJp: 'Lark (Japan, jp.larksuite.com)',
     regionCustom: 'Benutzerdefiniert',
     emailAttrNote: '⚠️ Feishu ordnet Mitglieder per <strong>E-Mail</strong> zu: Die IdP-Assertion muss ein <code>email</code>-Attribut (die E-Mail des Benutzers) enthalten, das mit der Feishu-E-Mail des Mitglieds übereinstimmt. Die Unternehmensdomain (<code>xxx.feishu.cn</code>) wird nur beim Login eingegeben und taucht in diesen SP-Parametern nicht auf.',
+    fRequestEmail: 'email-Attribut in Metadata deklarieren',
     fEntityId: 'SP Entity ID (Audience URI)',
     fEntityIdPh: 'Pro Region fest, z. B. https://www.feishu.cn',
     fAcs: 'ACS-URL (Single Sign-On URL) *',
@@ -374,6 +378,7 @@ function applyRegion() {
 const sloUrl = ref('')
 const wantAssertionsSigned = ref(true)
 const authnRequestsSigned = ref(false)
+const requestEmail = ref(true)
 const spCertPem = ref('')
 const nameIdOptions = computed(() => [
   { urn: 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress', label: t('niEmail') },
@@ -402,11 +407,17 @@ const genXml = computed(() => {
   const sloLine = sloUrl.value
     ? `    <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="${esc(sloUrl.value)}"/>\n`
     : ''
+  const attrSvc = requestEmail.value
+    ? `\n    <md:AttributeConsumingService index="0" isDefault="true">
+      <md:ServiceName xml:lang="en">Feishu</md:ServiceName>
+      <md:RequestedAttribute FriendlyName="email" Name="email" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic" isRequired="true"/>
+    </md:AttributeConsumingService>`
+    : ''
   return `<?xml version="1.0" encoding="UTF-8"?>
 <md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" entityID="${esc(spEntityId.value)}">
   <md:SPSSODescriptor AuthnRequestsSigned="${authnRequestsSigned.value}" WantAssertionsSigned="${wantAssertionsSigned.value}" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
 ${keyDesc}${sloLine}    <md:NameIDFormat>${nameIdFormat.value}</md:NameIDFormat>
-    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="${esc(acsUrl.value)}" index="0" isDefault="true"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="${esc(acsUrl.value)}" index="0" isDefault="true"/>${attrSvc}
   </md:SPSSODescriptor>
 </md:EntityDescriptor>`
 })

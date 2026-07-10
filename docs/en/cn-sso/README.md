@@ -52,7 +52,7 @@ Key points:
 - You **must configure an `email` attribute on the IdP** (value = the user's email); Feishu matches members by email, so both sides must match.
 - When entering the IdP certificate into Feishu, **strip the `-----BEGIN/END CERTIFICATE-----` markers** and keep only the body.
 
-> 🔧 The [Feishu SAML SSO Helper](../tools/feishu-saml.md) has these per-region fixed values built in: pick a region and it generates Feishu's standard SP metadata, ready to upload to IdPs (Okta / Entra ID) that **support import**.
+> 🔧 The [Feishu SAML SSO Helper](../tools/feishu-saml.md) has these per-region fixed values built in: pick a region and it generates Feishu's standard SP metadata, ready to upload to IdPs (Okta / Entra ID) that **support import**. The generated metadata also declares the required `email` attribute via `AttributeConsumingService` / `RequestedAttribute` (the proper SP↔IdP convention); note, however, that Okta / Entra **won't auto-release attributes based on it** — you still add the `email` attribute manually on the IdP. Only a few IdPs (e.g. Shibboleth) drive release from metadata.
 
 ### NameID and user matching
 
