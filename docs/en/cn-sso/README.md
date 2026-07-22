@@ -6,6 +6,10 @@ title: "China-Platform SSO Integration"
 
 China's platforms—Feishu, DingTalk, WeCom, and the like—**can all do enterprise SSO**, but how closely they align with the standard protocols (SAML / OIDC) varies widely, and the pitfalls are completely different from integrating with Okta or Entra ID. This page spells out those differences.
 
+::: tip Looking for "Log in with WeChat / WeCom"?
+This page covers **direction A** (logging into Feishu/DingTalk with your existing corporate accounts). "Logging into *your own* system with WeChat/WeCom scan-login" is **direction B**, covered separately: [WeChat Scan-Login](./wechat.md) · [WeCom Scan-Login](./wecom.md).
+:::
+
 ## First, distinguish the two directions
 
 "Enterprise SSO integration" has two very different meanings, and you must be clear about which one you are doing:
