@@ -74,7 +74,8 @@ Die WeChat-„Website-App" holt den Nutzer in zwei Schritten (einer weniger als 
 
 ## Praxis / Integration
 
-- 🔬 [Mock WeChat (Nutzung)](../mock/wechat.md) — den ganzen Ablauf gegen zum Offiziellen identische Mock-Endpunkte durchspielen, mit eingebetteter **anklickbarer, echter** Scan-Demo und der „Produktion = nur JS + URL ändern"-Zuordnung.
+- 🔬 [Scan-Login-Demo](../tools/wechat-login.html) — ein **anklickbarer, echter** Durchlauf mit dem identischen SDK des Mocks (auf den Reiter „WeChat" wechseln)
+- 🧪 [Mock WeChat (Nutzung)](../mock/wechat.md) — Endpunkte, Integrationscode und die „Produktion = nur JS + URL ändern"-Zuordnung
 - 📖 [OAuth-2.0-Doku](../oauth2/) · Vergleich mit [WeCom-Scan-Login](./wecom.md)
 
 ## Quellen

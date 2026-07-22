@@ -22,6 +22,7 @@ This site provides a set of online tools for debugging authentication protocols.
 |------|---------|
 | [PKCE Generator](./pkce.md) | Generate `code_verifier` / `code_challenge` (S256) plus `state`, `nonce` |
 | [OIDC Discovery Viewer](./discovery.md) | Enter issuer, fetch and interpret `/.well-known/openid-configuration` and JWKS |
+| [WeChat / WeCom Scan-Login Demo](./wechat-login.md) | Embed a QR with a Mock SDK identical to the official one; run WeChat / WeCom scan-login for real |
 
 ## MFA / Passkey
 

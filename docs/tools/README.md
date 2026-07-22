@@ -22,6 +22,7 @@ title: 工具总览
 |------|------|
 | [PKCE 生成器](./pkce.md) | 生成 `code_verifier` / `code_challenge`(S256) 及 `state`、`nonce` |
 | [OIDC Discovery 查看器](./discovery.md) | 输入 issuer,拉取并解读 `/.well-known/openid-configuration` 与 JWKS |
+| [微信 / 企业微信扫码登录演示](./wechat-login.md) | 用与官方一致的 Mock SDK 内嵌二维码,真实跑通微信 / 企业微信扫码登录 |
 
 ## MFA / Passkey
 

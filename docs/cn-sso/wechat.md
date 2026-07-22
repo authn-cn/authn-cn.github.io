@@ -74,7 +74,8 @@ title: "微信扫码登录"
 
 ## 动手 / 联调
 
-- 🔬 [Mock 微信(使用)](../mock/wechat.md) —— 用与官方一致的 Mock 端点跑通全流程,页面内嵌**真实可点**的扫码演示,并给出"上线只改 JS 与 URL"的对照。
+- 🔬 [扫码登录演示](../tools/wechat-login.html) —— 用 Mock 同款 SDK **真实可点**跑通扫码登录(切到「微信」标签)
+- 🧪 [Mock 微信(使用)](../mock/wechat.md) —— 端点、接入代码与"上线只改 JS 与 URL"
 - 📖 [OAuth 2.0 文档](../oauth2/) · [企业微信扫码登录](./wecom.md) 对比
 
 ## 参考来源

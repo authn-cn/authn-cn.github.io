@@ -74,7 +74,8 @@ The WeChat "Website App" fetches the user in two steps (one fewer than WeCom):
 
 ## Hands-on / integration
 
-- 🔬 [Mock WeChat (usage)](../mock/wechat.md) — run the whole flow against Mock endpoints identical to the official ones, with a **clickable, real** scan demo embedded, plus the "going live = change only JS + URL" mapping.
+- 🔬 [Scan-Login Demo](../tools/wechat-login.html) — a **clickable, real** run of the flow with the Mock's identical SDK (switch to the "WeChat" tab)
+- 🧪 [Mock WeChat (usage)](../mock/wechat.md) — endpoints, integration code and the "going live = change only JS + URL" mapping
 - 📖 [OAuth 2.0 docs](../oauth2/) · compare with [WeCom scan-login](./wecom.md)
 
 ## References

@@ -22,6 +22,7 @@ Diese Website bietet eine Reihe von Online-Tools für die Fehlersuche von Authen
 |------|------|
 | [PKCE-Generator](./pkce.md) | `code_verifier` / `code_challenge` (S256) sowie `state`, `nonce` Zufallswerte generieren |
 | [OIDC Discovery-Viewer](./discovery.md) | Geben Sie issuer ein, rufen Sie ab und dekodieren Sie `/.well-known/openid-configuration` und JWKS |
+| [WeChat- / WeCom-Scan-Login-Demo](./wechat-login.md) | QR mit einem zum offiziellen identischen Mock-SDK einbetten; WeChat- / WeCom-Scan-Login echt durchspielen |
 
 ## MFA / Passkey
 

@@ -92,8 +92,9 @@ Why this design? Because WeCom's `access_token` is a **corp/app-level credential
 
 ## Hands-on / integration
 
-- 🔬 [Mock WeCom (usage)](../mock/wecom.md) — run the whole flow against Mock endpoints identical to the official ones, with a **clickable, real** scan demo embedded, plus the "going live = change only JS + URL" mapping.
-- 📖 [OAuth 2.0 docs](../oauth2/) — the standard authorization-code flow · compare with [WeChat scan-login](./wechat.md)
+- 🔬 [Scan-Login Demo](../tools/wechat-login.html) — a **clickable, real** run of the flow with the Mock's identical SDK (switch to the "WeCom" tab)
+- 🧪 [Mock WeCom (usage)](../mock/wecom.md) — endpoints, integration code and the "going live = change only JS + URL" mapping
+- 📖 [OAuth 2.0 docs](../oauth2/) · compare with [WeChat scan-login](./wechat.md)
 
 ## References
 

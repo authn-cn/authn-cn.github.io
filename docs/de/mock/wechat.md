@@ -49,13 +49,9 @@ curl "https://mock.authn.tech/sns/userinfo?access_token=<AT>&openid=<OPENID>"
 # → { openid, nickname:"微信测试用户", sex, province, city, country, headimgurl, privilege, unionid }
 ```
 
-## Live-Demo (anklickbar, echt)
+## Live-Demo
 
-„Login-QR-Code anzeigen" klicken, scannen oder den Link „(Dev) Scan simulieren → bestätigen" unter dem QR-Code nutzen; die Seite kehrt mit einem `code` zurück und tauscht ihn automatisch gegen Nutzerinfos.
-
-<ClientOnly>
-  <WechatLoginDemo lock-provider="wechat" />
-</ClientOnly>
+Zum echten Durchklicken (QR einbetten → scannen → Rücksprung → Tausch gegen Nutzerinfos) das eigenständige [Scan-Login-Demo-Tool](../tools/wechat-login.html) nutzen (auf den Reiter „WeChat" wechseln).
 
 ## Für Produktion: nur eingebundenes JS und URL ändern
 
@@ -71,7 +67,3 @@ Backend-Pfade, `new WxLogin({...})`-Parameter, der `redirect_uri?code=&state=`-C
 ::: warning Nur zum Testen
 Der Mock liefert einen festen Nutzer, der Autorisierungscode ist ein kurzlebiges, wiederverwendbares selbstsigniertes JWT, und der Signaturschlüssel ist öffentlich. **Kein Produktionssystem sollte dem Mock vertrauen.**
 :::
-
-<script setup>
-import WechatLoginDemo from '@components/WechatLoginDemo.vue'
-</script>

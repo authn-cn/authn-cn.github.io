@@ -51,13 +51,9 @@ curl "https://mock.authn.tech/wecom/cgi-bin/user/get?access_token=<AT>&userid=<U
 # → { errcode:0, userid:"zhangsan", name:"张三", department, mobile, email, ... }
 ```
 
-## Live demo (clickable, real)
+## Live demo
 
-Click "Show login QR code", scan it or use the "(dev) simulate scan → confirm" link under the QR; the page returns with a `code` and walks through the three steps, showing each response.
-
-<ClientOnly>
-  <WechatLoginDemo lock-provider="wecom" />
-</ClientOnly>
+To click through it for real (embed QR → scan → redirect → three-step exchange), use the standalone [Scan-Login Demo tool](../tools/wechat-login.html) (switch to the "WeCom" tab).
 
 ## Going live: change only the imported JS and the URL
 
@@ -73,7 +69,3 @@ Backend paths (`/cgi-bin/gettoken`, `/cgi-bin/auth/getuserinfo`, `/cgi-bin/user/
 ::: warning Test-only
 The Mock returns a fixed member (`userid=zhangsan`), the authorization code is a short-lived, reusable self-signed JWT, and the signing key is public. **No production system should trust the Mock.**
 :::
-
-<script setup>
-import WechatLoginDemo from '@components/WechatLoginDemo.vue'
-</script>

@@ -51,13 +51,9 @@ curl "https://mock.authn.tech/wecom/cgi-bin/user/get?access_token=<AT>&userid=<U
 # → { errcode:0, userid:"zhangsan", name:"张三", department, mobile, email, ... }
 ```
 
-## 在线演示(真实可点)
+## 在线演示
 
-点"生成二维码登录",手机扫码或点二维码下方"(开发者)模拟扫码 → 确认登录",页面会带 `code` 回跳并按三步展示每一步响应。
-
-<ClientOnly>
-  <WechatLoginDemo lock-provider="wecom" />
-</ClientOnly>
+想真实点一遍(内嵌二维码 → 扫码 → 回跳 → 三步换取用户),用独立的 [扫码登录演示工具](../tools/wechat-login.html)(切到「企业微信」标签)。
 
 ## 上线切换:只改「引入的 JS」与「URL」
 
@@ -73,7 +69,3 @@ Mock 的 SDK 与官方逐字节一致(`redirect_uri` 不做 `encodeURIComponent`
 ::: warning 仅供测试
 Mock 固定返回一个测试成员(`userid=zhangsan`),授权码是短时效自签 JWT 且可重复使用,签名私钥公开。**任何生产系统都不应信任 Mock 服务。**
 :::
-
-<script setup>
-import WechatLoginDemo from '@components/WechatLoginDemo.vue'
-</script>

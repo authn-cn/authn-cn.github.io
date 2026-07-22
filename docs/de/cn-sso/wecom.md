@@ -92,8 +92,9 @@ Warum dieses Design? Weil WeComs `access_token` eine **Firmen-/App-Ebene-Anmeldu
 
 ## Praxis / Integration
 
-- 🔬 [Mock WeCom (Nutzung)](../mock/wecom.md) — den ganzen Ablauf gegen zum Offiziellen identische Mock-Endpunkte durchspielen, mit eingebetteter **anklickbarer, echter** Scan-Demo und der „Produktion = nur JS + URL ändern"-Zuordnung.
-- 📖 [OAuth-2.0-Doku](../oauth2/) — der Standard-Authorization-Code-Flow · Vergleich mit [WeChat-Scan-Login](./wechat.md)
+- 🔬 [Scan-Login-Demo](../tools/wechat-login.html) — ein **anklickbarer, echter** Durchlauf mit dem identischen SDK des Mocks (auf den Reiter „WeCom" wechseln)
+- 🧪 [Mock WeCom (Nutzung)](../mock/wecom.md) — Endpunkte, Integrationscode und die „Produktion = nur JS + URL ändern"-Zuordnung
+- 📖 [OAuth-2.0-Doku](../oauth2/) · Vergleich mit [WeChat-Scan-Login](./wechat.md)
 
 ## Quellen
 
