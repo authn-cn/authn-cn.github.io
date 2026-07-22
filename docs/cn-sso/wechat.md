@@ -2,108 +2,82 @@
 title: "微信扫码登录"
 ---
 
-# 微信扫码登录(微信开放平台 · 网站应用)
+# 微信扫码登录(协议详解)
 
-"用微信登录"面向 **C 端个人用户**:让访客用自己的个人微信扫码登进你的网站。它是 **OAuth2 授权码模式的变体**,`scope=snsapi_login`——PC 网页内嵌二维码,手机微信扫码授权后带 `code` 回跳,后端再换取用户信息。
+"用微信登录"面向 **C 端个人用户**:让访客用自己的个人微信扫码登进你的网站。它本质是 **OAuth2 授权码模式(Authorization Code)** 的实现,`scope=snsapi_login`:PC 网页展示二维码,用户手机微信扫码授权,浏览器拿到一次性 `code`,再由**后端**换取用户信息。
 
-> 面向企业员工的 [企业微信扫码登录](./wecom.md) 凭据体系和取用户步骤都不同,别混用。
+> 面向企业员工的 [企业微信扫码登录](./wecom.md) 取用户要三步、凭据也不同,别混用。想直接联调 / 看可点演示,见 [Mock 微信(使用)](../mock/wechat.md)。
 
-## 前提
+## 整体流程
 
-1. 在**微信开放平台**注册开发者,创建一个**网站应用**并通过审核,拿到 `AppID` / `AppSecret`;
-2. 配置**授权回调域**(只填域名,不带协议和路径);
-3. 网站需 **HTTPS**。
+```
+浏览器(你的登录页)                微信                          你的后端
+   │  1. 内嵌二维码(wxLogin.js)       │                             │
+   │ ──────────────────────────────►  │                             │
+   │  2. 手机扫码 + 确认授权            │                             │
+   │  3. 回跳 redirect_uri?code=&state=│                             │
+   │ ◄──────────────────────────────  │                             │
+   │  4. 把 code 交给后端 ──────────────────────────────────────────►│
+   │                                   │  /sns/oauth2/access_token   │
+   │                                   │  (换 access_token+openid)   │
+   │                                   │  /sns/userinfo(拉资料)     │
+   │  5. 建立你自己的会话 ◄─────────────────────────────────────────  │
+```
 
-## 流程
+`code` 在浏览器里拿到,换 token 与拉资料都在**后端**完成(需要 `AppSecret`)。
 
-1. **内嵌二维码**:页面引入官方 `wxLogin.js`,用 `new WxLogin({...})` 在容器里生成二维码:
+## JS SDK(wxLogin.js)到底在干什么
 
-   ```html
-   <div id="login_container"></div>
-   <script src="https://res.wx.qq.com/connect/zh_CN/htmledition/js/wxLogin.js"></script>
-   <script>
-     new WxLogin({
-       id: "login_container",
-       appid: "你的_AppID",
-       scope: "snsapi_login",
-       redirect_uri: encodeURIComponent("https://your-app.example/callback"), // 官方约定:调用方 urlencode
-       state: "随机防伪串",
-       self_redirect: false   // false=顶层窗口跳转,true=iframe 内跳转
-     });
-   </script>
-   ```
+`wxLogin.js` 是一段很薄的浏览器脚本。你给它 `appid`、`scope`、`redirect_uri`、`state` 等,它在你指定的容器 `<div>` 里:
 
-   (等价地也可直接跳转 `https://open.weixin.qq.com/connect/qrconnect?appid=...&scope=snsapi_login&redirect_uri=...&state=...#wechat_redirect`。)
+1. **拼出官方授权 URL** 并**插入一个 `<iframe>`** 指向微信官方扫码页(`open.weixin.qq.com/connect/qrconnect`)——二维码是微信域下的页面,渲染、扫码状态、过期刷新都由官方页处理;
+2. **把 `code` 交回你的页面**:用户扫码确认后,官方页带着 `code` + `state` 跳转到你的 `redirect_uri`;
+3. **`self_redirect` 控制在哪跳**:`false` = 顶层窗口跳转(整页到 `redirect_uri`),`true` = 在 iframe 内跳转;
+4. **顺带处理** iframe 尺寸/样式、Chrome 142+ 的 `allow="local-network-access"` 等。
 
-2. 用户手机扫码 → 微信里确认授权;
-3. 微信带 `code` + `state` **回跳** `redirect_uri?code=CODE&state=STATE`;
-4. **后端**用 `code` 换令牌(务必在后端,`AppSecret` 不进前端):
+一句话:**SDK = "把官方二维码嵌进你的页面 + 把扫码得到的 `code` 送回来"**。它不接触 `AppSecret`,也不参与后端换 token。
 
-   ```bash
-   GET https://api.weixin.qq.com/sns/oauth2/access_token?appid=APPID&secret=SECRET&code=CODE&grant_type=authorization_code
-   # → { access_token, expires_in, refresh_token, openid, scope, unionid }
-   ```
+## 为什么要用 JS SDK(而不是自己拼链接)
 
-5. 用 `access_token` + `openid` 拉用户资料:
+也可以不用 SDK——直接整页跳转到 `https://open.weixin.qq.com/connect/qrconnect?...#wechat_redirect`,扫完回跳。但用 SDK 内嵌二维码:
 
-   ```bash
-   GET https://api.weixin.qq.com/sns/userinfo?access_token=ACCESS_TOKEN&openid=OPENID&lang=zh_CN
-   # → { openid, nickname, sex, province, city, country, headimgurl, privilege, unionid }
-   ```
+- **不跳出站点**:用户停在你的登录页,不被带到微信域再跳回,体验连续、转化更高;
+- **回避跨域**:二维码页在微信域、你的页面在你自己域。自己写 iframe 要处理扫码状态轮询、跨域拿 `code`、样式适配;SDK 用官方页完成这些,扫码成功后由官方页顶层跳转把 `code` 交回,你不用碰跨域通信;
+- **官方维护、协议对齐**:微信改版(快捷登录、样式参数、Chrome 兼容)由 SDK 跟进。
+
+> 若你就是想整页跳转 / 后端渲染,也**可以不用 SDK**;拿到 `code` 之后的后端流程完全一样。
+
+## 拿到 `code` 之后
+
+微信"网站应用"取用户只要两步(比企业微信少):
+
+1. **`/sns/oauth2/access_token`**:用 `AppID` + `AppSecret` + `code` 换 `access_token` + `openid`(+ `unionid`、`refresh_token`)。这里的 `access_token` **与用户绑定**(不同于企业微信的应用级 token)。
+2. **`/sns/userinfo`**:用 `access_token` + `openid` 拉昵称、头像等资料。
 
 ## 关键概念
 
 - **`openid`**:用户在**该应用**内的唯一标识;换个应用同一个人 `openid` 不同。
-- **`unionid`**:同一开放平台账号下**多个应用/公众号之间打通**同一用户的标识。做多端(网站 + 小程序 + 公众号)统一账号时,应以 `unionid` 作主键。
-- **`state`**:发起时生成、回跳时比对,防 CSRF。
-- **Chrome 142+**:内嵌授权框会触发"本地网络访问"提示;用官方 `wxLogin.js` 会自动给 iframe 加 `allow="local-network-access"`,自己手写 iframe 需手动加。
-- **快捷登录**:较新版本的桌面微信(Windows 3.9.11+ / Mac 4.0+)在已登录时会优先提示免扫码确认,用户仍可切二维码。
+- **`unionid`**:同一开放平台账号下**多应用/公众号打通**同一用户。做网站 + 小程序 + 公众号统一账号时,应以 `unionid` 作主键。
+- **`scope=snsapi_login`**:网站应用扫码登录固定用它。
+- **授权回调域**:开放平台后台配置(只填域名);与 `redirect_uri` 域名不一致会报错。
+- **`state`**:防 CSRF。
+- **快捷登录**:较新桌面微信(Windows 3.9.11+ / Mac 4.0+)已登录时会提示免扫码确认,用户仍可切二维码。
 
-## 用本站 Mock 微信联调
+> 注意:微信"网站应用"扫码登录**不使用 PKCE**(PKCE 属标准 OAuth2,微信这条链路不涉及);安全靠"`code` 只在后端用 `AppSecret` 交换"来保证。
 
-没有审核通过的网站应用也能先把流程跑通:本站提供一个 **Mock 微信**(`https://mock.authn.tech/wechat/`),与官方**输入输出完全一致,只是域名不同**——同名 `WxLogin` SDK、相同回跳、相同 `/sns/*` 接口与字段,**不校验 AppID / AppSecret**,扫码后固定返回一个测试用户。
+## 安全要点
 
-| 用途 | Mock 端点 | 对应微信官方 |
-|------|-----------|-------------|
-| JS SDK | `/wechat/wxLogin.js` | `res.wx.qq.com/.../wxLogin.js` |
-| 内嵌二维码页 | `/connect/qrconnect` | `open.weixin.qq.com/connect/qrconnect` |
-| code 换 token | `/sns/oauth2/access_token` | `api.weixin.qq.com/sns/oauth2/access_token` |
-| 用户信息 | `/sns/userinfo` | `api.weixin.qq.com/sns/userinfo` |
-| 控制台 | `/wechat/` | — |
+- **`code` 换 token 一律在后端**,`AppSecret` 绝不进前端或仓库;
+- **校验 `state`**,防 CSRF;
+- **强制 HTTPS**,正确配置授权回调域;
+- `code` 短时效、应视为一次性;`access_token` 有有效期,注意刷新。
 
-## 在线演示(真实可点)
+## 动手 / 联调
 
-下面用上面这套 Mock 的**同款 SDK** 实跑一遍:点"生成二维码登录",手机扫码或点二维码下方"(开发者)模拟扫码 → 确认登录",页面会带 `code` 回跳并自动换取用户信息。
-
-<ClientOnly>
-  <WechatLoginDemo lock-provider="wechat" />
-</ClientOnly>
-
-## 上线切换:只改「引入的 JS」与「URL」
-
-Mock 的 SDK 与官方逐字节一致(`redirect_uri` 不做 `encodeURIComponent`,按官方约定由调用方 urlencode),且不校验凭据的值。上线时业务代码一行不用改,只替换两处:
-
-| 改什么 | Mock | 真实 |
-|--------|------|------|
-| 引入的 JS | `https://mock.authn.tech/wechat/wxLogin.js` | `https://res.wx.qq.com/connect/zh_CN/htmledition/js/wxLogin.js` |
-| 后端 API base | `https://mock.authn.tech` | `https://api.weixin.qq.com` |
-
-后端路径、`new WxLogin({...})` 参数、回跳 `redirect_uri?code=&state=`、返回字段都不变。
-
-::: warning 仅供测试
-Mock 固定返回一个测试用户,授权码是短时效自签 JWT 且可重复使用,签名私钥公开。**任何生产系统都不应信任 Mock 服务。**
-:::
-
-## 相关阅读
-
-- [企业微信扫码登录](./wecom.md) · [Mock 服务器总览](../mock/)
-- [OAuth 2.0 文档](../oauth2/) —— 微信登录是它的变体 · [JWT 解析器](../tools/jwt.md)
+- 🔬 [Mock 微信(使用)](../mock/wechat.md) —— 用与官方一致的 Mock 端点跑通全流程,页面内嵌**真实可点**的扫码演示,并给出"上线只改 JS 与 URL"的对照。
+- 📖 [OAuth 2.0 文档](../oauth2/) · [企业微信扫码登录](./wecom.md) 对比
 
 ## 参考来源
 
 - [网站应用微信登录开发指南 —— 微信开放文档](https://developers.weixin.qq.com/doc/oplatform/Website_App/WeChat_Login/Wechat_Login.html)
 - [网站应用授权登录(含内嵌二维码 wxLogin.js)—— 微信开放文档](https://developers.weixin.qq.com/doc/oplatform/developers/dev/auth/web)
-
-<script setup>
-import WechatLoginDemo from '@components/WechatLoginDemo.vue'
-</script>
