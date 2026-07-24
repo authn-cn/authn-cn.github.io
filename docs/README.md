@@ -1,6 +1,7 @@
 ---
 home: true
 title: 首页
+description: Authn.tech 提供 JWT、OAuth 2.0、OIDC、SAML、WebAuthn、Passkey、MFA/TOTP 与 LDAP 的中文协议文档、浏览器端在线工具和可联调的 Mock 身份认证服务器。
 heroText: Authn.tech
 tagline: 身份认证与授权的中文工具站 —— 在线工具 · Mock 服务器 · 协议文档
 actions:

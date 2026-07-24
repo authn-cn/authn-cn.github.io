@@ -1,9 +1,12 @@
 import { viteBundler } from '@vuepress/bundler-vite'
+import { seoPlugin } from '@vuepress/plugin-seo'
+import { sitemapPlugin } from '@vuepress/plugin-sitemap'
 import { defaultTheme } from '@vuepress/theme-default'
 import { defineUserConfig } from 'vuepress'
 import { getDirname, path } from 'vuepress/utils'
 
 const __dirname = getDirname(import.meta.url)
+const siteUrl = 'https://authn.tech'
 
 // 各语言的可翻译标签(专有名词类保持一致的放在 genNavbar/genSidebar 里直接写)
 const T = {
@@ -105,7 +108,7 @@ function genSidebar(prefix, t) {
     [p('/webauthn/')]: [{ text: 'WebAuthn / Passkey', children: [p('/webauthn/README.md'), p('/webauthn/concepts.md'), p('/webauthn/flows.md'), p('/webauthn/reference.md')] }],
     [p('/mfa/')]: [{ text: t.mfaH, children: [p('/mfa/README.md'), p('/mfa/totp.md'), p('/mfa/reference.md')] }],
     [p('/ldap/')]: [{ text: 'LDAP', children: [p('/ldap/README.md'), p('/ldap/concepts.md'), p('/ldap/flows.md'), p('/ldap/reference.md')] }],
-    [p('/cn-sso/')]: [{ text: t.cnSso, children: [p('/cn-sso/README.md'), p('/cn-sso/wechat.md'), p('/cn-sso/wecom.md')] }],
+    [p('/cn-sso/')]: [{ text: t.cnSso, children: [p('/cn-sso/README.md'), p('/cn-sso/wechat.md'), p('/cn-sso/wecom.md'), ...(prefix === '' ? [p('/cn-sso/ximalaya.md')] : [])] }],
     [p('/tools/')]: [
       {
         text: t.toolsH,
@@ -164,6 +167,20 @@ function genSidebar(prefix, t) {
 }
 
 export default defineUserConfig({
+  // Keep one authoritative URL for every page. The SEO plugin also emits
+  // localized alternate links, Open Graph metadata, JSON-LD, robots.txt, and
+  // a sitemap from the generated page list.
+  plugins: [
+    seoPlugin({
+      hostname: siteUrl,
+      canonical: (page) => siteUrl + page.path,
+    }),
+    sitemapPlugin({
+      hostname: siteUrl,
+      excludePaths: ['/404.html'],
+    }),
+  ],
+
   bundler: viteBundler({
     viteOptions: {
       resolve: {
