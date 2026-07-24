@@ -10,6 +10,59 @@ title: "微信扫码登录"
 
 > 本页讲**落地对接**;它与标准 OAuth2/OIDC 的差距、风险与改造建议见 [微信扫码登录:与标准的差距](./wechat-review.md)。
 
+## 微信登录的几种方式
+
+"用微信登录"按**入口不同**分四种,底层都是 OAuth2 授权码思路,但**发起方式、用户确认方式、换 token / 取用户信息的端点**各有差异:
+
+| 方式 | 发起入口 | 用户确认方式 | 换 token 端点 | 拉用户信息 |
+|---|---|---|---|---|
+| **移动应用(App)** | Native iOS/Android SDK(微信 OpenSDK) | 在**微信 App 内**确认授权 | `https://api.weixin.qq.com/sns/oauth2/access_token` | `https://api.weixin.qq.com/sns/userinfo` |
+| **网站应用(PC)** | `https://open.weixin.qq.com/connect/qrconnect` | 用微信 App **扫二维码** | `https://api.weixin.qq.com/sns/oauth2/access_token` | `https://api.weixin.qq.com/sns/userinfo` |
+| **小程序** | 小程序 SDK `wx.login` | **无需用户显式授权**(静默拿 `code`) | `https://api.weixin.qq.com/sns/jscode2session` | 随 `jscode2session` 返回(`openid`/`session_key`) |
+| **公众号网页授权** | `https://open.weixin.qq.com/connect/oauth2/authorize` | 在**微信 App 内**确认授权 | `https://api.weixin.qq.com/sns/oauth2/access_token` | `https://api.weixin.qq.com/sns/userinfo` |
+
+::: tip 怎么选
+- **PC 网站**登录 → 网站应用(扫码),即本页下文详解的流程。
+- **自己的 iOS/Android App** 里用微信登录 → 移动应用(App),见下节。
+- **微信内的公众号 H5 页面** → 公众号网页授权。
+- **微信小程序内** → `wx.login` + `jscode2session`。
+
+移动应用、网站应用、公众号三者**后端流程一致**(`/sns/oauth2/access_token` 换 `access_token`+`openid`,再 `/sns/userinfo` 拉资料),区别只在**前端如何发起、如何让用户确认、如何拿到 `code`**。小程序是另一套(见下)。
+:::
+
+### 移动应用(App)登录
+
+在你自己的 **iOS / Android App** 里用微信登录,走**微信 OpenSDK**,是 App 间跳转而非扫码:
+
+```
+你的 App                        微信 App                      你的后端
+   │  1. OpenSDK 发起 SendAuth.Req  │                            │
+   │    (scope=snsapi_userinfo)     │                            │
+   │ ─────────────────────────────► │                            │
+   │  2. 用户在微信内确认授权         │                            │
+   │  3. 微信回跳你的 App,回调带 code│                            │
+   │ ◄───────────────────────────── │                            │
+   │  4. 把 code 交给后端 ──────────────────────────────────────► │
+   │                                │  /sns/oauth2/access_token   │
+   │                                │  (换 access_token+openid)   │
+   │                                │  /sns/userinfo(拉资料)     │
+   │  5. 建立你自己的会话 ◄──────────────────────────────────────  │
+```
+
+要点:
+
+- 需在微信开放平台注册**移动应用**,配置 iOS 的 `Bundle ID`(及 Universal Link)/ Android 的**包名 + 应用签名**,否则拉起微信授权会失败。
+- App 端集成 OpenSDK 后用 `SendAuth.Req` 发起授权(`scope=snsapi_userinfo`),用户在微信内确认,微信通过 `onResp` 回调把一次性 `code` 交回你的 App。
+- **拿到 `code` 之后与网站应用完全一样**:App 把 `code` 交给你的后端,后端用 `AppID`+`AppSecret`+`code` 调 `/sns/oauth2/access_token` 换 `access_token`+`openid`,再调 `/sns/userinfo` 拉资料。`AppSecret` 只在后端。
+- 移动应用**不涉及二维码、也不涉及 `wxLogin.js`**;下文关于 JS SDK 的内容仅适用于网站应用。
+
+### 小程序 / 公众号(简述)
+
+- **小程序**:前端 `wx.login()` **静默**拿 `code`(无需用户点授权),后端用 `AppID`+`AppSecret`+`js_code` 调 `/sns/jscode2session` 换 `openid`+`session_key`(+`unionid`)。注意它**不用** `/sns/userinfo`;头像昵称等资料需前端 `wx.getUserProfile` 由用户主动授权后获取。
+- **公众号网页授权**:微信内 H5 跳 `/connect/oauth2/authorize`——`scope=snsapi_base` 静默只拿 `openid`,`scope=snsapi_userinfo` 需用户在微信内确认、可拿完整资料。后端换 token / 拉资料端点与网站应用相同。
+
+> 下文以 **网站应用(PC 扫码)** 为主线详解落地。
+
 ## 整体流程
 
 ```
