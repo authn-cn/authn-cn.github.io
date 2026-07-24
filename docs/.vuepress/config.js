@@ -108,7 +108,20 @@ function genSidebar(prefix, t) {
     [p('/webauthn/')]: [{ text: 'WebAuthn / Passkey', children: [p('/webauthn/README.md'), p('/webauthn/concepts.md'), p('/webauthn/flows.md'), p('/webauthn/reference.md')] }],
     [p('/mfa/')]: [{ text: t.mfaH, children: [p('/mfa/README.md'), p('/mfa/totp.md'), p('/mfa/reference.md')] }],
     [p('/ldap/')]: [{ text: 'LDAP', children: [p('/ldap/README.md'), p('/ldap/concepts.md'), p('/ldap/flows.md'), p('/ldap/reference.md')] }],
-    [p('/cn-sso/')]: [{ text: t.cnSso, children: [p('/cn-sso/README.md'), p('/cn-sso/wechat.md'), p('/cn-sso/wecom.md'), ...(prefix === '' ? [p('/cn-sso/ximalaya.md')] : [])] }],
+    [p('/cn-sso/')]: [{ text: t.cnSso, children: [
+      p('/cn-sso/README.md'),
+      ...(prefix === '' ? [
+        p('/cn-sso/feishu.md'), p('/cn-sso/feishu-review.md'),
+        p('/cn-sso/dingtalk.md'), p('/cn-sso/dingtalk-review.md'),
+      ] : []),
+      p('/cn-sso/wechat.md'),
+      ...(prefix === '' ? [p('/cn-sso/wechat-review.md')] : []),
+      p('/cn-sso/wecom.md'),
+      ...(prefix === '' ? [
+        p('/cn-sso/wecom-review.md'),
+        p('/cn-sso/ximalaya.md'), p('/cn-sso/ximalaya-review.md'),
+      ] : []),
+    ] }],
     [p('/tools/')]: [
       {
         text: t.toolsH,
