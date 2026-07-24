@@ -121,6 +121,7 @@ function genSidebar(prefix, t) {
         p('/cn-sso/wecom-review.md'),
         p('/cn-sso/ximalaya.md'), p('/cn-sso/ximalaya-review.md'),
         p('/cn-sso/qqmusic.md'), p('/cn-sso/qqmusic-review.md'),
+        p('/cn-sso/netease-music.md'), p('/cn-sso/netease-music-review.md'),
       ] : []),
     ] }],
     [p('/tools/')]: [
