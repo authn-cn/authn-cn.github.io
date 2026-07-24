@@ -17,6 +17,7 @@ title: "国内平台 SSO 对接"
 | **微信**(C 端) | OAuth2 授权码变体,`snsapi_login` | [对接实现](./wechat.md) | [评价与建议](./wechat-review.md) |
 | **企业微信** | OAuth2 授权码变体 + 应用级 token 三步取人 | [对接实现](./wecom.md) | [评价与建议](./wecom-review.md) |
 | **喜马拉雅车载 SDK** | 私有账户互通(透传 body + 回调) | [对接实现](./ximalaya.md) | [评价与建议](./ximalaya-review.md) |
+| **QQ 音乐 SDK** | 私有账号绑定(透传 token + 签名回调) | [对接实现](./qqmusic.md) | [评价与建议](./qqmusic-review.md) |
 
 ## 先分清两个方向
 
