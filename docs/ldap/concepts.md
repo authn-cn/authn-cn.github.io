@@ -8,10 +8,12 @@ title: 核心概念
 
 目录里的每个节点叫**条目(entry)**,由若干**属性**构成。每个条目有唯一的 **DN(Distinguished Name)**,是从条目到树根的路径:
 
-```
-uid=alice,ou=people,dc=example,dc=com
-└──┬───┘ └───┬────┘ └──────┬───────┘
-  RDN      父容器          根(后缀)
+```mermaid
+flowchart TD
+    DN["uid=alice,ou=people,dc=example,dc=com"]
+    DN --> RDN["uid=alice — RDN"]
+    DN --> P["ou=people — 父容器"]
+    DN --> R["dc=example,dc=com — 根(后缀)"]
 ```
 
 - **RDN(Relative Distinguished Name)**:DN 最左边的一段,如 `uid=alice`,在同一父节点下唯一。

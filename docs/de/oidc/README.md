@@ -12,14 +12,9 @@ Das Problem, das OAuth 2.0 löst, ist: "Wie kann Anwendung A mit Genehmigung des
 
 ## OIDC im Protokollstapel
 
-```
-┌─────────────────────────────────────┐
-│  OIDC  (Authentifizierung: Wer bist du?)           │
-├─────────────────────────────────────┤
-│  OAuth 2.0  (Autorisierung: Was darf ich tun?)    │
-├─────────────────────────────────────┤
-│  HTTP / TLS                         │
-└─────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["OIDC (Authentifizierung: Wer bist du?)"] -->|baut auf| B["OAuth 2.0 (Autorisierung: Was darf ich tun?)"] -->|baut auf| C["HTTP / TLS"]
 ```
 
 OIDC nutzt die Endpunkte (authorization endpoint, token endpoint), Flows (Autorisierungscode-Flow usw.) und Sicherheitsmechanismen (state, redirect_uri-Validierung) von OAuth 2.0 wieder, mit nur wenigen Erweiterungen:

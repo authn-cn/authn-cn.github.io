@@ -46,15 +46,16 @@ title: "网易云音乐 OpenAPI 登录对接实现"
 
 ## 扫码登录流程
 
-```
-车机设备                        openapi.music.163.com            用户手机(云音乐 App)
-   │ 1. 取二维码 qrcodekey/get/v2 ─►│                                  │
-   │ ◄── qrCodeUrl + uniKey         │                                  │
-   │ 2. 展示二维码 ─────────────────────────────────────────────────► 扫码
-   │ 3. 轮询 device/login/qrcode/get│  (用匿名 token,每 2~3s 一次)     │
-   │    (key=uniKey, clientId=appId)│                                  │
-   │ ◄── status=803 授权成功         │                                  │
-   │     + accessToken/refreshToken │                                  │
+```mermaid
+sequenceDiagram
+    participant C as 车机设备
+    participant O as openapi.music.163.com
+    participant P as 用户手机(云音乐 App)
+    C->>O: 1. 取二维码 qrcodekey/get/v2
+    O-->>C: qrCodeUrl + uniKey
+    C->>P: 2. 展示二维码 → 扫码
+    C->>O: 3. 轮询 device/login/qrcode/get<br/>(key=uniKey, clientId=appId, 用匿名 token,每 2~3s 一次)
+    O-->>C: status=803 授权成功 + accessToken/refreshToken
 ```
 
 1. **获取二维码** `GET/POST /openapi/music/basic/user/oauth2/qrcodekey/get/v2`

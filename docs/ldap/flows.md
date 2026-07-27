@@ -6,21 +6,18 @@ title: 典型流程
 
 ## 搜索:bind → search → 结果
 
-```
-客户端                         LDAP 服务器
-  │  1. bind(DN, 密码 / 匿名)        │
-  │ ───────────────────────────────▶│  校验凭据
-  │  bindResponse: success           │
-  │ ◀───────────────────────────────│
-  │  2. searchRequest                │
-  │     base, scope, filter, attrs   │
-  │ ───────────────────────────────▶│  遍历作用域内条目、按 filter 匹配
-  │  searchResultEntry * N           │
-  │ ◀───────────────────────────────│  (每命中一条返回一个 entry)
-  │  searchResultDone: success       │
-  │ ◀───────────────────────────────│
-  │  3. unbind                       │
-  │ ───────────────────────────────▶│
+```mermaid
+sequenceDiagram
+    participant C as 客户端
+    participant S as LDAP 服务器
+    C->>S: 1. bind(DN, 密码 / 匿名)
+    Note right of S: 校验凭据
+    S-->>C: bindResponse: success
+    C->>S: 2. searchRequest (base, scope, filter, attrs)
+    Note right of S: 遍历作用域内条目、按 filter 匹配
+    S-->>C: searchResultEntry * N (每命中一条返回一个 entry)
+    S-->>C: searchResultDone: success
+    C->>S: 3. unbind
 ```
 
 用 `ldapsearch` 演示同一过程:
@@ -53,21 +50,27 @@ ldapsearch -H ldaps://ldap.example.com \
 3. 用**查到的 DN + 用户密码**再做一次 bind 验证密码;
 4. (可选)再 search / 读 `memberOf` 判断组成员做授权。
 
-```
-应用 ──bind(服务账号)──▶ LDAP
-应用 ──search(&(objectClass=person)(mail=用户输入))──▶ LDAP  → 得到 userDN
-应用 ──bind(userDN, 用户密码)──▶ LDAP  → success/失败
-应用 ──search(memberOf / group member)──▶ LDAP  → 判断授权
+```mermaid
+sequenceDiagram
+    participant A as 应用
+    participant L as LDAP
+    A->>L: bind(服务账号)
+    A->>L: search(&(objectClass=person)(mail=用户输入))
+    L-->>A: 得到 userDN
+    A->>L: bind(userDN, 用户密码)
+    L-->>A: success / 失败
+    A->>L: search(memberOf / group member)
+    L-->>A: 判断授权
 ```
 
 ## 与联邦登录的衔接
 
 企业里 LDAP/AD 常作为 IdP 的后端目录:
 
-```
-用户 ──SAML/OIDC──▶ IdP(Keycloak/ADFS) ──LDAP bind+search──▶ AD/LDAP
-                         │
-                         └── 从目录取属性/组 → 映射进 SAML 断言 / OIDC claims
+```mermaid
+flowchart LR
+    U["用户"] -->|SAML/OIDC| I["IdP(Keycloak/ADFS)"] -->|LDAP bind+search| D["AD/LDAP"]
+    I --> M["从目录取属性/组 → 映射进 SAML 断言 / OIDC claims"]
 ```
 
 也就是说,前端讲 [SAML](../saml/flows.md) / [OIDC](../oidc/flows.md),背后仍是 LDAP 的 bind/search 在验证与取数。

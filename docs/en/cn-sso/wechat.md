@@ -10,18 +10,17 @@ title: "WeChat Scan-Login"
 
 ## The overall flow
 
-```
-Browser (your login page)           WeChat                         Your backend
-   │  1. embed QR (wxLogin.js)          │                             │
-   │ ──────────────────────────────►   │                             │
-   │  2. scan + authorize on phone      │                             │
-   │  3. redirect_uri?code=&state=      │                             │
-   │ ◄──────────────────────────────   │                             │
-   │  4. hand the code to the backend ─────────────────────────────► │
-   │                                    │  /sns/oauth2/access_token   │
-   │                                    │  (→ access_token + openid)  │
-   │                                    │  /sns/userinfo (profile)    │
-   │  5. establish your own session ◄──────────────────────────────  │
+```mermaid
+sequenceDiagram
+    participant B as Browser (your login page)
+    participant W as WeChat
+    participant S as Your backend
+    B->>W: 1. embed QR (wxLogin.js)
+    Note over B,W: 2. scan + authorize on phone
+    W-->>B: 3. redirect_uri?code=&state=
+    B->>S: 4. hand the code to the backend
+    Note over S: /sns/oauth2/access_token (→ access_token + openid)<br/>/sns/userinfo (profile)
+    S-->>B: 5. establish your own session
 ```
 
 The `code` is obtained in the browser; the token exchange and profile fetch both happen on the **backend** (they need the `AppSecret`).

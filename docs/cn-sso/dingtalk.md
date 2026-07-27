@@ -30,18 +30,19 @@ title: "钉钉 SSO 对接实现"
 
 ### 整体流程
 
-```
-浏览器(你的登录页)            钉钉                        你的后端
-   │  1. 扫码 / 免登组件           │                          │
-   │ ──────────────────────────►  │                          │
-   │  2. 员工扫码 + 确认           │                          │
-   │  3. 回跳 redirect_uri?authCode=&state=                   │
-   │ ◄──────────────────────────  │                          │
-   │  4. 把 authCode 交给后端 ───────────────────────────────►│
-   │                              │  ① authCode → userAccessToken
-   │                              │ ◄────────────────────────│
-   │                              │  ② userAccessToken → users/me
-   │  5. 建立你自己的会话 ◄───────────────────────────────────│
+```mermaid
+sequenceDiagram
+    participant B as 浏览器(你的登录页)
+    participant D as 钉钉
+    participant S as 你的后端
+    B->>D: 1. 扫码 / 免登组件
+    Note over B,D: 2. 员工扫码 + 确认
+    D-->>B: 3. 回跳 redirect_uri?authCode=&state=
+    B->>S: 4. 把 authCode 交给后端
+    S->>D: ① authCode → userAccessToken
+    D-->>S: 返回 userAccessToken
+    S->>D: ② userAccessToken → users/me
+    S-->>B: 5. 建立你自己的会话
 ```
 
 第 1~3 步在浏览器里拿到 `authCode`;第 4~5 步是后端换 token、取信息、建会话。**密钥换 token 的动作只能在后端做**。
@@ -92,9 +93,9 @@ title: "钉钉 SSO 对接实现"
 
 如果你的系统只认标准 **[SAML](../saml/)** 或标准 **[OIDC](../oidc/)**,又想用钉钉账号登录,直接对接钉钉私有 OAuth2 意味着每个应用都要写一遍钉钉专属逻辑。业界更常见的是加一层 **IDaaS 中间件**(阿里云 IDaaS / EIAM、竹云、宁盾等)来桥接:
 
-```
-你的应用 ──标准 SAML/OIDC──► IDaaS ──钉钉私有 OAuth2──► 钉钉
-（只认标准协议）           （对外标准、对内私有）
+```mermaid
+flowchart LR
+    A["你的应用<br/>(只认标准协议)"] -->|标准 SAML/OIDC| B["IDaaS<br/>(对外标准、对内私有)"] -->|钉钉私有 OAuth2| C["钉钉"]
 ```
 
 - **为什么**:IDaaS 对外暴露**标准协议**(标准 SAML/OIDC),你的应用当成普通标准 IdP 接即可;对内由 IDaaS 用钉钉私有 OAuth2 完成对接和字段映射。私有部分被封装在 IDaaS 里,应用侧零私有代码。

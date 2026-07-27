@@ -10,18 +10,19 @@ title: "WeCom-Scan-Login"
 
 ## Gesamtablauf
 
-```
-Browser (Ihre Login-Seite)          WeCom                          Ihr Backend
-   │  1. QR einbetten (JS-SDK)          │                              │
-   │ ───────────────────────────────►  │                              │
-   │  2. Mitarbeiter scannt + bestätigt │                              │
-   │  3. redirect_uri?code=&state=      │                              │
-   │ ◄───────────────────────────────  │                              │
-   │  4. code an das Backend geben ─────────────────────────────────► │
-   │                                    │  ① gettoken(corpid+secret)  │
-   │                                    │  ② code→userid              │
-   │                                    │  ③ userid→Mitglied-Detail    │
-   │  5. eigene Session aufbauen ◄──────────────────────────────────  │
+```mermaid
+sequenceDiagram
+    participant B as Browser (Ihre Login-Seite)
+    participant W as WeCom
+    participant S as Ihr Backend
+    B->>W: 1. QR einbetten (JS-SDK)
+    Note over B,W: 2. Mitarbeiter scannt + bestätigt
+    W-->>B: 3. redirect_uri?code=&state=
+    B->>S: 4. code an das Backend geben
+    S->>W: ① gettoken(corpid+secret)
+    S->>W: ② code→userid
+    S->>W: ③ userid→Mitglied-Detail
+    S-->>B: 5. eigene Session aufbauen
 ```
 
 Schritte 1–3 sind „den `code` im Browser holen", Schritte 4–5 „das Backend tauscht den `code` gegen eine Identität". **Das JS-SDK übernimmt nur den Frontend-Teil der Schritte 1–3**; die drei Backend-Schritte haben mit dem SDK nichts zu tun.

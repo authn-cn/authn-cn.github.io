@@ -20,13 +20,13 @@ Dies ist das häufigste Missverständnis. JWT ist ein von der IETF definierter *
 
 OAuth 2.0 und OIDC haben dieses Format nur **ausgeliehen**, sie "besitzen" es nicht:
 
-```
-              JWT / JOSE   ← eigenständiger Standard für Token- und Krypto-Formate (IETF)
-                   ↑ als Umsetzungsmittel genutzt
-        ┌──────────┴──────────┐
-    OAuth 2.0               OIDC
-    (Autorisierungs-Framework)  (Authentifizierungsebene über OAuth2)
-    zu JWT: optional        zum ID Token: verpflichtend
+```mermaid
+flowchart TD
+    J["JWT / JOSE<br/>eigenständiger Standard für Token- und Krypto-Formate (IETF)"]
+    O2["OAuth 2.0<br/>(Autorisierungs-Framework)<br/>zu JWT: optional"]
+    OIDC["OIDC<br/>(Authentifizierungsebene über OAuth2)<br/>zum ID Token: verpflichtend"]
+    O2 -->|als Umsetzungsmittel genutzt| J
+    OIDC -->|als Umsetzungsmittel genutzt| J
 ```
 
 - **OAuth 2.0 (RFC 6749)**: **schreibt kein** Tokenformat vor. Ein access token kann ein zufälliger String oder ein JWT sein (für die JWT-Variante gibt es das eigene [RFC 9068](https://www.rfc-editor.org/rfc/rfc9068)). JWT ist für OAuth2 eine optionale Umsetzungsentscheidung.

@@ -12,14 +12,9 @@ OAuth 2.0 solves the problem: "how can application A access a user's resources o
 
 ## OIDC's Position in the Protocol Stack
 
-```
-┌─────────────────────────────────────┐
-│  OIDC  (Authentication: who)        │
-├─────────────────────────────────────┤
-│  OAuth 2.0  (Authorization: access) │
-├─────────────────────────────────────┤
-│  HTTP / TLS                         │
-└─────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["OIDC (Authentication: who)"] -->|built on| B["OAuth 2.0 (Authorization: access)"] -->|built on| C["HTTP / TLS"]
 ```
 
 OIDC reuses OAuth 2.0's endpoints (authorization endpoint, token endpoint), flows (authorization code flow, etc.), and security mechanisms (state, redirect_uri validation), with only minor extensions:

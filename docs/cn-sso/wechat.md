@@ -34,19 +34,17 @@ title: "微信扫码登录"
 
 在你自己的 **iOS / Android App** 里用微信登录,走**微信 OpenSDK**,是 App 间跳转而非扫码:
 
-```
-你的 App                        微信 App                      你的后端
-   │  1. OpenSDK 发起 SendAuth.Req  │                            │
-   │    (scope=snsapi_userinfo)     │                            │
-   │ ─────────────────────────────► │                            │
-   │  2. 用户在微信内确认授权         │                            │
-   │  3. 微信回跳你的 App,回调带 code│                            │
-   │ ◄───────────────────────────── │                            │
-   │  4. 把 code 交给后端 ──────────────────────────────────────► │
-   │                                │  /sns/oauth2/access_token   │
-   │                                │  (换 access_token+openid)   │
-   │                                │  /sns/userinfo(拉资料)     │
-   │  5. 建立你自己的会话 ◄──────────────────────────────────────  │
+```mermaid
+sequenceDiagram
+    participant A as 你的 App
+    participant W as 微信 App
+    participant S as 你的后端
+    A->>W: 1. OpenSDK 发起 SendAuth.Req (scope=snsapi_userinfo)
+    Note over W: 2. 用户在微信内确认授权
+    W-->>A: 3. 微信回跳你的 App,回调带 code
+    A->>S: 4. 把 code 交给后端
+    Note over S: /sns/oauth2/access_token(换 access_token+openid)<br/>/sns/userinfo(拉资料)
+    S-->>A: 5. 建立你自己的会话
 ```
 
 要点:
@@ -65,18 +63,17 @@ title: "微信扫码登录"
 
 ## 整体流程
 
-```
-浏览器(你的登录页)                微信                          你的后端
-   │  1. 内嵌二维码(wxLogin.js)       │                             │
-   │ ──────────────────────────────►  │                             │
-   │  2. 手机扫码 + 确认授权            │                             │
-   │  3. 回跳 redirect_uri?code=&state=│                             │
-   │ ◄──────────────────────────────  │                             │
-   │  4. 把 code 交给后端 ──────────────────────────────────────────►│
-   │                                   │  /sns/oauth2/access_token   │
-   │                                   │  (换 access_token+openid)   │
-   │                                   │  /sns/userinfo(拉资料)     │
-   │  5. 建立你自己的会话 ◄─────────────────────────────────────────  │
+```mermaid
+sequenceDiagram
+    participant B as 浏览器(你的登录页)
+    participant W as 微信
+    participant S as 你的后端
+    B->>W: 1. 内嵌二维码(wxLogin.js)
+    Note over B,W: 2. 手机扫码 + 确认授权
+    W-->>B: 3. 回跳 redirect_uri?code=&state=
+    B->>S: 4. 把 code 交给后端
+    Note over S: /sns/oauth2/access_token(换 access_token+openid)<br/>/sns/userinfo(拉资料)
+    S-->>B: 5. 建立你自己的会话
 ```
 
 `code` 在浏览器里拿到,换 token 与拉资料都在**后端**完成(需要 `AppSecret`)。

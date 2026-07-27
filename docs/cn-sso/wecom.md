@@ -12,20 +12,20 @@ title: "企业微信扫码登录"
 
 ## 整体流程
 
-```
-浏览器(你的登录页)                企业微信                        你的后端
-   │  1. 内嵌二维码(JS SDK)            │                              │
-   │ ───────────────────────────────►  │                              │
-   │  2. 员工手机扫码 + 确认             │                              │
-   │                                    │                              │
-   │  3. 回跳 redirect_uri?code=&state= │                              │
-   │ ◄───────────────────────────────  │                              │
-   │  4. 把 code 交给后端 ───────────────────────────────────────────► │
-   │                                    │  ① gettoken(corpid+secret)  │
-   │                                    │ ◄──────────────────────────  │
-   │                                    │  ② code→userid              │
-   │                                    │  ③ userid→成员详情           │
-   │  5. 建立你自己的会话 ◄──────────────────────────────────────────  │
+```mermaid
+sequenceDiagram
+    participant B as 浏览器(你的登录页)
+    participant W as 企业微信
+    participant S as 你的后端
+    B->>W: 1. 内嵌二维码(JS SDK)
+    Note over B,W: 2. 员工手机扫码 + 确认
+    W-->>B: 3. 回跳 redirect_uri?code=&state=
+    B->>S: 4. 把 code 交给后端
+    S->>W: ① gettoken(corpid+secret)
+    W-->>S: access_token
+    S->>W: ② code→userid
+    S->>W: ③ userid→成员详情
+    S-->>B: 5. 建立你自己的会话
 ```
 
 第 1~3 步是"在浏览器里拿到 `code`",第 4~5 步是"后端用 `code` 换身份"。**JS SDK 只负责第 1~3 步的前端部分**,后端三步与 SDK 无关。

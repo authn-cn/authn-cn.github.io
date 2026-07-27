@@ -31,22 +31,18 @@ title: "喜马拉雅车载 SDK 账户互通:与 OIDC/OAuth2 标准的差距"
 
 ## 标准应该长什么样(基线流程)
 
-```
-车机 App(Client)         车厂 TSP(OpenID Provider)        喜马云端(RP)
-   │  ① 设备授权流登录            │                                │
-   │   RFC 8628 / 或 授权码+PKCE  │                                │
-   │ ─────────────────────────►  │                                │
-   │  ② 拿到 id_token +          │                                │
-   │     access_token(令牌端点)  │                                │
-   │ ◄─────────────────────────  │                                │
-   │  ③ 把 id_token 递交给喜马 ───────────────────────────────────► │
-   │                             │      ④ 用 JWKS 离线验签 id_token │
-   │                             │        (iss/aud/exp/nonce 校验) │
-   │                             │ ◄── ⑤(可选)Bearer access_token │
-   │                             │      调 /userinfo 补充 claim ──► │
-   │                             │        UserInfo 端点             │
-   │                             │ ───────────────────────────────►│
-   │  ⑥ 绑定成功(sub 作三方uid)◄───────────────────────────────── │
+```mermaid
+sequenceDiagram
+    participant A as 车机 App(Client)
+    participant T as 车厂 TSP(OpenID Provider)
+    participant X as 喜马云端(RP)
+    A->>T: ① 设备授权流登录(RFC 8628 / 或 授权码+PKCE)
+    T-->>A: ② 拿到 id_token + access_token(令牌端点)
+    A->>X: ③ 把 id_token 递交给喜马
+    Note over X: ④ 用 JWKS 离线验签 id_token<br/>(iss/aud/exp/nonce 校验)
+    X->>T: ⑤(可选)Bearer access_token 调 /userinfo 补充 claim
+    T-->>X: UserInfo 端点响应
+    X-->>A: ⑥ 绑定成功(sub 作三方uid)
 ```
 
 - **②** 令牌端点:OAuth 2.0 令牌端点,[RFC 6749 §3.2](https://datatracker.ietf.org/doc/html/rfc6749#section-3.2);`id_token` 是 JWT([RFC 7519](https://datatracker.ietf.org/doc/html/rfc7519))、经 JWS 签名([RFC 7515](https://datatracker.ietf.org/doc/html/rfc7515))。

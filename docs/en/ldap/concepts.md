@@ -8,10 +8,12 @@ title: Core Concepts
 
 Each node in the directory is called an **entry**, composed of several **attributes**. Each entry has a unique **DN (Distinguished Name)**, which is the path from the entry to the tree root:
 
-```
-uid=alice,ou=people,dc=example,dc=com
-└──┬───┘ └───┬────┘ └──────┬───────┘
-  RDN    parent container      root (suffix)
+```mermaid
+flowchart TD
+    DN["uid=alice,ou=people,dc=example,dc=com"]
+    DN --> RDN["uid=alice — RDN"]
+    DN --> P["ou=people — parent container"]
+    DN --> R["dc=example,dc=com — root (suffix)"]
 ```
 
 - **RDN (Relative Distinguished Name)**: the leftmost segment of the DN, such as `uid=alice`, which is unique within its parent node.

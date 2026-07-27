@@ -6,21 +6,18 @@ title: Typical Flows
 
 ## Search: bind → search → result
 
-```
-Client                         LDAP Server
-  │  1. bind(DN, password / anonymous)   │
-  │ ───────────────────────────────▶│  validate credentials
-  │  bindResponse: success           │
-  │ ◀───────────────────────────────│
-  │  2. searchRequest                │
-  │     base, scope, filter, attrs   │
-  │ ───────────────────────────────▶│  traverse entries in scope, match by filter
-  │  searchResultEntry * N           │
-  │ ◀───────────────────────────────│  (return one entry per match)
-  │  searchResultDone: success       │
-  │ ◀───────────────────────────────│
-  │  3. unbind                       │
-  │ ───────────────────────────────▶│
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant S as LDAP Server
+    C->>S: 1. bind(DN, password / anonymous)
+    Note right of S: validate credentials
+    S-->>C: bindResponse: success
+    C->>S: 2. searchRequest (base, scope, filter, attrs)
+    Note right of S: traverse entries in scope, match by filter
+    S-->>C: searchResultEntry * N (return one entry per match)
+    S-->>C: searchResultDone: success
+    C->>S: 3. unbind
 ```
 
 Demonstrate the same process with `ldapsearch`:
@@ -53,21 +50,27 @@ The username may not equal the RDN (login might be via mail or sAMAccountName), 
 3. Bind again with **the found DN + user password** to verify the password;
 4. (Optional) search / read `memberOf` again to check group membership for authorization.
 
-```
-Application ──bind(service account)──▶ LDAP
-Application ──search(&(objectClass=person)(mail=user input))──▶ LDAP  → get userDN
-Application ──bind(userDN, user password)──▶ LDAP  → success/failure
-Application ──search(memberOf / group member)──▶ LDAP  → check authorization
+```mermaid
+sequenceDiagram
+    participant A as Application
+    participant L as LDAP
+    A->>L: bind(service account)
+    A->>L: search(&(objectClass=person)(mail=user input))
+    L-->>A: get userDN
+    A->>L: bind(userDN, user password)
+    L-->>A: success / failure
+    A->>L: search(memberOf / group member)
+    L-->>A: check authorization
 ```
 
 ## Connection with Federated Login
 
 LDAP/AD commonly serves as the backend directory for an IdP in enterprises:
 
-```
-User ──SAML/OIDC──▶ IdP(Keycloak/ADFS) ──LDAP bind+search──▶ AD/LDAP
-                         │
-                         └── retrieve attributes/groups from directory → map into SAML assertion / OIDC claims
+```mermaid
+flowchart LR
+    U["User"] -->|SAML/OIDC| I["IdP(Keycloak/ADFS)"] -->|LDAP bind+search| D["AD/LDAP"]
+    I --> M["retrieve attributes/groups from directory → map into SAML assertion / OIDC claims"]
 ```
 
 That is, the front end speaks [SAML](../saml/flows.md) / [OIDC](../oidc/flows.md), but behind the scenes LDAP bind/search still performs authentication and data retrieval.

@@ -6,21 +6,18 @@ title: Typische Workflows
 
 ## Suche: bind → search → Ergebnisse
 
-```
-Client                         LDAP-Server
-  │  1. bind(DN, Kennwort / Anonym)     │
-  │ ───────────────────────────────▶│  Anmeldedaten überprüfen
-  │  bindResponse: success           │
-  │ ◀───────────────────────────────│
-  │  2. searchRequest                │
-  │     base, scope, filter, attrs   │
-  │ ───────────────────────────────▶│  Einträge im Bereich durchlaufen, nach Filter abgleichen
-  │  searchResultEntry * N           │
-  │ ◀───────────────────────────────│  (bei jedem Treffer ein Eintrag zurückgeben)
-  │  searchResultDone: success       │
-  │ ◀───────────────────────────────│
-  │  3. unbind                       │
-  │ ───────────────────────────────▶│
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant S as LDAP-Server
+    C->>S: 1. bind(DN, Kennwort / Anonym)
+    Note right of S: Anmeldedaten überprüfen
+    S-->>C: bindResponse: success
+    C->>S: 2. searchRequest (base, scope, filter, attrs)
+    Note right of S: Einträge im Bereich durchlaufen, nach Filter abgleichen
+    S-->>C: searchResultEntry * N (bei jedem Treffer ein Eintrag zurückgeben)
+    S-->>C: searchResultDone: success
+    C->>S: 3. unbind
 ```
 
 Demonstration des gleichen Prozesses mit `ldapsearch`:
@@ -53,21 +50,27 @@ Der Benutzername ist nicht unbedingt gleich dem RDN (es könnte sein, dass man s
 3. Mit **dem gefundenen DN + Benutzer-Kennwort** einen zweiten bind durchführen, um das Kennwort zu überprüfen;
 4. (Optional) Erneut search durchführen / `memberOf` lesen, um die Gruppenmitgliedschaft für die Autorisierung zu überprüfen.
 
-```
-Anwendung ──bind(Servicekonto)──▶ LDAP
-Anwendung ──search(&(objectClass=person)(mail=Benutzereingabe))──▶ LDAP  → userDN erhalten
-Anwendung ──bind(userDN, Benutzer-Kennwort)──▶ LDAP  → Erfolg/Fehler
-Anwendung ──search(memberOf / Gruppenmitglied)──▶ LDAP  → Autorisierung überprüfen
+```mermaid
+sequenceDiagram
+    participant A as Anwendung
+    participant L as LDAP
+    A->>L: bind(Servicekonto)
+    A->>L: search(&(objectClass=person)(mail=Benutzereingabe))
+    L-->>A: userDN erhalten
+    A->>L: bind(userDN, Benutzer-Kennwort)
+    L-->>A: Erfolg / Fehler
+    A->>L: search(memberOf / Gruppenmitglied)
+    L-->>A: Autorisierung überprüfen
 ```
 
 ## Verbindung mit Verbund-Login
 
 In Unternehmen dient LDAP/AD häufig als Backend-Verzeichnis des IdP:
 
-```
-Benutzer ──SAML/OIDC──▶ IdP(Keycloak/ADFS) ──LDAP bind+search──▶ AD/LDAP
-                         │
-                         └── Attribute aus Verzeichnis abrufen/Gruppen → in SAML-Assertion / OIDC-Claims abbilden
+```mermaid
+flowchart LR
+    U["Benutzer"] -->|SAML/OIDC| I["IdP(Keycloak/ADFS)"] -->|LDAP bind+search| D["AD/LDAP"]
+    I --> M["Attribute aus Verzeichnis abrufen/Gruppen → in SAML-Assertion / OIDC-Claims abbilden"]
 ```
 
 Mit anderen Worten, das Frontend nutzt [SAML](../saml/flows.md) / [OIDC](../oidc/flows.md), aber im Hintergrund führt LDAP bind/search Authentifizierung und Datenbeschaffung durch.

@@ -20,13 +20,13 @@ title: "JWT 概述"
 
 OAuth 2.0 与 OIDC 只是**借用**了 JWT 这个格式,并没有"拥有"它:
 
-```
-              JWT / JOSE   ← 独立的令牌与密码学格式标准(IETF)
-                   ↑ 被用作实现手段
-        ┌──────────┴──────────┐
-    OAuth 2.0               OIDC
-    (授权框架)         (在 OAuth2 之上加认证层)
-    对 JWT:可选          对 ID Token:强制 JWT
+```mermaid
+flowchart TD
+    J["JWT / JOSE<br/>独立的令牌与密码学格式标准(IETF)"]
+    O2["OAuth 2.0<br/>(授权框架)<br/>对 JWT:可选"]
+    OIDC["OIDC<br/>(在 OAuth2 之上加认证层)<br/>对 ID Token:强制 JWT"]
+    O2 -->|被用作实现手段| J
+    OIDC -->|被用作实现手段| J
 ```
 
 - **OAuth 2.0(RFC 6749)**:**不规定** token 格式。access token 可以是随机串,也可以是 JWT(JWT 化有专门的 [RFC 9068](https://www.rfc-editor.org/rfc/rfc9068))。JWT 对 OAuth2 是可选的实现选择。

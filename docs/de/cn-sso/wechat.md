@@ -10,18 +10,17 @@ title: "WeChat-Scan-Login"
 
 ## Gesamtablauf
 
-```
-Browser (Ihre Login-Seite)          WeChat                         Ihr Backend
-   │  1. QR einbetten (wxLogin.js)      │                             │
-   │ ──────────────────────────────►   │                             │
-   │  2. scannen + autorisieren (Handy) │                             │
-   │  3. redirect_uri?code=&state=      │                             │
-   │ ◄──────────────────────────────   │                             │
-   │  4. code an das Backend geben ────────────────────────────────► │
-   │                                    │  /sns/oauth2/access_token   │
-   │                                    │  (→ access_token + openid)  │
-   │                                    │  /sns/userinfo (Profil)     │
-   │  5. eigene Session aufbauen ◄─────────────────────────────────  │
+```mermaid
+sequenceDiagram
+    participant B as Browser (Ihre Login-Seite)
+    participant W as WeChat
+    participant S as Ihr Backend
+    B->>W: 1. QR einbetten (wxLogin.js)
+    Note over B,W: 2. scannen + autorisieren (Handy)
+    W-->>B: 3. redirect_uri?code=&state=
+    B->>S: 4. code an das Backend geben
+    Note over S: /sns/oauth2/access_token (→ access_token + openid)<br/>/sns/userinfo (Profil)
+    S-->>B: 5. eigene Session aufbauen
 ```
 
 Der `code` wird im Browser geholt; Token-Tausch und Profilabruf laufen beide im **Backend** (sie brauchen das `AppSecret`).

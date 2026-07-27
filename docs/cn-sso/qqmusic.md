@@ -35,14 +35,18 @@ title: "QQ 音乐第三方登录(账号绑定)对接实现"
 
 ## 接入流程(绑定 → 登录)
 
-```
-你的 App(系统账号)        QQ 音乐 SDK / 后台           你的后端
-   │  0. 先登录一个音乐账号        │                          │
-   │  1. updateThirdPartyAccount ─►│  校验绑定,建立           │
-   │     (partnerAppId/token/id)   │  unionId ↔ 音乐账号 关系  │
-   │                               │  ── 回调你方验证接口 ───► │(校验 token,返回 ret=0)
-   │  2. thirdPartyAccountLogin ──►│  换票登录,SDK 切到音乐账号│
-   │  ◄── 登录成功(同登同出)      │                          │
+```mermaid
+sequenceDiagram
+    participant A as 你的 App(系统账号)
+    participant Q as QQ 音乐 SDK / 后台
+    participant S as 你的后端
+    Note over A: 0. 先登录一个音乐账号
+    A->>Q: 1. updateThirdPartyAccount (partnerAppId/token/id)
+    Note over Q: 校验绑定,建立 unionId ↔ 音乐账号 关系
+    Q->>S: 回调你方验证接口
+    S-->>Q: 校验 token,返回 ret=0
+    A->>Q: 2. thirdPartyAccountLogin(换票登录,SDK 切到音乐账号)
+    Q-->>A: 登录成功(同登同出)
 ```
 
 要点(见官方 2.1.1.9 注意事项):

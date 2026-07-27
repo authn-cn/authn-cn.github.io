@@ -10,18 +10,19 @@ title: "WeCom Scan-Login"
 
 ## The overall flow
 
-```
-Browser (your login page)           WeCom                          Your backend
-   │  1. embed QR (JS SDK)              │                              │
-   │ ───────────────────────────────►  │                              │
-   │  2. employee scans + confirms      │                              │
-   │  3. redirect_uri?code=&state=      │                              │
-   │ ◄───────────────────────────────  │                              │
-   │  4. hand the code to the backend ──────────────────────────────► │
-   │                                    │  ① gettoken(corpid+secret)  │
-   │                                    │  ② code→userid              │
-   │                                    │  ③ userid→member detail      │
-   │  5. establish your own session ◄───────────────────────────────  │
+```mermaid
+sequenceDiagram
+    participant B as Browser (your login page)
+    participant W as WeCom
+    participant S as Your backend
+    B->>W: 1. embed QR (JS SDK)
+    Note over B,W: 2. employee scans + confirms
+    W-->>B: 3. redirect_uri?code=&state=
+    B->>S: 4. hand the code to the backend
+    S->>W: ① gettoken(corpid+secret)
+    S->>W: ② code→userid
+    S->>W: ③ userid→member detail
+    S-->>B: 5. establish your own session
 ```
 
 Steps 1–3 are "getting the `code` in the browser"; steps 4–5 are "the backend exchanges the `code` for an identity". **The JS SDK only handles the front-end part of steps 1–3**; the three backend steps have nothing to do with the SDK.

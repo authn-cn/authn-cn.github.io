@@ -1,4 +1,5 @@
 import { viteBundler } from '@vuepress/bundler-vite'
+import { markdownChartPlugin } from '@vuepress/plugin-markdown-chart'
 import { seoPlugin } from '@vuepress/plugin-seo'
 import { sitemapPlugin } from '@vuepress/plugin-sitemap'
 import { defaultTheme } from '@vuepress/theme-default'
@@ -186,6 +187,7 @@ export default defineUserConfig({
   // localized alternate links, Open Graph metadata, JSON-LD, robots.txt, and
   // a sitemap from the generated page list.
   plugins: [
+    markdownChartPlugin({ mermaid: true }),
     seoPlugin({
       hostname: siteUrl,
       canonical: (page) => siteUrl + page.path,

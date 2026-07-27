@@ -20,13 +20,13 @@ This is the most common misconception. JWT is an **independent standard** define
 
 OAuth 2.0 and OIDC merely **borrow** the JWT format; they do not "own" it:
 
-```
-              JWT / JOSE   ← Independent token & crypto format standard (IETF)
-                   ↑ used as an implementation mechanism
-        ┌──────────┴──────────┐
-    OAuth 2.0               OIDC
-  (authorization framework)  (adds an authentication layer on top of OAuth2)
-   for JWT: optional          for ID Token: JWT mandatory
+```mermaid
+flowchart TD
+    J["JWT / JOSE<br/>Independent token & crypto format standard (IETF)"]
+    O2["OAuth 2.0<br/>(authorization framework)<br/>for JWT: optional"]
+    OIDC["OIDC<br/>(adds an authentication layer on top of OAuth2)<br/>for ID Token: JWT mandatory"]
+    O2 -->|used as an implementation mechanism| J
+    OIDC -->|used as an implementation mechanism| J
 ```
 
 - **OAuth 2.0 (RFC 6749)**: **does not specify** a token format. An access token can be a random string or a JWT (there is a dedicated profile, [RFC 9068](https://www.rfc-editor.org/rfc/rfc9068), for JWT access tokens). JWT is an optional implementation choice for OAuth2.

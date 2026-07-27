@@ -8,11 +8,12 @@ title: Kernkonzepte
 
 Jeder Knoten im Verzeichnis heißt **Eintrag (entry)** und besteht aus mehreren **Attributen**. Jeder Eintrag hat einen eindeutigen **DN (Distinguished Name)**, der den Pfad vom Eintrag zur Baumwurzel darstellt:
 
-```
-uid=alice,ou=people,dc=example,dc=com
-└──┬───┘ └───┬────┘ └──────┬───────┘
-  RDN      übergeordneter    Wurzel
-          Container         (Suffix)
+```mermaid
+flowchart TD
+    DN["uid=alice,ou=people,dc=example,dc=com"]
+    DN --> RDN["uid=alice — RDN"]
+    DN --> P["ou=people — übergeordneter Container"]
+    DN --> R["dc=example,dc=com — Wurzel (Suffix)"]
 ```
 
 - **RDN (Relative Distinguished Name)**: Der linke Teil des DN, z.B. `uid=alice`, ist unter dem gleichen übergeordneten Knoten eindeutig.

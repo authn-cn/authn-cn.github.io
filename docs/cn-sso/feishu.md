@@ -70,20 +70,12 @@ title: "飞书 SSO 对接实现"
 - **必须在 IdP 侧配置 `email` 属性**,值为用户邮箱。飞书**按邮箱匹配成员**,IdP 断言里的邮箱与飞书成员的邮箱**必须完全一致**。
 - **NameID** 常用 `emailAddress` 格式。确保 IdP 断言的 NameID 与飞书成员对应字段一致,否则会出现"**登录成功但匹配不到人**"的现象。
 
-```
-员工输入企业域名 xxx.feishu.cn
-        │  (仅用于路由到租户)
-        ▼
-飞书重定向到 IdP 登录地址(SSO URL)
-        │
-        ▼
-IdP 认证 → 生成 SAML 断言(含 email 属性 + NameID)
-        │  HTTP-POST
-        ▼
-飞书 ACS(区域固定 URL)验签(裸 base64 证书)
-        │
-        ▼
-按 email / NameID 匹配飞书成员 → 登录成功
+```mermaid
+flowchart TD
+    A["员工输入企业域名 xxx.feishu.cn"] -->|仅用于路由到租户| B["飞书重定向到 IdP 登录地址(SSO URL)"]
+    B --> C["IdP 认证 → 生成 SAML 断言(含 email 属性 + NameID)"]
+    C -->|HTTP-POST| D["飞书 ACS(区域固定 URL)验签(裸 base64 证书)"]
+    D --> E["按 email / NameID 匹配飞书成员 → 登录成功"]
 ```
 
 ---
@@ -94,26 +86,19 @@ IdP 认证 → 生成 SAML 断言(含 email 属性 + NameID)
 
 ### 流程图
 
-```
-浏览器/前端                你的后端                    飞书开放平台
-    │                         │                            │
-    │ 1. 跳转飞书授权页        │                            │
-    │────────────────────────────────────────────────────▶│
-    │                         │      用户同意授权           │
-    │◀────────────────────────────────────────────────────│
-    │ 2. 回调带 code           │                            │
-    │────────────────────────▶│                            │
-    │                         │ 3. app_id+app_secret       │
-    │                         │    换 app/tenant_access_token
-    │                         │───────────────────────────▶│
-    │                         │ 4. 用 code + token          │
-    │                         │    换 user_access_token     │
-    │                         │───────────────────────────▶│
-    │                         │ 5. 调 /authen/v1/user_info  │
-    │                         │───────────────────────────▶│
-    │                         │◀── open_id/union_id/邮箱等 ─│
-    │ 6. 建立本地会话          │                            │
-    │◀────────────────────────│                            │
+```mermaid
+sequenceDiagram
+    participant B as 浏览器/前端
+    participant S as 你的后端
+    participant F as 飞书开放平台
+    B->>F: 1. 跳转飞书授权页
+    F-->>B: 用户同意授权
+    B->>S: 2. 回调带 code
+    S->>F: 3. app_id+app_secret 换 app/tenant_access_token
+    S->>F: 4. 用 code + token 换 user_access_token
+    S->>F: 5. 调 /authen/v1/user_info
+    F-->>S: open_id/union_id/邮箱等
+    S-->>B: 6. 建立本地会话
 ```
 
 ### 后端换 token 步骤
