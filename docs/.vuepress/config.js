@@ -116,9 +116,21 @@ function genSidebar(prefix, t) {
       ...(prefix === '' ? [
         p('/cn-sso/feishu.md'), p('/cn-sso/feishu-review.md'),
         p('/cn-sso/dingtalk.md'), p('/cn-sso/dingtalk-review.md'),
+        p('/cn-sso/wps.md'), p('/cn-sso/wps-review.md'),
+        p('/cn-sso/welink.md'), p('/cn-sso/welink-review.md'),
       ] : []),
       p('/cn-sso/wechat.md'),
-      ...(prefix === '' ? [p('/cn-sso/wechat-review.md')] : []),
+      ...(prefix === '' ? [
+        p('/cn-sso/wechat-review.md'),
+        p('/cn-sso/qq-connect.md'), p('/cn-sso/qq-connect-review.md'),
+        p('/cn-sso/cloudbase.md'), p('/cn-sso/cloudbase-review.md'),
+        p('/cn-sso/huawei-account.md'), p('/cn-sso/huawei-account-review.md'),
+        p('/cn-sso/douyin.md'), p('/cn-sso/douyin-review.md'),
+        p('/cn-sso/baidu.md'), p('/cn-sso/baidu-review.md'),
+        p('/cn-sso/alipay.md'), p('/cn-sso/alipay-review.md'),
+        p('/cn-sso/weibo.md'), p('/cn-sso/weibo-review.md'),
+        p('/cn-sso/gitee.md'), p('/cn-sso/gitee-review.md'),
+      ] : []),
       p('/cn-sso/wecom.md'),
       ...(prefix === '' ? [
         p('/cn-sso/wecom-review.md'),
