@@ -4,7 +4,7 @@ title: "网易云音乐 OpenAPI 登录对接实现"
 
 # 网易云音乐 OpenAPI 登录对接实现
 
-本页讲**怎么落地对接**网易云音乐开放平台(车机 / 手表 / TV / 音箱等 IoT 设备端)的用户登录:用户在设备上登录**自己的网易云音乐账号**,设备拿到 `accessToken` 后访问云音乐资源。它与标准 OIDC/OAuth2 的差距、风险与改造建议单独成文:[网易云音乐登录:与标准的差距](./netease-music-review.md)。
+本页讲网易云音乐合作方 OpenAPI 的设备登录流程；API 覆盖、SDK、签名、事件、文档和企业交付评价见 [网易云音乐 OpenAPI 企业评价](./netease-music-review.md)。
 
 > 依据网易云音乐开放平台《音乐 API 文档 · 用户登录 API / 公共 · 访问方式》。域名 `openapi.music.163.com`。
 

@@ -1,324 +1,74 @@
 ---
-title: "喜马拉雅车载 SDK 账户互通:与 OIDC/OAuth2 标准的差距"
+title: "喜马拉雅 API / SDK 企业集成评价"
 ---
 
-# 喜马拉雅车载 SDK「账户互通」评测:哪里不符合 OIDC / OAuth 2.0
+# 喜马拉雅 API / SDK 企业集成评价
 
-本页以喜马拉雅《车载 SDK 账户互通》文档(版本 1.0.6.0)为对象,**逐项**对照 OAuth 2.0 / OpenID Connect(OIDC)标准,指出其设计偏离标准之处,并给出应当改成的标准接口形态。每一项都附上对应的 RFC / 规范条款链接,便于直接与喜马技术方对齐。
+> 使用[统一评价方法](./methodology.md)。公开开放平台和车载合作 SDK 是两类交付，不能只用“车载账户互通”代表喜马拉雅全部开放能力。
 
-> 只想看**接口与接入流程本身**(不含评价)?见 [喜马拉雅账户互通对接实现](./ximalaya.md)。
-
-> 评测依据的原文见:喜马拉雅车载 SDK 文档 →「账户」→「账户互通」。核心接口为 Android 端 `IXmCarAdvanceAPI` 上的 `loginByThird` / `bindThirdAccount` / `unbindThirdAccount` / `getThirdAccountBoundState`,外加合作方需实现的「第三方账户信息验证接口」。
-
-::: tip 一句话结论
-喜马的「账户互通」在**做一件标准早就定义好的事**——用车主自己的账号联合登录(federated login)到喜马账户——却几乎没有采用任何标准构件:**没有 ID Token、没有 Access Token、没有签名、没有标准 UserInfo 端点、没有发现文档,连 HTTP 状态码都用错**。它把本应是「令牌 + 验签」的离线可校验模型,退化成了「透传一坨不透明 `body` + 同步回调合作方私有接口」的强耦合模型。建议整体改造为标准 OIDC 联合登录 + 设备授权流(RFC 8628)。
+::: tip 结论
+**74 / 100（B）**。喜马拉雅公开展示 API、H5、JS SDK、小程序、移动应用、智能硬件和车载等接入形态，文档目录覆盖 OAuth2/第三方账号、免费与付费内容、订单、订阅、播放历史和数据回传。公开接入面在三家音频平台中最好。风险是付费内容、播放能力和车载 SDK 依赖企业认证、应用审核与商务授权，车载账户互通细节属于合作方文档，运行 SLA 与版本支持周期需合同确认。
 :::
 
-## 场景在标准里叫什么
+## 统一评分
 
-先把角色对齐,后面所有结论都基于此:
+| 维度 | 分数 | 企业判断 |
+|---|---:|---|
+| 场景与企业适配 | 4.0 | 企业开发者、移动/H5/小程序、硬件和车载路径清楚 |
+| API 覆盖与可组合性 | 4.5 | 登录、内容、搜索、订单、订阅、历史、回传覆盖较广 |
+| SDK 与开发工具 | 3.5 | JS SDK、H5、小程序及硬件/车载 SDK；不同形态交付一致性需确认 |
+| 身份、权限与数据边界 | 3.5 | OAuth2 与第三方账号互通并存；内容和账号权限受合作范围约束 |
+| 事件与数据同步 | 2.5 | 数据回传能力明确，通用 Webhook/增量事件体系公开信息有限 |
+| 运行与可观测性 | 3.0 | 有 API 调试工具和错误码；统一限流、请求追踪、SLA 信息不足 |
+| 文档、测试与版本治理 | 4.0 | 公开文档索引和测试工具较完整；车载 SDK 仍依赖合作方包 |
+| 企业交付与合规 | 4.0 | 企业认证、内容审核和商务合作成熟；版权、终端与数据条款决定性强 |
 
-| 现实角色 | 标准角色 | 职责 |
-|---|---|---|
-| 车厂 TSP / 云端(车主账号体系) | **OpenID Provider(OP / IdP)** | 签发身份令牌、暴露 UserInfo |
-| 喜马拉雅云端 | **Relying Party(RP / 依赖方)** | 校验令牌、按 `sub` 建立/查询绑定 |
-| 车机 App(SDK 宿主) | **Client**(设备端) | 取得令牌并递交给喜马 |
-| 车主 | **End-User** | 已登录车机 |
+## 公开能力与商务能力要分开
 
-也就是说:**车主已经登录了车机 → 车机 App 应当从车厂 OP 拿到车主的 `id_token` + `access_token` → 递交给喜马 → 喜马云端离线验签 `id_token`,必要时用 `access_token` 调车厂的 `UserInfo` 端点补充信息 → 用 `sub` 作为「第三方 uid」建立绑定。** 这正是你(合作方)描述的标准姿势,也是本文的评测基线。
+公开开放平台可验证的能力包括：
 
-标准这么设计的目的:RP(喜马)**不需要在每次登录时同步回调你的私有接口**,只要缓存你的 JWKS 公钥就能离线验签,登录不再依赖你公网接口的可用性与时延。
+- OAuth2 标准登录与第三方账号登录；
+- 免费/付费点播内容、搜索、推荐和内容运营；
+- 商品、订单、会员/分销相关能力；
+- 用户订阅、播放历史、曝光/浏览/播放数据回传；
+- H5、Web JS SDK、小程序等接入形态和服务端 API 调试工具。
 
-## 标准应该长什么样(基线流程)
+车载/智能硬件则通常需要企业认证、产品审核和商务合作，SDK 包、UI SDK、内容范围、终端授权与上线验收可能按项目交付。企业不能仅凭公开“支持车载 SDK”推断某个车型、国家、内容版权或会员权益已经获得授权。
 
-```mermaid
-sequenceDiagram
-    participant A as 车机 App(Client)
-    participant T as 车厂 TSP(OpenID Provider)
-    participant X as 喜马云端(RP)
-    A->>T: ① 设备授权流登录(RFC 8628 / 或 授权码+PKCE)
-    T-->>A: ② 拿到 id_token + access_token(令牌端点)
-    A->>X: ③ 把 id_token 递交给喜马
-    Note over X: ④ 用 JWKS 离线验签 id_token<br/>(iss/aud/exp/nonce 校验)
-    X->>T: ⑤(可选)Bearer access_token 调 /userinfo 补充 claim
-    T-->>X: UserInfo 端点响应
-    X-->>A: ⑥ 绑定成功(sub 作三方uid)
-```
+## 账户互通的正确定位
 
-- **②** 令牌端点:OAuth 2.0 令牌端点,[RFC 6749 §3.2](https://datatracker.ietf.org/doc/html/rfc6749#section-3.2);`id_token` 是 JWT([RFC 7519](https://datatracker.ietf.org/doc/html/rfc7519))、经 JWS 签名([RFC 7515](https://datatracker.ietf.org/doc/html/rfc7515))。
-- **④** 验签:[OIDC Core §3.1.3.7 ID Token 校验](https://openid.net/specs/openid-connect-core-1_0.html#IDTokenValidation);公钥经 JWKS 分发([OIDC Discovery](https://openid.net/specs/openid-connect-discovery-1_0.html))。
-- **⑤** UserInfo:[OIDC Core §5.3](https://openid.net/specs/openid-connect-core-1_0.html#UserInfo),用 `Authorization: Bearer <access_token>`([RFC 6750](https://datatracker.ietf.org/doc/html/rfc6750))。
+现有[车载账户互通页](./ximalaya.md)描述 `loginByThird`、绑定/解绑和第三方验证回调，依据的是合作方车载 SDK 文档（证据 B），不是公众可独立验证的通用 SSO 标准。它适合车机用户与喜马拉雅账号联动，不适合当作企业员工 SSO。
 
-## 逐项问题
+若合作方回调只“原样透传 body”，项目必须书面确认：
 
-### 问题 1:根本没有「令牌」这个概念,只有一坨不透明的 `body`
+- 回调请求如何验证来源，是否支持平台签名、mTLS 或固定证书；
+- body 内票据、时间戳、nonce 的生成和过期规则；
+- 是否重放同一请求、超时与重试语义；
+- 绑定冲突、换绑、注销和账号删除如何处理。
 
-**现状**:所有接口(`loginByThird` / `bind` / `unbind` / `getBoundState`)第二个参数都是 `String body`——文档描述为「调用第三方账号获取接口的入参报文(JSON 格式),调用第三方接口时会透传过去」。它的结构完全未定义,喜马不解析、也无法解析。
+若厂商协议没有提供来源签名，合作方应在自身票据中使用短时效签名，并强制 HTTPS、限制重放；但这只能验证票据，不自动证明 HTTP 调用方就是喜马拉雅。
 
-**标准怎么做**:身份信息应承载在 **ID Token**(JWT)里——一个结构化、带签名、带标准声明(claim)的令牌。见 [OIDC Core §2 ID Token](https://openid.net/specs/openid-connect-core-1_0.html#IDToken) 与 [RFC 7519 JWT](https://datatracker.ietf.org/doc/html/rfc7519)。
+## 企业风险与建议
 
-**为什么是问题**:不透明 `body` 意味着——
-- 喜马**无法独立判断这个用户是谁、是否真实**,只能把球踢回给你的接口;
-- 没有任何标准字段(`iss` / `sub` / `aud` / `exp` / `iat`),下面问题 4、5、6 全部由此派生;
-- 两端对 `body` 结构的约定只能靠邮件和口头,无法用规范约束。
+1. **合同附件固定能力**：列出 API、SDK 包名/版本、平台、车型、内容品类、付费权益、上线区域和授权期限。
+2. **把 SDK 与服务端 API 隔离**：设备只持短期用户凭据；AppSecret、签名密钥和账号验证只在服务端。
+3. **账号绑定做完整状态机**：覆盖未绑定、已绑定、冲突、换绑、退出、注销、重复回调和补偿查询。
+4. **数据回传先做合规分类**：设备标识、OAID/IDFA、播放/曝光历史属于不同敏感度，必须最小化并向用户说明。
+5. **验证离线和弱网能力**：缓存、断点续播、token 过期、SDK 初始化失败和内容下架均应有降级。
+6. **要求版本与 SLA 承诺**：车载生命周期长，至少明确 SDK 安全更新、Android 版本兼容、废弃通知期和紧急支持渠道。
 
-**建议**:把 `body` 换成 `id_token`(必要时加 `access_token`)。喜马侧从「透传一个黑盒」升级为「校验一个标准 JWT」。
+## 已修正的旧结论
 
----
+- 喜马拉雅并非只有“私有 body 透传 + 回调”；公开平台还提供 OAuth2、内容 API、JS SDK、H5 和数据回传。
+- 车载账户互通是特定商务 SDK 能力，不应拿来评价整个平台是否符合 OIDC。
+- 无法从公开资料确认全部车载 SDK 版本、SLA 或回调来源认证，不再把未公开信息写成确定事实。
 
-### 问题 2:「第三方账户信息验证接口」是在手搓一个残缺版 UserInfo 端点
+## 官方资料
 
-**现状**:合作方要实现一个公网 `POST application/json` 接口,喜马把 `body` 透传过来,返回 `third_uid`。这实质是「喜马问车厂:这个用户是谁」——也就是 **UserInfo**。但它是私有形状:自定义 URL、自定义入参、自定义返回。
+- [喜马拉雅开放平台首页与接入形态](https://open.ximalaya.com/)
+- [开放平台文档目录](https://open.ximalaya.com/doc/api)
+- [JS SDK 接入指南](https://open.ximalaya.com/doc/detailApi?articleId=73&categoryId=7)
+- [服务端 API 调试工具](https://open.ximalaya.com/doc/tool)
+- [智能硬件/车载合作介绍](https://open.ximalaya.com/dev-access/hareware-app)
 
-**标准怎么做**:这正是 [OIDC UserInfo 端点(OIDC Core §5.3)](https://openid.net/specs/openid-connect-core-1_0.html#UserInfo) 的职责。RP 用 `Authorization: Bearer <access_token>`([RFC 6750 §2.1](https://datatracker.ietf.org/doc/html/rfc6750#section-2.1))访问,端点返回标准 claim(`sub`、`name`、`email`…)。
-
-**为什么是问题**:
-- 没有 Bearer 令牌鉴权(见问题 3、4),端点靠「URL 保密」自我保护,等于裸奔;
-- 返回字段 `third_uid` 是私有命名,而标准里稳定用户标识就是 `sub`([OIDC Core §2](https://openid.net/specs/openid-connect-core-1_0.html#IDToken));
-- 大量场景根本不需要这个同步回调——如果用 `id_token`,喜马离线验签即可拿到 `sub`,无需每次打你的接口。
-
-**建议**:若保留「喜马回调车厂」这一步,请把它实现为**标准 UserInfo 端点** + Bearer 令牌;并优先支持「喜马直接验签 `id_token`」以省掉这次网络往返。
-
----
-
-### 问题 3:验证接口用 body 里的 `"code": 200 / 500` 表达结果——误用 HTTP 状态码
-
-**现状**:验证接口的返回是
-
-```json
-正确:{ "code": 200, "third_uid": "xxxxx" }
-异常:{ "code": 500, "msg": "该用户不存在", "third_uid": null }
-```
-
-也就是**把 `200`/`500` 塞进 JSON 正文的 `code` 字段**。这几乎必然意味着无论成功失败,HTTP 响应行都是 `200 OK`,真正的语义被埋进 body。
-
-**标准怎么做**:HTTP 状态码是**协议层**的结果信号,由 [RFC 9110 §15](https://datatracker.ietf.org/doc/html/rfc9110#section-15) 精确定义:
-- 成功用 `200 OK`([§15.3.1](https://datatracker.ietf.org/doc/html/rfc9110#section-15.3.1));
-- 客户端错误用 `4xx`([§15.5](https://datatracker.ietf.org/doc/html/rfc9110#section-15.5)),如「用户不存在」应是 `404`/`400`,「令牌无效」应是 `401`;
-- 服务端错误才用 `5xx`([§15.6](https://datatracker.ietf.org/doc/html/rfc9110#section-15.6)),`500` 表示「你自己的服务器炸了」——把「该用户不存在」这种正常业务结果标成 `500` 是语义错误。
-
-**为什么是问题**:
-- 「该用户不存在」是**客户端/业务**问题,不是**服务端故障**,却回了 `500`——监控、网关、重试策略会据 HTTP 状态判断,`500` 会触发无意义的告警与重试;
-- body 内自定义 `code` 与 HTTP 状态**双轨制**,中间的负载均衡、CDN、代理无法据此正确处理(限流、熔断、缓存都看 HTTP 状态);
-- 这是典型的「用 HTTP 当纯管道、语义全塞 body」的反模式(SOAP 时代遗风)。
-
-**标准里的错误返回长什么样**:OAuth 2.0 的错误响应用 HTTP `400`/`401` + 机读 `error` 码([RFC 6749 §5.2](https://datatracker.ietf.org/doc/html/rfc6749#section-5.2));令牌类错误还要带 `WWW-Authenticate` 头([RFC 6750 §3](https://datatracker.ietf.org/doc/html/rfc6750#section-3))。通用 HTTP API 的现代做法是 **Problem Details for HTTP APIs([RFC 9457](https://datatracker.ietf.org/doc/html/rfc9457))**:HTTP 状态给对,body 里再用 `type`/`title`/`detail` 补充。
-
-**建议**:让 HTTP 状态码承载结果(2xx/4xx/5xx),body 用于**细节**而非**结果**;错误对齐 RFC 6749 §5.2 或 RFC 9457。
-
----
-
-### 问题 4:回调链路没有任何签名 / 完整性 / 来源认证
-
-**现状**:喜马云端**从公网**调你的验证接口,只带一个透传 `body`。文档全篇**未提任何签名、时间戳、mTLS、请求方认证**。反过来,喜马拿到的 `body` 也没有签名,无法判断它是否被伪造或重放。
-
-**标准怎么做**:
-- 身份令牌是 **JWS 签名的 JWT**([RFC 7515](https://datatracker.ietf.org/doc/html/rfc7515) / [RFC 7519](https://datatracker.ietf.org/doc/html/rfc7519)),RP 用签发方公钥验签,伪造不了;
-- 公钥经 **JWKS** 分发,RP 缓存即可离线校验([OIDC Discovery](https://openid.net/specs/openid-connect-discovery-1_0.html));
-- 服务器间调用另可叠加 **mTLS**([RFC 8705](https://datatracker.ietf.org/doc/html/rfc8705))或私有签名头。
-
-**为什么是问题**:
-- 你的验证接口只靠「URL 不外泄」保护——一旦 URL 泄露,任何人都能构造 `body` 探测/伪造用户;
-- 喜马无法证明收到的 `body` 真的来自车主本人授权,存在**令牌注入 / 重放**风险;
-- 缺 `exp`(见问题 5),即使截获也永久有效。
-
-**建议**:改用签名 JWT + JWKS;如需保留回调,给回调加请求签名或 mTLS,并校验来源。
-
----
-
-### 问题 5:`third_uid` 是裸字符串,缺失全部安全声明(`iss`/`aud`/`exp`/`iat`/`nonce`)
-
-**现状**:身份仅由一个 `third_uid` 字符串代表。没有签发者、没有受众、没有过期时间。
-
-**标准怎么做**:ID Token 的必备 claim 见 [OIDC Core §2](https://openid.net/specs/openid-connect-core-1_0.html#IDToken),校验规则见 [§3.1.3.7](https://openid.net/specs/openid-connect-core-1_0.html#IDTokenValidation):
-
-| Claim | 作用 | 缺失后果 |
-|---|---|---|
-| `iss` | 签发方 | 不知道令牌来自哪个车厂 OP |
-| `sub` | 稳定用户标识 | (对应 `third_uid`,但应由签名保护) |
-| `aud` | 受众 = 喜马的 client_id | **令牌可被复用到其它 RP**(缺受众绑定) |
-| `exp` | 过期时间 | **令牌永久有效**,截获即长期可用 |
-| `iat` | 签发时间 | 无法判断新鲜度 |
-| `nonce` | 防重放,绑定本次登录 | **可重放**([OIDC Core §15.5.2](https://openid.net/specs/openid-connect-core-1_0.html#NonceNotes)) |
-
-**为什么是问题**:缺 `aud` → 一个车厂签出的凭据可被拿去别处冒用;缺 `exp`/`nonce` → 重放攻击无成本。这些不是可选优化,是 OIDC 的**强制校验项**。
-
-**建议**:三方标识用 `sub`(issuer 作用域内唯一),并置于签名 JWT 内,连同 `iss`/`aud`/`exp`/`iat`/`nonce` 一并下发与校验。
-
----
-
-### 问题 6:车机「扫码登录」其实就是标准的设备授权流(RFC 8628),却自造了私有实现
-
-**现状**:未绑定时,文档要求「车机端 APK 调用喜马 SDK 的扫码登录能力」,这是喜马私有的扫码机制。
-
-**标准怎么做**:车机这类**输入受限设备**(没有键盘/浏览器友好输入)扫码登录,正是 **OAuth 2.0 Device Authorization Grant([RFC 8628](https://datatracker.ietf.org/doc/html/rfc8628))** 的设计目标场景(与智能电视、机顶盒同类)。设备拿 `device_code` + `user_code`,用户在手机上确认,设备轮询令牌端点拿到令牌。
-
-**为什么是问题**:自造扫码协议 = 无法复用标准库、无法被审计、每家车厂都要重新理解喜马的私有流程。而设备流是 IETF 正式标准,主流 IdP(Auth0、Keycloak、Okta…)开箱即用。
-
-**建议**:车厂 OP 侧的扫码登录用 RFC 8628 实现;若车机有 WebView,则用授权码 + PKCE([RFC 7636](https://datatracker.ietf.org/doc/html/rfc7636))。
-
----
-
-### 问题 7:没有发现文档 / 元数据,全靠邮件手工对接
-
-**现状**:接入靠给 `rui5.wang@ximalaya.com` 发邮件申请 `thirdAppId`,URL(测试/正式)在邮件正文里手填。
-
-**标准怎么做**:
-- [OIDC Discovery](https://openid.net/specs/openid-connect-discovery-1_0.html):OP 暴露 `/.well-known/openid-configuration`,自动声明授权/令牌/UserInfo/JWKS 端点与支持的算法;
-- [RFC 8414 OAuth Authorization Server Metadata](https://datatracker.ietf.org/doc/html/rfc8414):OAuth 版同类元数据。
-
-**为什么是问题**:手工填 URL → 环境切换易错、端点变更需重新发邮件、无法程序化对接、密钥轮换(JWKS 本可自动同步)变成人工事故点。
-
-**建议**:车厂 OP 提供标准 discovery 文档 + JWKS URI,喜马按 URL 自动读取端点与公钥。
-
----
-
-### 问题 8:`thirdAppId` 只是标识符,缺客户端认证与注册规范
-
-**现状**:`thirdAppId` 是账户互通的客户标识,无配套密钥,也无标准注册流程。
-
-**标准怎么做**:OAuth 客户端有 `client_id` + `client_secret`(或非对称密钥 / mTLS)做**客户端认证**([RFC 6749 §2.3](https://datatracker.ietf.org/doc/html/rfc6749#section-2.3));注册可走 [RFC 7591 动态客户端注册](https://datatracker.ietf.org/doc/html/rfc7591)。`aud` claim 应等于 `client_id`,把令牌**绑定到喜马这一个客户端**。
-
-**建议**:`thirdAppId` 对应到 `client_id`,并补客户端认证;令牌 `aud` 绑定该 client。
-
----
-
-### 问题 9:错误语义混淆——把「正常业务状态」当「远程错误」
-
-**现状**:`loginByThird` 与 `bindThirdAccount` 文档写:「已绑定为 `CODE_SUCCESS`,未绑定为 `CODE_REMOTE_ERROR`」。也就是**「未绑定」这个完全正常、预期内的状态,被表示为「远程错误」**。
-
-**标准怎么做**:「尚未认证/未授权」是有专门语义的**正常结果**,不是传输错误。OAuth 用明确的 `error` 枚举(如 `access_denied`、`invalid_grant`),见 [RFC 6749 §5.2](https://datatracker.ietf.org/doc/html/rfc6749#section-5.2);OIDC 认证错误见 [OIDC Core §3.1.2.6](https://openid.net/specs/openid-connect-core-1_0.html#AuthError)。
-
-**为什么是问题**:调用方无法区分「用户没绑定(该引导去扫码)」和「喜马服务/网络真的出错了(该重试/告警)」——两者都回 `CODE_REMOTE_ERROR`,处理逻辑无从下手。
-
-**建议**:为「未绑定」设独立的、非错误的状态码,与真正的远程/传输错误区分开。
-
----
-
-### 问题 10:`msg` 只有中文自由文本,没有机读错误码
-
-**现状**:异常返回 `"msg": "该用户不存在"`——人读的中文串,无机读枚举。
-
-**标准怎么做**:[RFC 6749 §5.2](https://datatracker.ietf.org/doc/html/rfc6749#section-5.2) 定义了**枚举**的 `error` 码集合(`invalid_request`、`invalid_client`、`invalid_grant`…),`error_description` 才是给人看的补充;RFC 9457 用稳定的 `type` URI 标识错误类别。
-
-**为什么是问题**:客户端要靠 `msg` 文案做分支就只能字符串匹配,文案一改逻辑就崩;也无法国际化。
-
-**建议**:提供稳定机读 `error` 码,`msg` 仅作人类可读补充。
-
----
-
-### 问题 11:同步回调造成运行时强耦合,放大攻击面与时延
-
-**现状**:每次登录/绑定,喜马都要**同步**打一次你的公网验证接口。你的接口一旦抖动/宕机,喜马侧登录直接失败。
-
-**标准怎么做**:令牌离线验签模型下,RP 只需**缓存 JWKS 公钥**即可校验,登录不依赖 OP 的实时可用性;需要吊销时才用 [RFC 7662 令牌内省](https://datatracker.ietf.org/doc/html/rfc7662) 或 [RFC 7009 令牌吊销](https://datatracker.ietf.org/doc/html/rfc7009) 按需查询。
-
-**为什么是问题**:把「验证」做成每次同步回调 = 你的公网接口成为登录链路的硬依赖 + 新增公网攻击面 + 每次登录多一跳网络时延。
-
-**建议**:默认离线验签;仅在需要实时吊销状态时才回调,并走标准内省接口。
-
----
-
-## 术语与做法对照表
-
-| 喜马现状 | 标准对应 | 依据 |
-|---|---|---|
-| 不透明 `body`(String) | `id_token`(签名 JWT) | [OIDC Core §2](https://openid.net/specs/openid-connect-core-1_0.html#IDToken)、[RFC 7519](https://datatracker.ietf.org/doc/html/rfc7519) |
-| 「第三方账户信息验证接口」 | UserInfo 端点 + Bearer | [OIDC Core §5.3](https://openid.net/specs/openid-connect-core-1_0.html#UserInfo)、[RFC 6750](https://datatracker.ietf.org/doc/html/rfc6750) |
-| `third_uid`(裸串) | `sub` claim(签名保护) | [OIDC Core §2](https://openid.net/specs/openid-connect-core-1_0.html#IDToken) |
-| body 内 `"code":200/500` | HTTP 状态码 2xx/4xx/5xx | [RFC 9110 §15](https://datatracker.ietf.org/doc/html/rfc9110#section-15) |
-| `msg`(中文文本) | 机读 `error` + `error_description` | [RFC 6749 §5.2](https://datatracker.ietf.org/doc/html/rfc6749#section-5.2)、[RFC 9457](https://datatracker.ietf.org/doc/html/rfc9457) |
-| 私有「扫码登录能力」 | 设备授权流 Device Grant | [RFC 8628](https://datatracker.ietf.org/doc/html/rfc8628) |
-| 邮件申请 URL / `thirdAppId` | Discovery 文档 + `client_id` | [OIDC Discovery](https://openid.net/specs/openid-connect-discovery-1_0.html)、[RFC 8414](https://datatracker.ietf.org/doc/html/rfc8414)、[RFC 7591](https://datatracker.ietf.org/doc/html/rfc7591) |
-| 无签名的公网回调 | JWS 验签 + JWKS(+ mTLS) | [RFC 7515](https://datatracker.ietf.org/doc/html/rfc7515)、[RFC 8705](https://datatracker.ietf.org/doc/html/rfc8705) |
-| bind / unbind(私有) | 联合登录 + 账户关联(必要时 Token Exchange) | [RFC 8693](https://datatracker.ietf.org/doc/html/rfc8693) |
-| 「未绑定 = `CODE_REMOTE_ERROR`」 | 独立的未认证/未授权状态 | [OIDC Core §3.1.2.6](https://openid.net/specs/openid-connect-core-1_0.html#AuthError) |
-
-## 推荐的标准化改造方案
-
-给喜马的最小改造建议(按优先级):
-
-1. **引入 ID Token**:车机递交 `id_token`(签名 JWT)给喜马,喜马用 JWKS **离线验签**并校验 `iss`/`aud`/`exp`/`nonce`。以 `sub` 取代 `third_uid` 作为三方唯一标识。——一举解决问题 1、4、5,并让问题 11 的同步回调变为可选。
-2. **HTTP 状态码用对**:验证/绑定接口成功回 `2xx`,业务失败回对应 `4xx`,服务故障才 `5xx`;错误体对齐 [RFC 6749 §5.2](https://datatracker.ietf.org/doc/html/rfc6749#section-5.2) 或 [RFC 9457](https://datatracker.ietf.org/doc/html/rfc9457)。——解决问题 3、10。
-3. **回调即 UserInfo**:若保留「喜马问车厂」,把它实现为标准 [UserInfo 端点](https://openid.net/specs/openid-connect-core-1_0.html#UserInfo) + `Authorization: Bearer`。——解决问题 2。
-4. **扫码走设备授权流**:车厂 OP 侧用 [RFC 8628](https://datatracker.ietf.org/doc/html/rfc8628) 实现扫码登录。——解决问题 6。
-5. **提供 Discovery + JWKS**:让端点与公钥可自动发现、可轮换。——解决问题 7、8。
-6. **区分「未绑定」与「远程错误」**:给未绑定单独状态。——解决问题 9。
-
-> 若喜马短期内无法全量改造,**最有价值的单点改动是第 1、2 两条**:用签名 `id_token` 取代不透明 `body`(安全性质变),以及把 HTTP 状态码用对(可运维性质变)。
-
-## 用标准协议 = 直接复用现成生态,不必自研
-
-这是「改标准」相较「维持私有设计」最实在的一条理由:**账户互通的每一个环节,标准生态里都有久经生产验证的开源库与软件包可直接用**——喜马、车厂两侧都不需要手写协议、手搓验签、手搓扫码状态机。私有设计恰恰放弃了这整片生态,逼两边各写一遍易错的自研代码。
-
-### 身份提供方(车厂 OP / IdP):部署现成 IdP 即可
-
-车厂几乎不需要自己实现授权/令牌/UserInfo/JWKS/发现文档/设备流——用现成 IdP 软件开箱即得,全部符合 OIDC:
-
-| 软件 | 形态 | 说明 |
-|---|---|---|
-| [Keycloak](https://www.keycloak.org/) | 自托管(Java) | CNCF 生态最流行的开源 IdP,原生支持 OIDC / 设备授权流([RFC 8628](https://datatracker.ietf.org/doc/html/rfc8628))/ JWKS / Discovery |
-| [Ory Hydra](https://www.ory.sh/hydra/) | 自托管(Go) | 通过 OpenID 认证的 OAuth2/OIDC Server,无状态、云原生 |
-| [ZITADEL](https://zitadel.com/) | 自托管 / SaaS | 现代 OIDC IdP,设备流、PKCE、mTLS 齐全 |
-| [Authentik](https://goauthentik.io/) / [Logto](https://logto.io/) | 自托管 | 轻量,面向多端登录场景 |
-| [Casdoor](https://casdoor.org/) | 自托管(国产) | 中文生态友好,OIDC/OAuth2/SAML 全支持 |
-| [Auth0](https://auth0.com/) / [Okta](https://www.okta.com/) / [Microsoft Entra ID](https://www.microsoft.com/security/business/identity-access/microsoft-entra-id) | SaaS | 托管服务,免运维 |
-
-> 这些 IdP 都提供 `/.well-known/openid-configuration` 与 JWKS,喜马作为 RP 直接读 URL 即可完成对接——省掉问题 7 里「邮件手填 URL」的全部人工环节。
-
-### 依赖方(喜马 RP):用 OIDC RP 库验签,取代私有回调接口
-
-喜马云端校验 `id_token`(问题 1、4、5)不用自己写 JWT 解析与验签,标准库全包了:
-
-- **Java / Kotlin(喜马服务端常见)**:[Nimbus JOSE + JWT](https://connect2id.com/products/nimbus-jose-jwt) 或 [Spring Security OAuth2 Resource Server](https://docs.spring.io/spring-security/reference/servlet/oauth2/resource-server/jwt.html)——`iss`/`aud`/`exp`/`nonce` 校验与 JWKS 拉取全自动。
-- **Node.js**:[`openid-client`](https://github.com/panva/openid-client)、[`jose`](https://github.com/panva/jose)(`jwtVerify` + `createRemoteJWKSet` 一步验签)。
-- **Go**:[`github.com/coreos/go-oidc`](https://github.com/coreos/go-oidc)(RP/验签)、[`golang.org/x/oauth2`](https://pkg.go.dev/golang.org/x/oauth2)。
-- **Python**:[Authlib](https://authlib.org/)、[PyJWT](https://pyjwt.readthedocs.io/) + [`python-jose`](https://github.com/mpdavis/python-jose)。
-
-用了这些,喜马「第三方账户信息验证接口」这套私有回调**可以整体去掉**——验签在本地完成,不再依赖车厂公网接口的实时可用性(问题 11)。
-
-### 客户端(车机 SDK 宿主 · Android):现成 AppAuth + 设备流
-
-车机端取令牌同样有官方库,无需自研扫码状态机(问题 6):
-
-- **Android**:[AppAuth-Android](https://github.com/openid/AppAuth-Android)(OpenID Foundation 官方认证客户端库,支持授权码 + PKCE);设备授权流可配合上述 IdP 的 device endpoint。
-- **通用**:PKCE 参数生成、`device_code` 轮询都在库里,喜马 SDK 只需承载「展示 `user_code`/二维码 + 轮询」这层 UI。
-
-> 可用 [PKCE 生成器](../tools/pkce.html) 与 [Discovery 探测器](../tools/discovery.html) 在线联调这些参数。
-
-### 一句话
-
-> 私有 `body` + 私有回调 + 私有扫码,意味着**喜马和每一家车厂都要各写一遍**协议细节和安全校验,且无法被任何标准审计工具检查。改成标准 OIDC 后,两端都只是**配置 + 引一个成熟库**,协议正确性由生态而非自研代码保证。
-
-## 参考标准
-
-**OAuth 2.0 / 2.1**
-
-- [RFC 6749 — The OAuth 2.0 Authorization Framework](https://datatracker.ietf.org/doc/html/rfc6749)(错误响应见 [§5.2](https://datatracker.ietf.org/doc/html/rfc6749#section-5.2))
-- [RFC 6750 — Bearer Token Usage](https://datatracker.ietf.org/doc/html/rfc6750)
-- [RFC 8628 — Device Authorization Grant](https://datatracker.ietf.org/doc/html/rfc8628)
-- [RFC 7636 — PKCE](https://datatracker.ietf.org/doc/html/rfc7636)
-- [RFC 8414 — Authorization Server Metadata](https://datatracker.ietf.org/doc/html/rfc8414)
-- [RFC 7591 — Dynamic Client Registration](https://datatracker.ietf.org/doc/html/rfc7591)
-- [RFC 7662 — Token Introspection](https://datatracker.ietf.org/doc/html/rfc7662) · [RFC 7009 — Token Revocation](https://datatracker.ietf.org/doc/html/rfc7009)
-- [RFC 8693 — Token Exchange](https://datatracker.ietf.org/doc/html/rfc8693) · [RFC 8705 — mTLS Client Auth](https://datatracker.ietf.org/doc/html/rfc8705)
-- [OAuth 2.1(draft)](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-1)
-
-**OpenID Connect**
-
-- [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html)(ID Token [§2](https://openid.net/specs/openid-connect-core-1_0.html#IDToken)、校验 [§3.1.3.7](https://openid.net/specs/openid-connect-core-1_0.html#IDTokenValidation)、UserInfo [§5.3](https://openid.net/specs/openid-connect-core-1_0.html#UserInfo))
-- [OpenID Connect Discovery 1.0](https://openid.net/specs/openid-connect-discovery-1_0.html)
-
-**JOSE / JWT**
-
-- [RFC 7519 — JSON Web Token (JWT)](https://datatracker.ietf.org/doc/html/rfc7519) · [RFC 7515 — JSON Web Signature (JWS)](https://datatracker.ietf.org/doc/html/rfc7515) · [RFC 7517 — JSON Web Key (JWK)](https://datatracker.ietf.org/doc/html/rfc7517)
-
-**HTTP**
-
-- [RFC 9110 — HTTP Semantics](https://datatracker.ietf.org/doc/html/rfc9110)(状态码 [§15](https://datatracker.ietf.org/doc/html/rfc9110#section-15))
-- [RFC 9457 — Problem Details for HTTP APIs](https://datatracker.ietf.org/doc/html/rfc9457)
-
-**相关文档**
-
-- [OAuth 2.0 文档](../oauth2/) · [OpenID Connect 文档](../oidc/) · [JWT / JOSE 文档](../jwt/)
-- [企业微信扫码登录](./wecom.md) · [微信扫码登录](./wechat.md)
+> 资料核验：2026-07-27。车载账户互通的具体方法签名来自合作方文档，应在项目启动时用当前 SDK 包重新核对。

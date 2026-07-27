@@ -115,11 +115,11 @@ sequenceDiagram
 | `msg` | String | 否 | 报错原因,`code=500` 时需要 |
 
 ::: warning 安全提示
-文档**未定义任何签名 / 加密 / 来源认证**,喜马通过公网 HTTP(S) 调你方接口且只透传 `body`。**务必**自行在 `body` 里带签名 + 时间戳(如 HMAC + 防重放)并强制 HTTPS,否则接口在公网裸奔。这一点及其它与标准的差距详见 [标准差距评价](./ximalaya-review.md#问题-4-回调链路没有任何签名-完整性-来源认证)。
+现有合作方车载 SDK 文档片段未说明平台侧回调签名、mTLS 或固定证书机制，因此不能假设请求来源已被验证。项目应要求厂商明确当前版本的来源认证、时间戳、重试和重放规则；如没有平台签名，合作方至少应在自身短期票据中加入 audience、过期时间和防重放信息，并强制 HTTPS。详见 [喜马拉雅 API / SDK 企业评价](./ximalaya-review.md)。
 :::
 
 ## 参考
 
-- [喜马拉雅账户互通:与 OIDC/OAuth2 标准的差距与改造建议](./ximalaya-review.md)
+- [喜马拉雅 API / SDK 企业评价](./ximalaya-review.md)
 - [OAuth 2.0 文档](../oauth2/) · [OpenID Connect 文档](../oidc/)
 - 喜马拉雅车载 SDK 官方文档(账户 → 账户互通)

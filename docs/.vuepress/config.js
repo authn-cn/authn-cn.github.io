@@ -111,6 +111,8 @@ function genSidebar(prefix, t) {
     [p('/ldap/')]: [{ text: 'LDAP', children: [p('/ldap/README.md'), p('/ldap/concepts.md'), p('/ldap/flows.md'), p('/ldap/reference.md')] }],
     [p('/cn-sso/')]: [{ text: t.cnSso, children: [
       p('/cn-sso/README.md'),
+      p('/cn-sso/methodology.md'),
+      p('/cn-sso/comparison.md'),
       ...(prefix === '' ? [
         p('/cn-sso/feishu.md'), p('/cn-sso/feishu-review.md'),
         p('/cn-sso/dingtalk.md'), p('/cn-sso/dingtalk-review.md'),

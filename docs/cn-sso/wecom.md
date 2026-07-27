@@ -8,7 +8,7 @@ title: "企业微信扫码登录"
 
 > 面向 C 端个人用户的 [微信扫码登录](./wechat.md) 只需一步取用户信息、凭据体系也不同,别混用。想直接联调 / 看可点演示,见 [Mock 企业微信(使用)](../mock/wecom.md)。
 
-> 本页讲**落地对接**;它与标准 OAuth2/OIDC 的差距、风险与改造建议见 [企业微信扫码登录:与标准的差距](./wecom-review.md)。
+> 本页讲登录落地；企业微信服务端 API、回调、权限、第三方应用与 SDK 的统一评价见 [企业微信 API / SDK 企业评价](./wecom-review.md)。
 
 ## 整体流程
 
@@ -24,11 +24,11 @@ sequenceDiagram
     S->>W: ① gettoken(corpid+secret)
     W-->>S: access_token
     S->>W: ② code→userid
-    S->>W: ③ userid→成员详情
+    S->>W: ③ 按需查询成员详情（可选）
     S-->>B: 5. 建立你自己的会话
 ```
 
-第 1~3 步是"在浏览器里拿到 `code`",第 4~5 步是"后端用 `code` 换身份"。**JS SDK 只负责第 1~3 步的前端部分**,后端三步与 SDK 无关。
+第 1~3 步是在浏览器中取得 `code`，后续由后端完成应用凭据与成员身份查询。**JS SDK 只负责前端登录面板和返回 code**，不参与后端 token 或成员资料调用。
 
 ## JS SDK(wwLogin / @wecom/jssdk)到底在干什么
 
@@ -64,17 +64,17 @@ sequenceDiagram
 
 官方建议新接入用 `@wecom/jssdk`;两者最终都走同一套 qrConnect 与后端 `/cgi-bin/*` 接口。
 
-## 拿到 `code` 之后:为什么分三步取用户信息
+## 拿到 `code` 之后：身份查询与可选资料查询
 
-这是企业微信和微信最大的不同。微信"网站应用"一步 `/sns/userinfo` 就拿到用户;企业微信要**三步**:
+企业微信先用应用身份取得 token，再用扫码 `code` 确认成员；是否继续读取通讯录或授权用户详情，取决于业务所需字段和已获权限，并非所有登录都固定必须三步：
 
-1. **`gettoken`**:用 `corpid` + 应用 `secret` 换一个**应用级 `access_token`**。它代表"**应用**"这个身份,不绑定用户,用来调用通讯录等接口。有配额与频率限制,**必须服务端缓存**、按 `expires_in` 刷新。
-2. **`auth/getuserinfo`**:用 `access_token` + 扫码得到的 `code` 换出**是哪个员工**(`userid`,可能还给 `user_ticket`)。
-3. **`user/get`**:用 `access_token` + `userid` 读该员工的**通讯录详情**(姓名、部门、手机、邮箱……)。
+1. **`gettoken`**：用 `corpid` + 应用 `secret` 获取应用级 `access_token`。它代表应用而非扫码用户，必须仅在服务端按 `expires_in` 缓存；可访问范围仍受 API 权限、应用可见范围、可信 IP 和资源规则约束。
+2. **`auth/getuserinfo`**：用 `access_token` + 扫码得到的 `code` 获取成员标识（如 `userid`，部分场景还会返回 `user_ticket`）。仅建立登录态时，取得并映射稳定成员标识后即可完成。
+3. **按需补充资料**：需要通讯录字段时调用 `user/get`；需要本次授权用户的敏感详情时，按接口规则使用 `user_ticket` 调 `auth/getuserdetail`。可返回字段取决于权限，不能假设姓名、手机、邮箱一定存在。
 
-为什么这么设计?因为企业微信的 `access_token` 是**企业/应用级凭据**(能读整个通讯录),而不是"某个用户授权给你的令牌"。所以要先证明"我是这个应用"(gettoken),再用一次性的 `code` 定位"这次是谁扫的"(getuserinfo),最后凭应用权限去查这个人的档案(user/get)。`code` 只是把"扫码的人"和"应用"关联起来的一次性凭证。
+这套模型把应用身份与本次扫码成员分开：应用 token 证明“哪个应用在调用”，一次性 `code` 表示“本次是哪个成员登录”。应用 token 泄露的影响范围等于该应用已获授权范围，不应写成必然可读取全企业通讯录，但仍需最小权限和后端安全存储。
 
-(需要头像、性别等敏感字段时,用第②步给的 `user_ticket` 调 `auth/getuserdetail`。)
+（具体返回字段、`user_ticket` 适用条件和接口选择，以当前应用类型对应的企业微信官方文档为准。）
 
 ## 关键概念与参数
 

@@ -1,110 +1,78 @@
 ---
-title: "飞书 SSO:与标准的差距与改造建议"
+title: "飞书 API / SDK 企业集成评价"
 ---
 
-# 飞书 SSO:与标准的差距与改造建议
+# 飞书 API / SDK 企业集成评价
 
-> 本页是**评价 / 分析**页。想看具体怎么对接、怎么填字段,请看 [飞书 SSO 对接落地](./feishu.md);本页只谈飞书的实现与标准协议([SAML 2.0](../saml/)、[OIDC](../oidc/))之间差在哪、有什么风险、该怎么改。
+> 使用[统一评价方法](./methodology.md)。本页评价企业调用飞书开放平台的能力；“外部 IdP 登录飞书”和“飞书账号登录第三方应用”只作为身份入口，不再主导评分。
 
-::: tip 一句话结论
-飞书作 **SP**(登录进飞书)时的 SSO 是个"能用但不标准"的实现:只支持 SAML、锁在旗舰版、不吃 metadata、证书写死要手动轮换、靠邮箱匹配人——每一条都踩在 SAML 2.0 当年想解决的痛点上。飞书作 **IdP** 时协议规范得多,但对外抛的是私有的 `open_id`/`union_id`,得自己映射成标准 `sub`。核心建议:用 [飞书 SAML SSO 助手](../tools/feishu-saml.html) 把 metadata 自动解析成要手填的字段,把手工出错和证书过期这两个最大风险压下去。
-::: 
+::: tip 结论
+**94.5 / 100（A）**。飞书是本组公开开发体验最完整的平台：业务 API 面广，Go/Java/Python/Node.js 四种官方服务端 SDK、API 调试台、应用/用户两类调用身份、字段级权限、Webhook 和 SDK 长连接形成了完整链路。企业风险主要不在“能不能调”，而在用户 ID 作用域、敏感字段审批、事件幂等、应用发布审核以及缺少公开统一 SLA。
+:::
 
-## 先分清两个方向
+## 统一评分
 
-飞书的 SSO 有两个完全不同的方向,标准化程度天差地别,别混为一谈:
+| 维度 | 分数 | 企业判断 |
+|---|---:|---|
+| 场景与企业适配 | 5.0 | 企业自建应用和商店应用边界清楚，支持单租户与跨租户分发 |
+| API 覆盖与可组合性 | 5.0 | 通讯录、消息、群、文档、多维表格、日历、审批、招聘、HR 等覆盖广 |
+| SDK 与开发工具 | 5.0 | 四种官方服务端 SDK；调试台可取 token、申请权限并生成示例代码 |
+| 身份、权限与数据边界 | 4.5 | 应用/用户身份、scope 和字段权限细；ID 类型多，需正确建模 |
+| 事件与数据同步 | 5.0 | Webhook 与长连接并存，SDK 封装验签/解密和事件处理 |
+| 运行与可观测性 | 4.0 | 接口级限流、错误码、请求 ID 和后台日志较好；统一公开 SLA 不充分 |
+| 文档、测试与版本治理 | 5.0 | 文档持续更新，标注版本、权限、限流、错误码并提供调试台 |
+| 企业交付与合规 | 4.0 | 权限/字段审核和商店发布流程完整，但高敏能力与支持承诺需项目确认 |
 
-- **方向 A —— 飞书作 SP(Service Provider)**:员工用**企业自己的 IdP**(如 Okta、Azure AD、Keycloak)登录**进飞书**。这是本页批评的重点。
-- **方向 B —— 飞书作 IdP(Identity Provider)**:用**飞书账号**登录进企业的第三方系统。这一侧飞书提供 SAML / OIDC / OAuth2、也能下载 metadata,规范得多,问题主要在字段私有。
+## 外部系统实际能调用什么
 
-## 现状 → 标准对应
+飞书 OpenAPI 不是“只有登录”。企业可按业务域组合：
 
-| 维度 | 飞书现状(方向 A / SP) | 标准怎么做 | 差距 |
-|---|---|---|---|
-| 协议支持 | 只支持 SAML 2.0,通常要**旗舰版** | SAML 2.0 与 OIDC 并存,按场景选 | 能力被商业分层锁死,无 OIDC 轻量路径 |
-| IdP 配置 | **不支持导入 metadata**,手工填 SSO URL / Entity ID / 证书 | 导入 IdP metadata,字段自动落位 | 违背 metadata 的互操作初衷,易填错 |
-| 证书 | 裸 base64(去 PEM 头尾)、**写死**、手动轮换 | metadata 带证书,`validUntil`/`cacheDuration` 自动刷新 | 证书过期 = 全员登录中断 |
-| SP 元数据 | **不提供 SP metadata 文件**,参数要人工照抄 | 双方交换 metadata 文件 | 单向手抄,回填 IdP 时易错 |
-| 身份匹配 | 按 **email 属性 / NameID** 匹配成员 | 推荐稳定的 persistent NameID | 邮箱一变或两边不一致就匹配不到人 |
-| 方向 B 字段 | 私有 `open_id` / `union_id` 为主 | 标准 `sub` + 标准 claim | 需要自建映射层才能对接标准消费方 |
+- 组织与人员：用户、部门、离职/入职事件和通讯录字段；
+- 协作：单聊/群聊消息、机器人、群管理、卡片；
+- 内容与流程：云文档、多维表格、知识库、日历、审批；
+- 管理业务：招聘、绩效、CoreHR 等，但产品许可和 API 权限需逐项确认。
 
----
+每个接口页面会列出 HTTP 方法、支持的应用类型、调用身份、scope、字段权限、频率限制、错误码和多语言示例。不能从“平台有该 API”推断“当前租户一定可用”：产品版本、应用类型、管理员授权、资源本身权限和字段权限会共同决定返回结果。
 
-## 逐项分析
+## SDK 与事件能力
 
-### 问题 1:SP 侧只有 SAML,且锁在旗舰版
+官方服务端 SDK 覆盖 Go、Java、Python、Node.js，能够管理 `tenant_access_token` 生命周期、构造类型化请求、调用 API、处理事件和回调。API 调试台可以直接调接口并生成对应 SDK 示例，这是降低接入和排障成本的关键优势。
 
-**现状**:方向 A(企业 IdP 登录进飞书)**只支持 SAML 2.0**,且这项能力通常需要**旗舰版**才开放——是一个商业化门槛,而不是技术选择。想用更轻的 OIDC 走这个方向,没有入口。
+事件可走传统 HTTP Webhook，也可由官方 SDK 通过 WebSocket 长连接接收。长连接适合自建应用和本地联调，不要求暴露公网回调地址；但它是集群消费而非广播，同一应用多个连接时事件只会交给其中一个消费者。无论使用哪种方式，都应按至少一次投递设计：快速确认、按 `event_id` 去重、异步处理，并用定期拉取做补偿。
 
-**标准怎么做**:SAML 2.0 与 OIDC 是两套并行的成熟 SSO 标准。SAML 面向传统企业 Web SSO(见 [SAML 2.0 Core](http://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf) 与 [SAML 2.0 技术总览](http://docs.oasis-open.org/security/saml/Post2.0/sstc-saml-tech-overview-2.0.html));OIDC 构建在 OAuth 2.0([RFC 6749](https://datatracker.ietf.org/doc/html/rfc6749))之上,配置更轻、有 [Discovery](https://openid.net/specs/openid-connect-discovery-1_0.html) 自动发现端点(见 [OIDC Core](https://openid.net/specs/openid-connect-core-1_0.html))。成熟平台一般两者都给,让企业按现有 IdP 能力选。
+## 必须正确理解的身份与权限
 
-**为什么是问题 · 风险**:很多现代 IdP 更愿意走 OIDC(配置少、维护成本低),飞书方向 A 不给 OIDC,就把这些企业逼回 SAML;再叠加"旗舰版才有 SSO",中小团队要么升级付费、要么放弃统一登录,SSO 这种基础安全能力被当作增值功能分层出售。
+| 对象 | 正确语义 | 常见错误 |
+|---|---|---|
+| `tenant_access_token` | 应用在指定租户内调用，实际数据范围仍受应用权限与资源权限约束 | 当成租户全部数据的“管理员 token” |
+| `user_access_token` | 代表用户调用，结果受用户权限、组织可见性和授权 scope 约束 | 认为授权后可读取该用户不可见的资源 |
+| `open_id` | 同一用户在单个应用内的标识 | 跨应用直接作为全局主键 |
+| `union_id` | 同一开发商下跨应用关联用户 | 跨开发商或跨环境使用 |
+| `user_id` | 用户在单个租户内、跨该租户应用较稳定 | 跨租户直接使用 |
 
-**建议**:接受方向 A 只能 SAML 的现实,把精力放在把 SAML 这条路走顺(见下面各条);预算敏感时评估是否值得为 SSO 单独升级旗舰版,或用方向 B(飞书作 IdP)反向承载部分场景。
+企业内部主键建议保存 `(tenant_key, user_id)`；商店应用或无法获取 `user_id` 时保存 `(tenant_key, app_id, open_id)`，再单独维护 `union_id` 关联。邮箱和手机号是可变敏感属性，不应作为唯一主键。
 
-### 问题 2:不吃 metadata,手工填字段 + 证书裸 base64
+## 企业风险与建议
 
-**现状**:配置 IdP 时飞书**不支持导入 IdP metadata**,必须手工把 SSO URL(登录端点)、Entity ID、签名证书一个个填进去;证书还要求是**裸 base64**——去掉 `-----BEGIN CERTIFICATE-----` / `-----END CERTIFICATE-----` 头尾、只留中间那段。
+1. **先做权限矩阵**：列出每个 API、调用身份、scope、字段权限、资源权限和管理员审批人；不要用一个“大权限应用”承载所有集成。
+2. **拆分应用身份与用户身份场景**：后台同步用应用身份，确需“以某用户操作”时才申请用户授权。
+3. **为 ID 建作用域**：数据库字段名不要只叫 `user_id`，应同时保存平台、租户、应用和环境。
+4. **事件链路做幂等和补偿**：3 秒内确认，业务异步化；保存事件 ID，定时拉取人员/资源变化补漏。
+5. **按接口处理限流**：不要假设所有 API 都是同一配额；读取接口页面的分钟/秒限制，对 429 和平台限流码做退避。
+6. **把商业条件单独确认**：CoreHR、招聘等 API 是否随当前产品版本开放，生产 SLA、配额扩容和支持响应时限应书面确认。
 
-**标准怎么做**:[SAML 2.0 Metadata](http://docs.oasis-open.org/security/saml/v2.0/saml-metadata-2.0-os.pdf) 规范的存在**就是为了免手填**:IdP 把端点、Entity ID、`<KeyDescriptor>` 里的证书都打包进一个 metadata XML,SP 导入即可,所有字段自动落位、格式由机器解析。手工照抄字段正是 metadata 想消灭的操作。
+## 已修正的旧结论
 
-**为什么是问题 · 风险**:手填每个环节都可能出错——SSO URL 抄错、Entity ID 大小写/尾斜杠不一致、证书 base64 漏字符或误留了头尾/换行。任何一处错都会导致签名校验失败或断言被拒,而报错往往笼统,排查耗时。
+- 不能把飞书整体评价成“能用但不标准的 SAML 实现”；那只描述特定的登录进飞书场景，无法代表开放平台 API/SDK。
+- `open_id`、`union_id`、`user_id` 不是简单的“私有字段缺陷”，而是不同作用域的标识。真正风险是使用者忽略作用域。
+- 证书轮换、SAML metadata 仍是 SSO 项目风险，但不应压过 API、SDK、事件和权限治理的企业选型价值。
 
-**建议**:用 [飞书 SAML SSO 助手](../tools/feishu-saml.html) 把 IdP 的 metadata **自动解析**成飞书要手填的那几个字段(含把证书剥成裸 base64),照抄工具输出而不是手扒 XML,能把这类低级错误几乎清零。
+## 官方资料
 
-### 问题 3:证书写死、需手动轮换,无自动刷新
+- [飞书开放平台概述：API 调试台与服务端 SDK](https://open.feishu.cn/document/uAjLw4CM/uYjL24iN/platform-overveiw)
+- [快速调用服务端 API：四种 SDK、权限与日志排查](https://open.feishu.cn/document/introduction)
+- [事件概述：Webhook、长连接、事件 ID 与重试](https://open.feishu.cn/document/server-docs/event-subscription-guide/overview)
+- [使用长连接接收事件](https://open.feishu.cn/document/server-docs/event-subscription-guide/event-subscription-configure-/request-url-configuration-case)
+- [获取单个用户信息：调用身份、字段权限和限流](https://open.feishu.cn/document/server-docs/contact-v3/user/get)
 
-**现状**:飞书里的 IdP 签名证书是**写死**的一段 base64。IdP 一旦轮换证书,飞书这边**不会自动更新**;管理员不手动改,登录立刻失败。飞书没有"填 metadata URL 让它定期拉取"的机制。
-
-**标准怎么做**:SAML metadata 支持通过 **metadata URL** 让对端定期拉取,并用 [SAML 2.0 Metadata](http://docs.oasis-open.org/security/saml/v2.0/saml-metadata-2.0-os.pdf) 里的 `validUntil` / `cacheDuration` 声明有效期与缓存刷新周期。IdP 换证书时会在 metadata 里**同时挂上新旧两张证书**过渡,SP 按 URL 刷新就无缝切换,全程无需人工。
-
-**为什么是问题 · 风险**:这是运维上最致命的一条——证书过期或 IdP 提前轮换,而飞书没同步,结果是**全员登录中断**,且往往在证书到期那一刻才爆发,属于典型的"定时炸弹"。靠人记证书有效期不可靠。
-
-**建议**:
-1. 把 IdP 证书的到期日登记进日历/告警,**提前**处理;
-2. 轮换时让 IdP 侧**新旧证书并行**一段时间,先在飞书填入新证书验证通过,再让 IdP 停用旧证书,避免切换窗口内断登;
-3. 用 [飞书 SAML SSO 助手](../tools/feishu-saml.html) 在轮换时快速从新 metadata 提取新证书,减少手改出错。
-
-### 问题 4:靠 email 属性 / NameID 匹配成员
-
-**现状**:飞书把 SAML 断言里的 **email 属性 / NameID** 拿来匹配飞书成员。只要两边邮箱对不上,就会出现"IdP 认证成功、飞书却匹配不到这个人"的尴尬——登录看似成功却进不去。
-
-**标准怎么做**:[SAML 2.0 Core](http://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf) 定义了多种 NameID 格式,做稳定的身份关联时推荐用**持久标识符(persistent NameID)**这类**不随人事/邮箱变化而改变**的标识,而不是拿业务上会变的邮箱当主键。
-
-**为什么是问题 · 风险**:邮箱是会变的——改名、换域名、别名、大小写差异都可能让两边不一致;一旦不一致,受影响员工直接被挡在门外,且这类问题在邮箱变更时才浮现,难以预判。用可变属性做身份主键本身就是脆弱设计。
-
-**建议**:严格保证 IdP 下发的邮箱与飞书成员邮箱**逐一致**(同一大小写、同一域),并纳入入职/改名流程校验;条件允许时优先用稳定标识而非邮箱做关联;把"邮箱一致性"作为对接飞书 SAML 的硬性前置检查项。
-
-### 问题 5:方向 B 字段私有,`open_id` / `union_id` 非标准 claim
-
-**现状**:方向 B(飞书作 IdP)协议上规范得多——SAML / OIDC / OAuth2 都有,也能下载 metadata。但飞书对外给的用户标识以私有的 **`open_id` / `union_id`** 为主,而不是标准的 `sub`。
-
-**标准怎么做**:[OIDC Core](https://openid.net/specs/openid-connect-core-1_0.html) 规定 ID Token 用 [`sub`](https://openid.net/specs/openid-connect-core-1_0.html#IDToken) 作为主体的稳定唯一标识,并有一套标准 claim(如 `email`、`name`,见 [UserInfo](https://openid.net/specs/openid-connect-core-1_0.html#UserInfo));标准的 OIDC 消费方默认按 `sub` 认人。
-
-**为什么是问题 · 风险**:标准 RP / SP 期望 `sub`,拿到的却是 `open_id`/`union_id`,直接对接会字段对不上;而且 `open_id` 是**按应用隔离**的(同一人在不同飞书应用下 `open_id` 不同,`union_id` 才在同开发者主体下一致),不理解这套语义会导致跨应用认成两个人或认错人。
-
-**建议**:在方向 B 的消费侧建一层**映射适配**:明确把飞书的 `open_id`/`union_id` 映射到你系统里的标准 `sub`,并想清楚跨应用场景该用 `union_id` 还是 `open_id`;把飞书私有字段收敛在适配层内,对上游只暴露标准 claim。
-
----
-
-## 改造建议(按优先级)
-
-1. **先堵最致命的证书过期(问题 3)**:登记 IdP 证书到期告警,轮换走"新旧并行"流程,杜绝"到期即全员断登"。
-2. **用工具消灭手填错误(问题 2)**:对接与轮换都用 [飞书 SAML SSO 助手](../tools/feishu-saml.html),从 metadata 自动解析出飞书要手填的字段 + 裸 base64 证书,照抄工具输出。
-3. **锁死邮箱一致性(问题 4)**:把 IdP 邮箱与飞书成员邮箱一致性作为硬前置,纳入入职/改名流程校验。
-4. **方向 B 建映射层(问题 5)**:把 `open_id`/`union_id` 收敛到适配层,对上游只给标准 `sub` 与标准 claim,并处理好跨应用语义。
-5. **务实接受协议边界(问题 1)**:方向 A 只能 SAML、可能要旗舰版,提前把成本与路径想清楚,别指望 OIDC 走进飞书。
-
-## 参考标准
-
-- [SAML 2.0 Core(OASIS)](http://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf) —— NameID 与断言
-- [SAML 2.0 Metadata(OASIS)](http://docs.oasis-open.org/security/saml/v2.0/saml-metadata-2.0-os.pdf) —— metadata、`validUntil`/`cacheDuration`、证书交换
-- [SAML 2.0 技术总览(OASIS)](http://docs.oasis-open.org/security/saml/Post2.0/sstc-saml-tech-overview-2.0.html)
-- [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html) —— [`sub` / ID Token](https://openid.net/specs/openid-connect-core-1_0.html#IDToken)、[UserInfo](https://openid.net/specs/openid-connect-core-1_0.html#UserInfo)
-- [OpenID Connect Discovery 1.0](https://openid.net/specs/openid-connect-discovery-1_0.html)
-- [OAuth 2.0(RFC 6749)](https://datatracker.ietf.org/doc/html/rfc6749)
-- [飞书官方 SSO 文档](https://www.feishu.cn/hc/zh-CN/articles/360043576234)
-
----
-
-> 相关:[飞书 SSO 对接落地](./feishu.md) · [SAML 2.0 专题](../saml/) · [OIDC 专题](../oidc/) · [飞书 SAML SSO 助手](../tools/feishu-saml.html)
+> 资料核验：2026-07-27。未在公开资料中确认统一生产 SLA、全部业务域许可和配额扩容承诺，采购时需另行确认。

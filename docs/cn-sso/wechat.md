@@ -6,9 +6,9 @@ title: "微信扫码登录"
 
 "用微信登录"面向 **C 端个人用户**:让访客用自己的个人微信扫码登进你的网站。它本质是 **OAuth2 授权码模式(Authorization Code)** 的实现,`scope=snsapi_login`:PC 网页展示二维码,用户手机微信扫码授权,浏览器拿到一次性 `code`,再由**后端**换取用户信息。
 
-> 面向企业员工的 [企业微信扫码登录](./wecom.md) 取用户要三步、凭据也不同,别混用。想直接联调 / 看可点演示,见 [Mock 微信(使用)](../mock/wechat.md)。
+> 面向企业员工的 [企业微信扫码登录](./wecom.md) 使用企业成员标识和应用权限模型，凭据体系不同，不能混用。想直接联调 / 看可点演示，见 [Mock 微信(使用)](../mock/wechat.md)。
 
-> 本页讲**落地对接**;它与标准 OAuth2/OIDC 的差距、风险与改造建议见 [微信扫码登录:与标准的差距](./wechat-review.md)。
+> 本页讲登录落地；微信作为 C 端身份与渠道平台的 API、SDK、ID 作用域和企业适用性见 [微信开放平台企业评价](./wechat-review.md)。
 
 ## 微信登录的几种方式
 
@@ -56,7 +56,7 @@ sequenceDiagram
 
 ### 小程序 / 公众号(简述)
 
-- **小程序**:前端 `wx.login()` **静默**拿 `code`(无需用户点授权),后端用 `AppID`+`AppSecret`+`js_code` 调 `/sns/jscode2session` 换 `openid`+`session_key`(+`unionid`)。注意它**不用** `/sns/userinfo`;头像昵称等资料需前端 `wx.getUserProfile` 由用户主动授权后获取。
+- **小程序**：前端 `wx.login()` 静默取得临时 `code`，后端用 `AppID` + `AppSecret` + `js_code` 调 `/sns/jscode2session` 换取 `openid` + `session_key`（满足平台条件时可能返回 `unionid`）。它不使用 `/sns/userinfo`；头像、昵称、手机号等资料必须按当前小程序接口和用户授权规则另行获取。
 - **公众号网页授权**:微信内 H5 跳 `/connect/oauth2/authorize`——`scope=snsapi_base` 静默只拿 `openid`,`scope=snsapi_userinfo` 需用户在微信内确认、可拿完整资料。后端换 token / 拉资料端点与网站应用相同。
 
 > 下文以 **网站应用(PC 扫码)** 为主线详解落地。
@@ -103,13 +103,13 @@ sequenceDiagram
 
 微信"网站应用"取用户只要两步(比企业微信少):
 
-1. **`/sns/oauth2/access_token`**:用 `AppID` + `AppSecret` + `code` 换 `access_token` + `openid`(+ `unionid`、`refresh_token`)。这里的 `access_token` **与用户绑定**(不同于企业微信的应用级 token)。
+1. **`/sns/oauth2/access_token`**：用 `AppID` + `AppSecret` + `code` 换 `access_token` + `openid`（以及接口在满足条件时返回的 `unionid`、`refresh_token` 等字段）。这里的 `access_token` 与该用户授权绑定，不同于企业微信的应用级 token。
 2. **`/sns/userinfo`**:用 `access_token` + `openid` 拉昵称、头像等资料。
 
 ## 关键概念
 
 - **`openid`**:用户在**该应用**内的唯一标识;换个应用同一个人 `openid` 不同。
-- **`unionid`**:同一开放平台账号下**多应用/公众号打通**同一用户。做网站 + 小程序 + 公众号统一账号时,应以 `unionid` 作主键。
+- **`unionid`**：在应用归属、开放平台绑定等条件满足时，可用于关联同一开放平台主体下的用户。它并非每个入口、每次响应都必然返回；数据库应保留 `(appid, openid)` 原始键，并在实际取得 `unionid` 后建立关联。
 - **`scope=snsapi_login`**:网站应用扫码登录固定用它。
 - **授权回调域**:开放平台后台配置(只填域名);与 `redirect_uri` 域名不一致会报错。
 - **`state`**:防 CSRF。
