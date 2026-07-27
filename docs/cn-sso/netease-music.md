@@ -4,13 +4,17 @@ title: "网易云音乐 OpenAPI 登录对接实现"
 
 # 网易云音乐 OpenAPI 登录对接实现
 
-本页讲网易云音乐合作方 OpenAPI 的设备登录流程；API 覆盖、SDK、签名、事件、文档和企业交付评价见 [网易云音乐 OpenAPI 企业评价](./netease-music-review.md)。
+本页讲网易云音乐合作方 OpenAPI 的设备登录流程；授权、令牌、签名、设备流与标准化评价见 [网易云音乐标准安全评价](./netease-music-review.md)。
+
+::: tip 标准化边界
+本页说明如何兼容平台当前协议，不表示本站建议继续扩展私有实现。新系统应优先要求标准 OIDC/OAuth/SAML/SCIM；必须接入私有流程时，应将它限制在身份网关适配器内。评价基线见[统一协议安全评价方法](./methodology.md)。
+:::
 
 > 依据网易云音乐开放平台《音乐 API 文档 · 用户登录 API / 公共 · 访问方式》。域名 `openapi.music.163.com`。
 
 ## 这是什么
 
-与 [喜马拉雅](./ximalaya.md) / [QQ 音乐](./qqmusic.md) 那种"绑定你方账号"的模式不同,网易云音乐是**让用户直接登录自己的云音乐账号**,更接近标准 OAuth2:设备通过**扫码**或 **H5/唤端**拿到用户授权,换取 `accessToken` + `refreshToken`,再用 `accessToken` 访问用户信息与资源。
+与 [喜马拉雅](./ximalaya.md) / [QQ 音乐](./qqmusic.md) 那种"绑定你方账号"的模式不同,网易云音乐是**让用户直接登录自己的云音乐账号**,结构上接近 OAuth2，但仍是私有 OpenAPI:设备通过**扫码**或 **H5/唤端**拿到用户授权,换取 `accessToken` + `refreshToken`,再用 `accessToken` 访问用户信息与资源。
 
 两种登录入口:
 
@@ -109,6 +113,6 @@ H5 或唤起云音乐 App 授权后,回调拿到临时 `grantCode`(**10 分钟**
 
 ## 参考
 
-- [网易云音乐登录:与 OIDC/OAuth2 标准的差距与改造建议](./netease-music-review.md)
+- [网易云音乐登录:标准化与安全评价与改造建议](./netease-music-review.md)
 - 网易云音乐开放平台文档([获取登录二维码](https://developer.music.163.com/st/developer/document?docId=2bb12a93e71a4be0842243b930c2f33c) 等,登录相关)
 - [OAuth 2.0 文档](../oauth2/) · [OpenID Connect 文档](../oidc/)

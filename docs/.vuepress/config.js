@@ -18,7 +18,7 @@ const T = {
     overview: '概览 / 角色术语', mail: '邮件服务器', ldapDir: 'LDAP 目录', oidcDemo: 'OIDC 登录演示', samlDemo: 'SAML 登录演示', wechatLogin: '微信扫码登录', wecomLogin: '企业微信扫码登录',
     jwt: 'JWT 解析', jwtSign: 'JWT 签名', jwk: 'JWK 生成', pkce: 'PKCE 生成', saml: 'SAML 编解码', scanLoginDemo: '扫码登录演示',
     cert: 'X.509 证书', pemParse: 'PEM 解析', ldapFilter: 'LDAP 过滤器',
-    cnSso: '国内平台 SSO', feishuSaml: '飞书 SAML',
+    cnSso: '中国平台身份标准评测', feishuSaml: '飞书 SAML',
   },
   en: {
     home: 'Home', protocols: 'Protocols', tools: 'Tools', mock: 'Mock Servers',

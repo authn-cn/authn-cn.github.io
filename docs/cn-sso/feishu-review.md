@@ -1,78 +1,66 @@
 ---
-title: "飞书 API / SDK 企业集成评价"
+title: "飞书身份接口标准化与安全评价"
 ---
 
-# 飞书 API / SDK 企业集成评价
+# 飞书身份接口标准化与安全评价
 
-> 使用[统一评价方法](./methodology.md)。本页评价企业调用飞书开放平台的能力；“外部 IdP 登录飞书”和“飞书账号登录第三方应用”只作为身份入口，不再主导评分。
+> 采用[统一协议安全评价方法](./methodology.md)。本页只评价外部系统所接触的身份联邦、授权、令牌、账号生命周期和回调协议，不按 API 数量、SDK 语言或业务覆盖加分。
 
 ::: tip 结论
-**94.5 / 100（A）**。飞书是本组公开开发体验最完整的平台：业务 API 面广，Go/Java/Python/Node.js 四种官方服务端 SDK、API 调试台、应用/用户两类调用身份、字段级权限、Webhook 和 SDK 长连接形成了完整链路。企业风险主要不在“能不能调”，而在用户 ID 作用域、敏感字段审批、事件幂等、应用发布审核以及缺少公开统一 SLA。
+**74.5 / 100（B）**。飞书在应用/用户身份分离、细粒度权限和事件安全方面基础较好，也提供 SAML 企业登录能力；但飞书账号登录外部系统的公开流程仍需要平台专用 token 与用户信息接口。公开资料尚不足以证明它可作为完整 OIDC Provider 由通用客户端直接接入，也未验证标准 SCIM、OAuth metadata/JWKS、标准吊销及发送方约束令牌。它是本组标准化基础较好的一家，但仍没有消除私有适配。
 :::
 
 ## 统一评分
 
-| 维度 | 分数 | 企业判断 |
-|---|---:|---|
-| 场景与企业适配 | 5.0 | 企业自建应用和商店应用边界清楚，支持单租户与跨租户分发 |
-| API 覆盖与可组合性 | 5.0 | 通讯录、消息、群、文档、多维表格、日历、审批、招聘、HR 等覆盖广 |
-| SDK 与开发工具 | 5.0 | 四种官方服务端 SDK；调试台可取 token、申请权限并生成示例代码 |
-| 身份、权限与数据边界 | 4.5 | 应用/用户身份、scope 和字段权限细；ID 类型多，需正确建模 |
-| 事件与数据同步 | 5.0 | Webhook 与长连接并存，SDK 封装验签/解密和事件处理 |
-| 运行与可观测性 | 4.0 | 接口级限流、错误码、请求 ID 和后台日志较好；统一公开 SLA 不充分 |
-| 文档、测试与版本治理 | 5.0 | 文档持续更新，标注版本、权限、限流、错误码并提供调试台 |
-| 企业交付与合规 | 4.0 | 权限/字段审核和商店发布流程完整，但高敏能力与支持承诺需项目确认 |
+| 技术维度 | 权重 | 分数 | 依据 |
+|---|---:|---:|---|
+| 身份联邦与协议互操作 | 20% | 3.5 | 企业登录支持 SAML；对外账号登录采用授权码式流程，但公开材料未验证完整 OIDC Discovery、`id_token` 与 JWKS 互操作 |
+| 授权流程安全 | 15% | 3.5 | 授权码和 `state` 可用；未公开验证所有公共客户端强制 PKCE、`nonce` 和精确回调匹配策略 |
+| 令牌与客户端凭据安全 | 15% | 3.5 | 区分应用、租户和用户 token；未验证标准 revocation/introspection、刷新重放检测或 mTLS/DPoP |
+| 权限模型与最小授权 | 15% | 4.5 | 应用/用户调用身份、scope、字段和资源权限分层较细 |
+| 密码学与密钥生命周期 | 10% | 3.5 | HTTPS、事件验签/加密可用；SAML metadata、JWKS 和自动双钥轮换能力未统一验证 |
+| 主体标识与账号生命周期 | 10% | 3.5 | `open_id`、`union_id`、`user_id` 作用域可建模；未验证通用 `iss/sub` 和 SCIM 供应 |
+| 回调、事件与防重放 | 10% | 4.0 | Webhook 验签/加密与事件 ID 可用；协议仍为厂商实现，需接入方做重放和幂等控制 |
+| API 传输与消息语义 | 5% | 4.0 | HTTPS 和后端凭据传递较规范，主体仍是飞书私有资源与错误模型 |
 
-## 外部系统实际能调用什么
+## 标准符合度判断
 
-飞书 OpenAPI 不是“只有登录”。企业可按业务域组合：
+### 可以肯定的部分
 
-- 组织与人员：用户、部门、离职/入职事件和通讯录字段；
-- 协作：单聊/群聊消息、机器人、群管理、卡片；
-- 内容与流程：云文档、多维表格、知识库、日历、审批；
-- 管理业务：招聘、绩效、CoreHR 等，但产品许可和 API 权限需逐项确认。
+- 企业已有 IdP 登录飞书可采用 SAML 2.0，属于标准联邦方向。
+- 外部应用可用授权码式流程取得用户授权，应用身份、租户身份和用户身份有明确区分。
+- 权限不只由 token 决定，还受 scope、字段权限、资源权限和租户边界约束。
+- 事件链路提供验签/加密能力和事件标识，能够构建防伪造、去重与补偿处理。
 
-每个接口页面会列出 HTTP 方法、支持的应用类型、调用身份、scope、字段权限、频率限制、错误码和多语言示例。不能从“平台有该 API”推断“当前租户一定可用”：产品版本、应用类型、管理员授权、资源本身权限和字段权限会共同决定返回结果。
+### 不能等同于标准的部分
 
-## SDK 与事件能力
+- `/authen`、`user_access_token`、`open_id` 等命名不能证明 OIDC；缺少可验证的 Discovery、标准 `id_token`、Issuer/Audience/Nonce 校验链时，通用 OIDC 客户端不能直接替代飞书 SDK/适配器。
+- `open_id`、`union_id`、`user_id` 是平台作用域标识，不等同于标准 `iss + sub`；接入方仍需维护映射。
+- 通讯录 API 能同步用户和部门，但没有公开验证 SCIM 2.0 服务端，因此不能算标准账号供应。
+- SDK 封装 token 刷新和事件解密属于工程便利，不增加协议标准化得分。
 
-官方服务端 SDK 覆盖 Go、Java、Python、Node.js，能够管理 `tenant_access_token` 生命周期、构造类型化请求、调用 API、处理事件和回调。API 调试台可以直接调接口并生成对应 SDK 示例，这是降低接入和排障成本的关键优势。
+## 建议飞书按此顺序改进
 
-事件可走传统 HTTP Webhook，也可由官方 SDK 通过 WebSocket 长连接接收。长连接适合自建应用和本地联调，不要求暴露公网回调地址；但它是集群消费而非广播，同一应用多个连接时事件只会交给其中一个消费者。无论使用哪种方式，都应按至少一次投递设计：快速确认、按 `event_id` 去重、异步处理，并用定期拉取做补偿。
+1. 对外提供完整 OIDC Provider：发布 Discovery、JWKS、标准 `id_token` 和 UserInfo，支持通用客户端注册与互操作测试。
+2. 所有 Web、桌面和移动公共客户端强制授权码 + PKCE，明确 `state`、`nonce`、精确 redirect URI 和原生应用回跳要求。
+3. 发布 OAuth Authorization Server Metadata，并提供标准 token revocation；高风险 API 支持 `private_key_jwt`、mTLS 或 DPoP。
+4. 为企业用户与组提供 SCIM 2.0，将入职、转岗、离职和组成员关系从私有通讯录 API 中解耦。
+5. SAML 方向提供标准 SP metadata、多签名证书并行和自动轮换，避免依赖手工复制单张证书。
+6. 事件签名公布算法版本和 `kid`，统一使用现代算法并明确重放窗口。
 
-## 必须正确理解的身份与权限
+## 接入企业当前应做什么
 
-| 对象 | 正确语义 | 常见错误 |
-|---|---|---|
-| `tenant_access_token` | 应用在指定租户内调用，实际数据范围仍受应用权限与资源权限约束 | 当成租户全部数据的“管理员 token” |
-| `user_access_token` | 代表用户调用，结果受用户权限、组织可见性和授权 scope 约束 | 认为授权后可读取该用户不可见的资源 |
-| `open_id` | 同一用户在单个应用内的标识 | 跨应用直接作为全局主键 |
-| `union_id` | 同一开发商下跨应用关联用户 | 跨开发商或跨环境使用 |
-| `user_id` | 用户在单个租户内、跨该租户应用较稳定 | 跨租户直接使用 |
-
-企业内部主键建议保存 `(tenant_key, user_id)`；商店应用或无法获取 `user_id` 时保存 `(tenant_key, app_id, open_id)`，再单独维护 `union_id` 关联。邮箱和手机号是可变敏感属性，不应作为唯一主键。
-
-## 企业风险与建议
-
-1. **先做权限矩阵**：列出每个 API、调用身份、scope、字段权限、资源权限和管理员审批人；不要用一个“大权限应用”承载所有集成。
-2. **拆分应用身份与用户身份场景**：后台同步用应用身份，确需“以某用户操作”时才申请用户授权。
-3. **为 ID 建作用域**：数据库字段名不要只叫 `user_id`，应同时保存平台、租户、应用和环境。
-4. **事件链路做幂等和补偿**：3 秒内确认，业务异步化；保存事件 ID，定时拉取人员/资源变化补漏。
-5. **按接口处理限流**：不要假设所有 API 都是同一配额；读取接口页面的分钟/秒限制，对 429 和平台限流码做退避。
-6. **把商业条件单独确认**：CoreHR、招聘等 API 是否随当前产品版本开放，生产 SLA、配额扩容和支持响应时限应书面确认。
-
-## 已修正的旧结论
-
-- 不能把飞书整体评价成“能用但不标准的 SAML 实现”；那只描述特定的登录进飞书场景，无法代表开放平台 API/SDK。
-- `open_id`、`union_id`、`user_id` 不是简单的“私有字段缺陷”，而是不同作用域的标识。真正风险是使用者忽略作用域。
-- 证书轮换、SAML metadata 仍是 SSO 项目风险，但不应压过 API、SDK、事件和权限治理的企业选型价值。
+- 标准身份网关与飞书之间保留独立适配器，由网关签发企业自己的 OIDC 会话；不得把飞书 access token 当作身份令牌。
+- 使用 `(platform, tenant_key, app_id, external_id)` 保存原始身份映射；企业成员可另存 `(tenant_key, user_id)`。
+- token 仅在后端托管；对授权码、`state`、回调地址和事件时间戳/事件 ID 做严格校验。
+- SAML 上线前验证 Audience、Recipient、Destination、InResponseTo、签名覆盖范围和证书轮换演练。
 
 ## 官方资料
 
-- [飞书开放平台概述：API 调试台与服务端 SDK](https://open.feishu.cn/document/uAjLw4CM/uYjL24iN/platform-overveiw)
-- [快速调用服务端 API：四种 SDK、权限与日志排查](https://open.feishu.cn/document/introduction)
-- [事件概述：Webhook、长连接、事件 ID 与重试](https://open.feishu.cn/document/server-docs/event-subscription-guide/overview)
-- [使用长连接接收事件](https://open.feishu.cn/document/server-docs/event-subscription-guide/event-subscription-configure-/request-url-configuration-case)
-- [获取单个用户信息：调用身份、字段权限和限流](https://open.feishu.cn/document/server-docs/contact-v3/user/get)
+- [飞书 SSO 与登录用户信息](https://open.feishu.cn/document/common-capabilities/sso/api/get-user_info)
+- [飞书事件订阅概述](https://open.feishu.cn/document/server-docs/event-subscription-guide/overview)
+- [飞书用户信息接口与权限](https://open.feishu.cn/document/server-docs/contact-v3/user/get)
+- [OAuth 2.0 Security BCP（RFC 9700）](https://datatracker.ietf.org/doc/html/rfc9700)
+- [OpenID Connect 规范目录](https://openid.net/developers/specs/)
 
-> 资料核验：2026-07-27。未在公开资料中确认统一生产 SLA、全部业务域许可和配额扩容承诺，采购时需另行确认。
+> 核验日期：2026-07-27。“未验证”表示公开资料不足以证明标准互操作能力，不等同于断言平台内部没有该安全控制。
