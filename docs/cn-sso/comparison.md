@@ -10,16 +10,16 @@ title: "国内平台 SSO 标准化与安全横向评价"
 
 | 排名 | 具体产品 | 角色 | 分数 | 等级 | 核心判断 |
 |---:|---|---|---:|---|---|
-| 1 | [飞书](./feishu-review.md) | ToE | **74.5** | B | SAML、权限与事件基础较好；对外登录未验证完整 OIDC/SCIM |
+| 1 | [飞书](./feishu-review.md) | ToB | **74.5** | B | SAML、权限与事件基础较好；对外登录未验证完整 OIDC/SCIM |
 | 2 | [华为账号 Account Kit](./huawei-account-review.md) | ToC | **72.5** | B | 明确 OAuth2/OIDC 与 ID token；PKCE、Discovery/JWKS 等仍需补证 |
 | 3 | [腾讯云 CloudBase](./cloudbase-review.md) | ToC/应用身份 | **71.0** | B | 消费 OIDC/SAML 与刷新轮换较强；完整 OIDC Provider 能力未验证 |
-| 4 | [钉钉](./dingtalk-review.md) | ToE | **63.0** | C | 授权码和 Stream 可用；身份接口仍高度平台化 |
+| 4 | [钉钉](./dingtalk-review.md) | ToB | **63.0** | C | 授权码和 Stream 可用；身份接口仍高度平台化 |
 | 5 | [抖音开放平台](./douyin-review.md) | ToC | **56.5** | C | 后端授权码、刷新轮换与解授权可用；未验证完整 OIDC/PKCE 强制 |
 | 6 | [支付宝开放平台](./alipay-review.md) | ToC/商户 | **56.0** | C | RSA2/证书与主体分离较强；授权仍是私有 OpenAPI |
-| 7 | [企业微信](./wecom-review.md) | ToE | **55.5** | C | 权限与加密回调有效；登录、通讯录和 token 为专有协议 |
-| 7 | [华为云 WeLink](./welink-review.md) | ToE | **55.5** | C | 后端换票与应用 token 可用；OIDC/PKCE/SCIM 未验证 |
+| 7 | [企业微信](./wecom-review.md) | ToB | **55.5** | C | 权限与加密回调有效；登录、通讯录和 token 为专有协议 |
+| 7 | [华为云 WeLink](./welink-review.md) | ToB | **55.5** | C | 后端换票与应用 token 可用；OIDC/PKCE/SCIM 未验证 |
 | 7 | [喜马拉雅](./ximalaya-review.md) | 内容/设备 | **55.5** | C | OAuth 式入口具备迁移基础；车载换票仍私有 |
-| 10 | [WPS 365](./wps-review.md) | ToE | **53.5** | D | 权限层次较好；私有 SSO、查询串凭据与遗留回调算法拉低基线 |
+| 10 | [WPS 365](./wps-review.md) | ToB | **53.5** | D | 权限层次较好；私有 SSO、查询串凭据与遗留回调算法拉低基线 |
 | 11 | [网易云音乐](./netease-music-review.md) | 内容/设备 | **50.0** | D | AT/RT 与 RSA-SHA256 可用；设备流与身份声明未标准化 |
 | 12 | [Gitee](./gitee-review.md) | ToC/开发者 | **47.5** | D | OAuth/企业 API 可接入；Webhook 缺现代消息签名和重放保护 |
 | 13 | [微信开放平台](./wechat-review.md) | ToC | **41.5** | D | 授权码可用；多套私有流程、无 OIDC/PKCE 与查询串凭据 |
@@ -32,7 +32,7 @@ title: "国内平台 SSO 标准化与安全横向评价"
 
 ## 按系统角色的判断
 
-- **ToE**：飞书的标准联邦基础领先，但仍没有一家同时完整证明 OIDC/SAML metadata、SCIM、现代 token 生命周期与密钥轮换。通讯录 API 多，不等于账号供应标准化。
+- **ToB**：飞书的标准联邦基础领先，但仍没有一家同时完整证明 OIDC/SAML metadata、SCIM、现代 token 生命周期与密钥轮换。通讯录 API 多，不等于账号供应标准化。
 - **ToC/开发者**：Account Kit 的 OIDC/ID token 方向最明确；CloudBase 擅长消费标准身份源，但不能把 RP/SP 能力当成 OP/IdP 能力；其余平台普遍需要私有用户接口。
 - **内容/设备**：三家均未把车载/二维码登录统一为 OAuth Device Authorization Grant，设备厂商仍需维护专用 SDK、换票和状态机。
 - **同厂边界**：企业微信、微信、QQ 互联、CloudBase、QQ 音乐分别评价；WeLink 与 Account Kit 分别评价。厂商归属不能推导主体 ID 等价。
