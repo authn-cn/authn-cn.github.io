@@ -118,6 +118,10 @@ function genSidebar(prefix, t) {
         p('/cn-sso/dingtalk.md'), p('/cn-sso/dingtalk-review.md'),
         p('/cn-sso/wps.md'), p('/cn-sso/wps-review.md'),
         p('/cn-sso/welink.md'), p('/cn-sso/welink-review.md'),
+        p('/cn-sso/microsoft365-china.md'), p('/cn-sso/microsoft365-china-review.md'),
+        p('/cn-sso/aws-china.md'), p('/cn-sso/aws-china-review.md'),
+        p('/cn-sso/jihu-gitlab.md'), p('/cn-sso/jihu-gitlab-review.md'),
+        p('/cn-sso/salesforce-china.md'), p('/cn-sso/salesforce-china-review.md'),
       ] : []),
       p('/cn-sso/wechat.md'),
       ...(prefix === '' ? [

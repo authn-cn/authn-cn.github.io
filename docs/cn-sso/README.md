@@ -25,6 +25,10 @@ title: "国内平台 SSO 标准化与安全评测"
 | **企业微信** | 私有授权码、应用 token、成员查询和加密回调 | [接入](./wecom.md) | [55.5 / C](./wecom-review.md) |
 | **WPS 365** | 企业 SSO 三端点 + 用户/应用 token + OpenAPI | [接入](./wps.md) | [53.5 / D](./wps-review.md) |
 | **华为云 WeLink** | WeCode 免登 code、应用 ticket 与成员 API | [接入](./welink.md) | [55.5 / C](./welink-review.md) |
+| **Microsoft 365 中国版（世纪互联运营）** | 中国国家云 OIDC/OAuth + Microsoft Graph | [接入](./microsoft365-china.md) | [84.5 / B](./microsoft365-china-review.md) |
+| **亚马逊云科技中国区域** | 独立 `aws-cn` 分区、STS、SigV4 与服务 API | [接入](./aws-china.md) | [73.5 / B](./aws-china-review.md) |
+| **极狐 GitLab** | OAuth + REST/GraphQL + 签名 Webhook | [接入](./jihu-gitlab.md) | [73.5 / B](./jihu-gitlab-review.md) |
+| **阿里云上的 Salesforce** | 连接应用 OAuth/OIDC + CRM API + 事件流 | [接入](./salesforce-china.md) | [72 / B](./salesforce-china-review.md) |
 
 ## ToC：消费者账号和开发者平台
 
@@ -62,6 +66,19 @@ title: "国内平台 SSO 标准化与安全评测"
 
 厂商归属只用于说明产品边界，不用于合并账号或继承评分。任何跨产品账号关联都必须有公开的作用域规则和用户控制权验证，不能依据“同属一家公司”推导。
 
+## 国际品牌的国内独立运营边界
+
+| 国内具体产品 | 独立边界 | 不能直接沿用 |
+|---|---|---|
+| Microsoft 365 中国版 | 世纪互联运营的国家云租户、authority、Graph 根地址和 token | Microsoft 365 全球租户、`graph.microsoft.com` token |
+| 亚马逊云科技中国区域 | 本地运营方、独立中国账户、`aws-cn`、中国 ARN 与端点 | AWS 全球账户、`aws` 分区凭据和 ARN |
+| 极狐 GitLab | 国内独立公司、JihuLab.com/私有实例 origin | GitLab.com 用户、应用、token 和全球 SaaS 能力推定 |
+| 阿里云上的 Salesforce | 中国 org、My Domain、API/事件可用性与本地化 CXG | 全球 org endpoint、token 和未经验证的全球功能 |
+
+全球版支持某个协议只能作为技术背景，不能替中国版本得分。中国实例必须提供实际 endpoint、metadata、API 调用或版本证据。
+
+本次也检查了 Apple 中国、Unity 中国、Steam 中国、Zoom 中国以及 SAP/Oracle 等候选。暂未纳入不是判断其“没有能力”，而是公开资料尚不足以同时证明：存在独立的中国协议面、面向外部系统的稳定在线身份/API 文档，并且对象不是标准 IAM 产品或纯合同交付能力。后续取得可复现的国内 endpoint 和协议证据后再单独成页。
+
 ## 统一判断原则
 
 - 路径或接口名含 `oauth`、`oidc`、`sso`，不代表符合对应标准。
@@ -73,8 +90,8 @@ title: "国内平台 SSO 标准化与安全评测"
 ## 快速入口
 
 - [统一协议安全评价方法](./methodology.md)
-- [17 个具体系统横向综合评价](./comparison.md)
+- [21 个具体系统横向综合评价](./comparison.md)
 - [SAML Metadata 解析器](../tools/saml-metadata.html) · [PKCE 生成](../tools/pkce.html)
 - [SAML 2.0](../saml/) · [OAuth 2.0](../oauth2/) · [OpenID Connect](../oidc/)
 
-> 资料核验日期：2026-07-27。评测只衡量公开可验证的协议标准化与安全控制，不对平台整体安全、产品功能或商业价值作排名。
+> 资料核验日期：2026-07-28。评测只衡量公开可验证的协议标准化与安全控制，不对平台整体安全、产品功能或商业价值作排名。
