@@ -1,7 +1,7 @@
 ---
 home: true
 title: 首页
-description: Authn.tech 提供 JWT、OAuth 2.0、OIDC、SAML、WebAuthn、Passkey、MFA/TOTP 与 LDAP 的中文协议文档、浏览器端在线工具和可联调的 Mock 身份认证服务器。
+description: Authn.tech 提供 JWT、OAuth 2.0、OIDC、SAML、WebAuthn、Passkey、MFA/TOTP、LDAP、GraphQL 与 SCIM 2.0 的中文协议文档、浏览器端在线工具和可联调的 Mock 身份认证服务器。
 heroText: Authn.tech
 tagline: 身份认证与授权的中文工具站 —— 在线工具 · Mock 服务器 · 协议文档
 actions:
@@ -17,7 +17,7 @@ features:
   - title: 🚀 Mock 服务器
     details: 已上线的 SAML / OIDC 双协议 Mock，四角色齐全（IdP / SP / OP / RP）外加资源服务器，真实签名验签，用于联调、集成测试与学习演练。
   - title: 📖 协议文档
-    details: 系统化的 SAML 2.0、OAuth 2.0、OIDC、WebAuthn/Passkey、MFA/TOTP 中文介绍：核心概念、典型流程、关键参数，面向工程实践。
+    details: 系统化的 SAML 2.0、OAuth 2.0、OIDC、WebAuthn/Passkey、MFA/TOTP、GraphQL 与 SCIM 2.0 中文介绍：核心概念、典型流程、安全实现和关键参数。
 footer: Authn.tech · 用中文把认证与授权讲清楚
 ---
 
@@ -51,3 +51,5 @@ footer: Authn.tech · 用中文把认证与授权讲清楚
 - 想做**无密码 / 抗钓鱼登录**（Passkey）？看 [WebAuthn 概述](/webauthn/)。
 - 想加**第二因素**（动态验证码）？看 [MFA / TOTP 概述](/mfa/)。
 - 想查/验证**目录里的用户与组**？看 [LDAP 概述](/ldap/)。
+- 想设计**强类型、可组合的 API 查询**？看 [GraphQL 概述](/graphql/)。
+- 想标准化**用户与组的供应、变更和停用**？看 [SCIM 2.0 概述](/scim/)。

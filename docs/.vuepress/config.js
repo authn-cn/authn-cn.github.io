@@ -55,6 +55,10 @@ function genNavbar(prefix, t) {
         { text: 'WebAuthn / Passkey', link: p('/webauthn/') },
         { text: 'MFA / TOTP', link: p('/mfa/') },
         { text: 'LDAP', link: p('/ldap/') },
+        ...(prefix === '' ? [
+          { text: 'GraphQL', link: p('/graphql/') },
+          { text: 'SCIM 2.0', link: p('/scim/') },
+        ] : []),
         { text: t.cnSso, link: p('/cn-sso/') },
       ],
     },
@@ -109,6 +113,22 @@ function genSidebar(prefix, t) {
     [p('/webauthn/')]: [{ text: 'WebAuthn / Passkey', children: [p('/webauthn/README.md'), p('/webauthn/concepts.md'), p('/webauthn/flows.md'), p('/webauthn/reference.md')] }],
     [p('/mfa/')]: [{ text: t.mfaH, children: [p('/mfa/README.md'), p('/mfa/totp.md'), p('/mfa/reference.md')] }],
     [p('/ldap/')]: [{ text: 'LDAP', children: [p('/ldap/README.md'), p('/ldap/concepts.md'), p('/ldap/flows.md'), p('/ldap/reference.md')] }],
+    ...(prefix === '' ? {
+      [p('/graphql/')]: [{ text: 'GraphQL', children: [
+        p('/graphql/README.md'),
+        p('/graphql/concepts.md'),
+        p('/graphql/http.md'),
+        p('/graphql/security.md'),
+        p('/graphql/reference.md'),
+      ] }],
+      [p('/scim/')]: [{ text: 'SCIM 2.0', children: [
+        p('/scim/README.md'),
+        p('/scim/concepts.md'),
+        p('/scim/operations.md'),
+        p('/scim/security.md'),
+        p('/scim/reference.md'),
+      ] }],
+    } : {}),
     [p('/cn-sso/')]: [{ text: t.cnSso, children: [
       p('/cn-sso/README.md'),
       p('/cn-sso/methodology.md'),

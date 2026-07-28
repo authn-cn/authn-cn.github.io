@@ -43,7 +43,7 @@ title: "国内平台 SSO 标准化与安全评价方法"
 | API 授权 | OAuth 2.0，并遵循 OAuth 2.0 Security BCP；scope、resource/audience 和客户端类型语义清楚 | 把永久 AppSecret 放入 URL，或用自定义 ticket 代替标准授权 |
 | 令牌生命周期 | 标准过期、刷新、吊销；需要时提供 introspection；JWT 遵循 JWT BCP | 只能等待令牌自然过期，或把资源令牌当身份令牌 |
 | 高保障客户端认证 | `private_key_jwt`、mTLS，或发送方约束令牌（mTLS/DPoP） | 仅靠共享密钥、来源 IP 或 SDK 混淆 |
-| 人员与组生命周期 | SCIM 2.0 用户/组模型及协议，或可验证的标准扩展 | 厂商私有通讯录 API 被称作“账号供应标准” |
+| 人员与组生命周期 | [SCIM 2.0](/scim/) 用户/组模型及协议，或可验证的标准扩展 | 厂商私有通讯录 API 被称作“账号供应标准” |
 | 设备登录 | OAuth 2.0 Device Authorization Grant | 自定义二维码轮询状态机但宣称“标准 OAuth” |
 | 回调与事件 | TLS；HMAC-SHA-256、JWS/非对称签名或 mTLS；时间戳、nonce/事件 ID、重放窗口和密钥轮换 | MD5/SHA-1 拼接、只有明文 token、只依赖 IP 白名单 |
 | HTTP 与传输 | TLS 安全基线；凭据放授权头或请求体；标准状态码、媒体类型和错误语义 | Secret/Token 放查询串、所有结果都返回 HTTP 200 + 私有业务码 |
@@ -129,6 +129,7 @@ title: "国内平台 SSO 标准化与安全评价方法"
 - [OAuth mTLS（RFC 8705）](https://datatracker.ietf.org/doc/html/rfc8705) 与 [DPoP（RFC 9449）](https://datatracker.ietf.org/doc/html/rfc9449)
 - [OpenID Connect 规范目录](https://openid.net/developers/specs/)
 - [SAML 2.0 规范集](https://docs.oasis-open.org/security/saml/v2.0/)
+- [本站 SCIM 2.0 中文专题](/scim/)
 - [SCIM Core Schema（RFC 7643）](https://datatracker.ietf.org/doc/html/rfc7643) 与 [SCIM Protocol（RFC 7644）](https://datatracker.ietf.org/doc/html/rfc7644)
 - [TLS/DTLS 安全使用建议（RFC 9325）](https://datatracker.ietf.org/doc/html/rfc9325)
 
