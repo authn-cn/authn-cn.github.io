@@ -11,9 +11,9 @@ title: "国内平台 SSO 标准化与安全横向评价"
 | 排名 | 具体产品 | 角色 | 分数 | 等级 | 核心判断 |
 |---:|---|---|---:|---|---|
 | 1 | [Microsoft 365 中国版](./microsoft365-china-review.md) | ToB | **84.5** | B | 标准 OIDC/OAuth、Graph 与权限体系最完整；国家云端点/能力差异和通知签名仍有缺口 |
-| 2 | [飞书](./feishu-review.md) | ToB | **74.5** | B | SAML、权限与事件基础较好；对外登录未验证完整 OIDC/SCIM |
-| 3 | [亚马逊云科技中国区域](./aws-china-review.md) | ToB/API | **73.5** | B | 短期 STS、策略和 SigV4 安全强；服务 API 仍是专用签名协议 |
-| 3 | [极狐 GitLab](./jihu-gitlab-review.md) | ToB/开发者 | **73.5** | B | PKCE、撤销和现代 Webhook 较完整；无完整 OIDC 且仍保留遗留流程 |
+| 2 | [亚马逊云科技中国区域](./aws-china-review.md) | ToB/API | **82.0** | B | SAML/SCIM 企业控制台接入与短期角色成熟；服务 API 仍是专用 SigV4 |
+| 3 | [飞书](./feishu-review.md) | ToB | **74.5** | B | SAML、权限与事件基础较好；对外登录未验证完整 OIDC/SCIM |
+| 4 | [极狐 GitLab](./jihu-gitlab-review.md) | ToB/开发者 | **73.5** | B | PKCE、撤销和现代 Webhook 较完整；无完整 OIDC 且仍保留遗留流程 |
 | 5 | [华为账号 Account Kit](./huawei-account-review.md) | ToC | **72.5** | B | 明确 OAuth2/OIDC 与 ID token；PKCE、Discovery/JWKS 等仍需补证 |
 | 6 | [阿里云上的 Salesforce](./salesforce-china-review.md) | ToB/CRM | **72.0** | B | 连接应用和 API 标准化较好；中国 org 的全球功能等价性需逐项验收 |
 | 7 | [腾讯云 CloudBase](./cloudbase-review.md) | ToC/应用身份 | **71.0** | B | 消费 OIDC/SAML 与刷新轮换较强；完整 OIDC Provider 能力未验证 |
@@ -48,8 +48,8 @@ title: "国内平台 SSO 标准化与安全横向评价"
 | 产品 | 联邦 | 授权 | token | 权限 | 密钥 | 主体 | 回调 | HTTP |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
 | Microsoft 365 中国版 | 4.5 | 4.5 | 4.0 | 4.5 | 4.5 | 3.5 | 3.5 | 4.5 |
+| 亚马逊云科技中国区域 | 4.0 | 3.5 | 4.5 | 5.0 | 4.5 | 4.0 | 3.0 | 4.0 |
 | 飞书 | 3.5 | 3.5 | 3.5 | 4.5 | 3.5 | 3.5 | 4.0 | 4.0 |
-| 亚马逊云科技中国区域 | 2.5 | 3.0 | 4.5 | 5.0 | 4.5 | 3.5 | 3.0 | 4.0 |
 | 极狐 GitLab | 3.0 | 4.0 | 3.5 | 4.0 | 3.5 | 3.5 | 4.5 | 4.0 |
 | 华为账号 Account Kit | 4.0 | 3.5 | 3.5 | 3.5 | 4.0 | 3.5 | 3.0 | 4.0 |
 | 阿里云上的 Salesforce | 3.5 | 3.5 | 3.5 | 4.0 | 4.0 | 3.5 | 3.0 | 4.0 |

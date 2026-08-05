@@ -26,7 +26,7 @@ title: "国内平台 SSO 标准化与安全评测"
 | **WPS 365** | 企业 SSO 三端点 + 用户/应用 token + OpenAPI | [接入](./wps.md) | [53.5 / D](./wps-review.md) |
 | **华为云 WeLink** | WeCode 免登 code、应用 ticket 与成员 API | [接入](./welink.md) | [55.5 / C](./welink-review.md) |
 | **Microsoft 365 中国版（世纪互联运营）** | 中国国家云 OIDC/OAuth + Microsoft Graph | [接入](./microsoft365-china.md) | [84.5 / B](./microsoft365-china-review.md) |
-| **亚马逊云科技中国区域** | 独立 `aws-cn` 分区、STS、SigV4 与服务 API | [接入](./aws-china.md) | [73.5 / B](./aws-china-review.md) |
+| **亚马逊云科技中国区域** | Identity Center SAML/SCIM 控制台登录 + STS/SigV4 服务 API | [接入](./aws-china.md) | [82 / B](./aws-china-review.md) |
 | **极狐 GitLab** | OAuth + REST/GraphQL + 签名 Webhook | [接入](./jihu-gitlab.md) | [73.5 / B](./jihu-gitlab-review.md) |
 | **阿里云上的 Salesforce** | 连接应用 OAuth/OIDC + CRM API + 事件流 | [接入](./salesforce-china.md) | [72 / B](./salesforce-china-review.md) |
 
