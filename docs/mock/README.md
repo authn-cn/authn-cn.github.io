@@ -44,6 +44,7 @@ Mock 的价值在于**只 mock 你还没有的那部分**,其余用你自己的�
 |----------|--------------|--------|
 | RP / 客户端 | **Mock OP** | 把你 RP 的 issuer 指向 `https://mock.authn.tech`(自动发现 `/.well-known/openid-configuration`) |
 | OP / 授权服务器 | **Mock RP** | 打开 [`/rp/`](https://mock.authn.tech/rp/) 控制台,填你的 issuer 与 `client_id`,并把 `…/rp/callback` 加入白名单 |
+| OP 在内网 / WAF 之后 | **Mock RP（手动分步）** | 打开 [`/rp/manual`](https://mock.authn.tech/rp/manual),由你自己的浏览器逐步请求 OP,本站只做离线解析与验签([说明](./oidc.md#手动分步模式-op-在内网-waf-之后)) |
 | 受保护 API 但缺令牌来源 | **Mock OP** | 从 Mock OP 用 `client_credentials` 或授权码取 `access_token`,再拿去调你的 API |
 | API 客户端但缺受保护资源 | **Mock RS** | 用 Mock OP 签发的令牌调 [`/rs/api`](https://mock.authn.tech/rs/),验证你客户端的 401 / 403 处理 |
 | SP / 受信应用 | **Mock IdP** | 把 [`/saml/idp/metadata`](https://mock.authn.tech/saml/idp/metadata) 导入你的 SP |

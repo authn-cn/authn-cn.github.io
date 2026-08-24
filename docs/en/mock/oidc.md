@@ -31,6 +31,30 @@ Use this Mock as a **client**, connecting to **any external OP** (Keycloak, Auth
 
 > The callback address `https://mock.authn.tech/rp/callback` must be added to the external OP's whitelist.
 
+### Manual step-by-step mode (OP behind a corporate network / WAF)
+
+**Console: <https://mock.authn.tech/rp/manual>**
+
+The automatic mode above requires **this site to reach your OP directly**. If the OP sits behind a corporate network, a VPN, or a WAF / login portal, this publicly hosted site simply cannot connect to it — Discovery, token exchange, and the JWKS fetch all fail.
+
+Typical symptom: the security gateway returns an HTML block page with **HTTP 200** (rather than 401/403), JSON parsing then fails, and the page reports 502. The automatic mode now shows the HTTP status, `content-type`, and a body snippet so you can tell who blocked the request.
+
+Manual mode hands the networking half back to you — **this site sends no requests to your OP at all**; it only builds URLs and does offline parsing and verification:
+
+| Step | What you do | What this site does |
+|------|-------------|---------------------|
+| ① | Open `.well-known/openid-configuration` in a browser that *can* reach the OP and paste the JSON here (or fill in the endpoints by hand) | Parse the endpoints, check completeness |
+| ② | Click "start login" | Generate `state`/`nonce`/PKCE, build the authorization URL and **302** to it (the redirect is issued by *your* browser) |
+| ③ | Copy the generated curl, run it from a machine that can reach the OP, paste the token response back | Verify `state`, fill `code`, `code_verifier` and friends into the curl command |
+| ④ | — | Decode the ID Token offline, check `iss`/`aud`/`nonce`/`exp` |
+| ⑤ | Open `jwks_uri`, paste the JWKS back | Verify the signature locally with WebCrypto and render the verdict |
+
+Other notes:
+
+- If the client's redirect_uri whitelist only allows an internal address, you'll land on your own app after login — copy the full URL from the address bar into [paste callback URL](https://mock.authn.tech/rp/manual/callback) to continue.
+- Uncheck PKCE in step ① if the client doesn't have it enabled; add extra authorization parameters such as `prompt` or `acr_values` one `key=value` per line on the same page.
+- The login context is a signed JWT kept in an HttpOnly cookie (valid for 1 hour); a copyable duplicate is shown on the page so a lost cookie won't strand you.
+
 ## Resource Server (Protected API / Resource Server)
 
 **Info page: <https://mock.authn.tech/rs/>** · Protected endpoint `GET /rs/api`

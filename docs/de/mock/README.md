@@ -44,6 +44,7 @@ Der Wert des Mock liegt in **nur mocken Sie den Teil, den Sie noch nicht haben**
 |----------|--------------|--------|
 | RP / Client | **Mock OP** | Richten Sie issuer des RP auf `https://mock.authn.tech` (automatische Erkennung `/.well-known/openid-configuration`) |
 | OP / Autorisierungsserver | **Mock RP** | Öffnen Sie [`/rp/`](https://mock.authn.tech/rp/) Konsole, geben Sie Ihren issuer und `client_id` ein, und whitelist Sie `…/rp/callback` |
+| OP hinter Unternehmensnetz / WAF | **Mock RP (manuell)** | Öffnen Sie [`/rp/manual`](https://mock.authn.tech/rp/manual) — Ihr eigener Browser stellt jede Anfrage an den OP, diese Site parst und verifiziert nur offline ([Details](./oidc.md#manueller-schritt-für-schritt-modus-op-hinter-unternehmensnetz-waf)) |
 | Geschützte API aber fehlende Token-Quelle | **Mock OP** | Nutzen Sie Mock OP mit `client_credentials` oder Autorisierungscode um `access_token` zu erhalten, verwenden Sie es dann mit Ihrer API |
 | API-Client aber fehlende geschützte Ressource | **Mock RS** | Verwenden Sie Token, die von Mock OP signiert wurden, auf [`/rs/api`](https://mock.authn.tech/rs/), validieren Sie Ihres Clients 401 / 403 Behandlung |
 | SP / vertrauenswürdige Anwendung | **Mock IdP** | Importieren Sie [`/saml/idp/metadata`](https://mock.authn.tech/saml/idp/metadata) in Ihren SP |

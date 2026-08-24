@@ -31,6 +31,30 @@ Nutzen Sie diesen Mock als **Client**, verbinden Sie sich mit **jeden beliebigen
 
 > Rückruf-Adresse `https://mock.authn.tech/rp/callback` muss zur Whitelist des externen OP hinzugefügt werden.
 
+### Manueller Schritt-für-Schritt-Modus (OP hinter Unternehmensnetz / WAF)
+
+**Konsole: <https://mock.authn.tech/rp/manual>**
+
+Der obige automatische Modus setzt voraus, dass **diese Site Ihren OP direkt erreichen kann**. Liegt der OP hinter einem Unternehmensnetz, einem VPN oder einer WAF / einem Login-Portal, kommt diese öffentlich gehostete Site schlicht nicht an ihn heran — Discovery, Token-Tausch und JWKS-Abruf schlagen allesamt fehl.
+
+Typisches Symptom: Das Security-Gateway liefert eine HTML-Sperrseite mit **HTTP 200** (statt 401/403), das JSON-Parsing scheitert, und die Seite meldet 502. Der automatische Modus zeigt nun HTTP-Status, `content-type` und einen Auszug des Rumpfs an, damit erkennbar wird, wer die Anfrage blockiert hat.
+
+Der manuelle Modus gibt Ihnen die Netzwerk-Hälfte zurück — **diese Site sendet keinerlei Anfragen an Ihren OP**, sie baut nur URLs und wertet offline aus:
+
+| Schritt | Was Sie tun | Was diese Site tut |
+|---------|-------------|--------------------|
+| ① | `.well-known/openid-configuration` in einem Browser öffnen, der den OP *erreicht*, und das JSON hier einfügen (oder Endpunkte manuell eintragen) | Endpunkte parsen, Vollständigkeit prüfen |
+| ② | Auf „Login starten" klicken | `state`/`nonce`/PKCE erzeugen, Autorisierungs-URL bauen und **302** dorthin (die Weiterleitung sendet *Ihr* Browser) |
+| ③ | Das erzeugte curl kopieren, auf einem Rechner mit OP-Zugang ausführen, die Token-Antwort zurück einfügen | `state` prüfen, `code`, `code_verifier` usw. in den curl-Befehl einsetzen |
+| ④ | — | ID Token offline dekodieren, `iss`/`aud`/`nonce`/`exp` prüfen |
+| ⑤ | `jwks_uri` öffnen, JWKS zurück einfügen | Signatur lokal per WebCrypto verifizieren und Ergebnis ausgeben |
+
+Weitere Hinweise:
+
+- Erlaubt die redirect_uri-Whitelist des Clients nur eine interne Adresse, landen Sie nach dem Login auf Ihrer eigenen Anwendung — kopieren Sie die vollständige URL aus der Adresszeile in [Callback-URL einfügen](https://mock.authn.tech/rp/manual/callback), um fortzufahren.
+- Ist PKCE für den Client nicht aktiviert, in Schritt ① das Häkchen entfernen; zusätzliche Autorisierungsparameter wie `prompt` oder `acr_values` auf derselben Seite zeilenweise als `key=value` eintragen.
+- Der Login-Kontext ist ein signiertes JWT in einem HttpOnly-Cookie (1 Stunde gültig); eine kopierbare Zweitfassung steht auf der Seite, damit ein verlorenes Cookie Sie nicht blockiert.
+
 ## Resource Server (Ressourcenserver / geschützte API)
 
 **Info-Seite: <https://mock.authn.tech/rs/>** · Geschützter Endpunkt `GET /rs/api`
