@@ -1,0 +1,1 @@
+import{l as e,n as t}from"./app-D04jC65z.js";function n(){let n=t();return e(()=>n.value===`/en/`?`en`:n.value===`/de/`?`de`:`zh`)}function r(e){let t=n();return n=>{let r=e[t.value]||e.zh||{},i=e.zh||{};return n in r?r[n]:n in i?i[n]:n}}export{r as n,n as t};
